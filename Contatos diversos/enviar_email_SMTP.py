@@ -2,6 +2,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
+# simple code to send e-mails through smtplib
 
 s = smtplib.SMTP(host=usuario.servidor, port=usuario.porta)
 s.starttls()

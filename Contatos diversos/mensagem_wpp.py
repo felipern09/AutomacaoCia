@@ -1,6 +1,6 @@
 import urllib
 from openpyxl import load_workbook as l_w
-
+# simple code to send whatsapp messages through browser
 wb = l_w("AV.xlsm")
 sh = wb['Planilha1']
 x=1
@@ -13,9 +13,7 @@ while x<139:
     texto = urllib.parse.quote(mensagem)
     cel = urllib.parse.quote(numero)
     link = f'https://web.whatsapp.com/send?phone={cel}&text={texto}'
-    if numero == "None":
-        pass
-    else:
+    if numero:
         print(link)
         print(pessoa)
         print(email)

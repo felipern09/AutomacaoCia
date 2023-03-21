@@ -1,5 +1,6 @@
 import win32com.client as win32
 import os
+# simple code to send e-mails through win32com.client libary
 
 os.system('taskkill /im outlook.exe /f')
 outlook = win32.Dispatch('outlook.application')

@@ -1,4 +1,3 @@
-# Cadastra funcionário no Dexion, salva dados no banco e salva planilha com dados
 import pyautogui as pa
 import pyperclip as pp
 import function as f
@@ -15,6 +14,10 @@ from tkinter import *
 from tkinter import messagebox, ttk
 import tkinter.filedialog
 
+# this code automates the task process necessary for hiring a company employee. Made in tkinter, it was developed for
+# the desktop to be integrated with other HR programs in the company
+# it automates, through different processes, admissions of employees, interns or freelancers.
+# Each one with its specificity
 
 root = Tk()
 root.title("Atividades DP - Cia BSB")
