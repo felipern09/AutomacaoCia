@@ -4,14 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Admissao/admiss_geral_atualizado_com_banco.py" beforeDir="false" afterPath="$PROJECT_DIR$/Admissao/admiss_geral_atualizado_com_banco.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Contatos diversos/enviar_email.py" beforeDir="false" afterPath="$PROJECT_DIR$/Contatos diversos/enviar_email.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Contatos diversos/enviar_email_SMTP.py" beforeDir="false" afterPath="$PROJECT_DIR$/Contatos diversos/enviar_email_SMTP.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Contatos diversos/mensagem_wpp.py" beforeDir="false" afterPath="$PROJECT_DIR$/Contatos diversos/mensagem_wpp.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Desempenho/avaliacao_desemp.py" beforeDir="false" afterPath="$PROJECT_DIR$/Desempenho/avaliacao_desemp.py" afterDir="false" />
-    </list>
+    <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -28,13 +21,13 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Felipe/PycharmProjects/Automacao&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/Users/Felipe/PycharmProjects/appCia"
   }
-}</component>
+}]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
