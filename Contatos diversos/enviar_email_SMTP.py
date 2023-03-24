@@ -2,39 +2,35 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
+from dados import host, port, k1, em_rem
+from openpyxl import load_workbook as l_w
 # simple code to send e-mails through smtplib
 
-s = smtplib.SMTP(host=usuario.servidor, port=usuario.porta)
+s = smtplib.SMTP(host=host, port=port)
 s.starttls()
-s.login(email_remetente, senha)
+s.login(em_rem, k1)
 
-msg = MIMEMultipart()
-message = f'''
-        Olá, {str(personal.nome).title().split(sep=' ')[0]}!\n
-        \n
-        Seguem dados para o pagamento:\n
-        \n
-        PIX: 03732305000186
-        Banco: Itaú
-        Agência: 6205
-        C/C: 01588-3\n
-        Assim que o pagamento for feito, favor responder esse e-mail com o comprovante bancário.
-        \n
-        Atenciosamente,\n
-        Marcelo Gonçalves
-        '''
-# parameters of the message
-msg['From'] = email_remetente
-msg['To'] = 'felipe.rodrigues@ciaathletica.com.br'
-msg['Subject'] = "Aulas de personal - Cia Athletica"
-msg.attach(MIMEText(message, 'plain', _charset='utf-8'))
-
-# Anexo PNG
-arquivo_png = usuario.assinatura
-with open(arquivo_png, 'rb') as img_file:
-    imagem = MIMEImage(img_file.read())
-    msg.attach(imagem)
-
-s.send_message(msg)
-del msg
+wb = l_w('Nomes e e-mails.xlsx')
+sh = wb['Dados']
+x = 1
+while x <= len(sh['A']):
+    msg = MIMEMultipart()
+    message = f'''
+    Olá, {str(sh[f'A{x}'].value).title().split(sep=' ')[0]}!\n
+    \n
+    Para repor o encontro com colaboradores novatos cancelado no dia 21/03, abrimos novo horário hoje:\n
+    24/03:
+    14h às 15h30 - Sala 3.
+    \n
+    Atenciosamente,\n
+    Felipe Rodrigues
+    '''
+    # parameters of the message
+    msg['From'] = em_rem
+    msg['To'] = str(sh[f'B{x}'].value).lower()
+    msg['Subject'] = "Reposição Encontro Cinthia Guimarães"
+    msg.attach(MIMEText(message, 'plain', _charset='utf-8'))
+    s.send_message(msg)
+    del msg
+    x += 1
 s.quit()
