@@ -8,6 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
+from dados_servd import em_rem, em_ti, em_if, k1
 
 
 hoje = datetime.today()
@@ -40,9 +41,9 @@ cadastro = {'nome': str(sh["C3"].value).title().strip(), 'nasc_ed': sh["D3"].val
             'faculdade': str(sh["AV3"].value), 'semestre': str(sh["AS3"].value),
             'turno':str(sh["AT3"].value), 'conclusao': str(sh["AU3"].value),'salario': str(sh["AM3"].value),
             'hrsemanais': str(sh["AQ3"].value),'hrmensais': str(sh["AR3"].value)}
-email_remetente = 'felipe.rodrigues@ciaathletica.com.br'
+email_remetente = em_rem
 email_destinatario = 'felipe.rodrigs09@gmail.com'
-senha = 'Felipe090290'
+senha = k1
 lot = lotacao[f'{sh["AG3"].value}']
 caminho = r'\192.168.0.250'
 modelo = f'\\{caminho}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\Modelo'
@@ -156,7 +157,7 @@ html = r'''
 
 # setup the parameters of the message
 msg['From'] = email_remetente
-msg['To'] = 'wallace.fonseca@ciaathletica.com.br'
+msg['To'] = em_ti
 msg['Subject'] = f"Ficha Cadastral {str(cadastro['nome']).split(' ')[0]}"
 msg.attach(MIMEText(message, 'plain', _charset='utf-8'))
 msg.attach(MIMEText(html, "html"))
@@ -189,7 +190,7 @@ html = r'''
     '''
 # setup the parameters of the message
 msg['From'] = email_remetente
-msg['To'] = 'comercial.if@institutofecomerciodf.com.br'
+msg['To'] = em_if
 msg['Subject'] = f"Pedido TCE {str(cadastro['nome']).split(' ')[0]}"
 msg.attach(MIMEText(message, 'plain', _charset='utf-8'))
 msg.attach(MIMEText(html, "html"))
