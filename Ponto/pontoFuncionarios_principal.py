@@ -86,10 +86,21 @@ for linha in linhasNomes:
     dif = dif[['Data', 'DifEntr', 'DifSaida']]
     dif = dif.loc[(dif['DifEntr'] >= regra) | (dif['DifEntr'] + dif['DifSaida'] >= regra)]
     dif = dif.astype(str)
-    dif['DifEntr'] = dif['DifEntr'].map(lambda x: datetime.strftime(datetime.strptime(str(x).replace('0 days ','').replace('NaT', '00:00:00'), '%H:%M:%S'), '%H hora(s) e %M minutos'))
-    dif['DifSaida'] = dif['DifSaida'].map(lambda x: datetime.strftime(datetime.strptime(str(x).replace('0 days ','').replace('NaT', '00:00:00'), '%H:%M:%S'), '%H hora(s) e %M minutos'))
-    dif['DifEntr'] = dif['DifEntr'].map(lambda x: str(x).replace('00 hora(s) e 00 minutos', '-').replace('00 hora(s) e ', ''))
-    dif['DifSaida'] = dif['DifSaida'].map(lambda x: str(x).replace('00 hora(s) e 00 minutos', '-').replace('00 hora(s) e ', ''))
+    dif['DifEntr'] = dif['DifEntr'].map(
+        lambda x: datetime
+        .strftime(datetime.strptime(str(x).replace('0 days ', '').replace('NaT', '00:00:00'), '%H:%M:%S'),
+                  '%H hora(s) e %M minutos')
+    )
+    dif['DifSaida'] = dif['DifSaida'].map(
+        lambda x: datetime.strftime(datetime.strptime(str(x).replace('0 days ', '').replace('NaT', '00:00:00'),
+                                                      '%H:%M:%S'), '%H hora(s) e %M minutos')
+    )
+    dif['DifEntr'] = dif['DifEntr'].map(
+        lambda x: str(x).replace('00 hora(s) e 00 minutos', '-').replace('00 hora(s) e ', '')
+    )
+    dif['DifSaida'] = dif['DifSaida'].map(
+        lambda x: str(x).replace('00 hora(s) e 00 minutos', '-').replace('00 hora(s) e ', '')
+    )
     plan = plan[['Data', 0, 1, 2, 3]]
     plan = plan.merge(dif, on='Data', how='outer')
     plan = plan.astype(str)
