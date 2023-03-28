@@ -33,7 +33,8 @@ def selecionarfunc():
 
 
 funcionario = Frame(my_notebook, width=10, height=20)
-ttk.Label(funcionario, width=40, text="Escolher planilha relatório de uniformes").grid(column=1, row=1, padx=25, pady=1, sticky=W)
+ttk.Label(funcionario, width=40, text="Escolher planilha relatório de uniformes").grid(column=1, row=1, padx=25, pady=1,
+                                                                                       sticky=W)
 ttk.Button(funcionario, text="Escolha a planilha", command=selecionarfunc).grid(column=1, row=1, padx=350, pady=1,
                                                                                 sticky=W)
 
@@ -51,11 +52,11 @@ def gerar_recibo(local, nome, cargo, cpf, genero, tamanho1, tamanho2=''):
 
     if tamanho2 != '':
         recibo = docx.Document('Recibo.docx')
-        recibo.paragraphs[11].text = str(recibo.paragraphs[11].text).replace('#nome', pessoa).replace('#num_cpf',
-                                                                                                    cpf_ed).replace('#tam',
-                                                                                                                 tamanho1+' e '+tamanho2).replace(
+        recibo.paragraphs[11].text = str(recibo.paragraphs[11].text)\
+            .replace('#nome', pessoa).replace('#num_cpf', cpf_ed).replace('#tam', tamanho1+' e '+tamanho2).replace(
             '#genero', str(gen).lower())
-        recibo.paragraphs[19].text = str(recibo.paragraphs[19].text).replace('#data', datetime.strftime(hoje, '%d/%m/%Y'))
+        recibo.paragraphs[19].text = str(recibo.paragraphs[19].text)\
+            .replace('#data', datetime.strftime(hoje, '%d/%m/%Y'))
         recibo.paragraphs[24].text = str(recibo.paragraphs[24].text).replace('#nome', pessoa)
         recibo.paragraphs[25].text = str(recibo.paragraphs[25].text).replace('#cargo', cargo)
         recibo.save(f'Recibo_alterado {pessoa}.docx')
@@ -117,8 +118,11 @@ def gerar_recibo(local, nome, cargo, cpf, genero, tamanho1, tamanho2=''):
         tkinter.messagebox.showinfo(title='Recibo ok!', message='Recibo impresso com sucesso!')
     else:
         recibo = docx.Document('Recibo.docx')
-        recibo.paragraphs[11].text = str(recibo.paragraphs[11].text).replace('#nome', pessoa).replace('#num_cpf', cpf_ed).replace('#tam', tamanho1).replace('#genero', str(gen).lower())
-        recibo.paragraphs[19].text = str(recibo.paragraphs[19].text).replace('#data', datetime.strftime(hoje, '%d/%m/%Y'))
+        recibo.paragraphs[11].text = str(recibo.paragraphs[11].text)\
+            .replace('#nome', pessoa).replace('#num_cpf', cpf_ed)\
+            .replace('#tam', tamanho1).replace('#genero', str(gen).lower())
+        recibo.paragraphs[19].text = str(recibo.paragraphs[19].text)\
+            .replace('#data', datetime.strftime(hoje, '%d/%m/%Y'))
         recibo.paragraphs[24].text = str(recibo.paragraphs[24].text).replace('#nome', pessoa)
         recibo.paragraphs[25].text = str(recibo.paragraphs[25].text).replace('#cargo', cargo)
         recibo.save(f'Recibo_alterado {pessoa}.docx')
@@ -202,7 +206,9 @@ def adicionartamanho():
         combotam1.config(values=lista_tamanhos)
 
 
-onde = ttk.Checkbutton(funcionario, text='Mais de um tamanho.', variable=maisum, onvalue=1, offvalue=0, command=adicionartamanho)
+onde = ttk.Checkbutton(
+    funcionario, text='Mais de um tamanho.', variable=maisum, onvalue=1, offvalue=0, command=adicionartamanho
+)
 onde.grid(column=1, row=17, padx=25, pady=1, sticky=W)
 
 
@@ -239,11 +245,10 @@ ttk.Button(funcionario, text="Carregar planilha", command=lambda: [carregarfunc(
                                                                                                       padx=350, pady=25,
                                                                                                       sticky=W)
 ttk.Button(funcionario, width=20, text="Gerar recibo",
-           command=lambda: [gerar_recibo(caminho.get(), nome.get(), str(labelcargo['text']), str(labelcpf['text']), str(labelgenero['text']), tamanho.get(), tamanho2.get())]).grid(column=1, row=28, padx=325, pady=1, sticky=W)
+           command=lambda: [
+               gerar_recibo(caminho.get(), nome.get(), str(labelcargo['text']), str(labelcpf['text']),
+                            str(labelgenero['text']), tamanho.get(), tamanho2.get())
+           ]).grid(column=1, row=28, padx=325, pady=1, sticky=W)
 funcionario.pack(fill='both', expand=0)
 my_notebook.add(funcionario, text='Gerar Recibo de uniforme')
 root.mainloop()
-
-
-
-
