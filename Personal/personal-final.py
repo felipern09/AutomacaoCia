@@ -1344,7 +1344,14 @@ ttk.Label(verificar, text="R$").grid(column=2, row=10, sticky=W)
 acrescimo = StringVar()
 acres = ttk.Entry(verificar, width=10, textvariable=acrescimo)
 acres.grid(column=2, row=11, sticky=W)
-ttk.Button(verificar, text="Lançar ajuste", command=lambda: [ajuste(combo.get(), comboaulad.get(), aulas.get(), desconto.get(), comboaulaa.get(), aulasacr.get(), acrescimo.get()), tkinter.messagebox.showinfo(title='Lançamento ok!', message='Ajuste lançado com sucesso!'), desconto.set(''), acrescimo.set(''), aulas.set(''), aulasacr.set(''), descaula.delete(0, END), desc.delete(0, END), comboaulad.set(''), comboaulaa.set(''), acresaula.delete(0, END), acres.delete(0, END)]).grid(column=3, row=13, sticky=E)
+ttk.Button(verificar, text="Lançar ajuste", command=lambda: [
+    ajuste(combo.get(), comboaulad.get(), int(aulas.get()), int(desconto.get()), comboaulaa.get(),
+    int(aulasacr.get()), int(acrescimo.get())),
+    tkinter.messagebox.showinfo(title='Lançamento ok!',message='Ajuste lançado com sucesso!'),
+    desconto.set(''), acrescimo.set(''), aulas.set(''), aulasacr.set(''), descaula.delete(0, END),
+    desc.delete(0, END), comboaulad.set(''), comboaulaa.set(''), acresaula.delete(0, END),
+    acres.delete(0, END)
+]).grid(column=3, row=13, sticky=E)
 ttk.Button(verificar, text="Enviar todos e-mails", command=lambda: [mandar_email(), tkinter.messagebox.showinfo(title='Sucesso!', message='Operação efetuada com sucesso!')]).grid(column=1, row=20, padx=20, sticky=W, pady=20)
 verificar.pack(fill='both', expand=1)
 my_notebook.add(verificar, text='Verificar')
