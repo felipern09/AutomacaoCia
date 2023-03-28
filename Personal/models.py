@@ -93,4 +93,3 @@ class Usuario(Base):
 
 
 Base.metadata.create_all(engine)
-
