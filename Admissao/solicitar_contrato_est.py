@@ -11,8 +11,9 @@ from email import encoders
 from dados_servd import em_rem, em_ti, em_if, k1
 
 
+# this code automate the process of creation of tree documents for a new intern
+# set up interns datas and serv path
 hoje = datetime.today()
-
 wb = l_w('Cadastro Funcionários.xlsm')
 sh = wb['Admitidos']
 lotacao = {
@@ -57,6 +58,7 @@ os.makedirs(f'\\{caminho}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Fun
 os.makedirs(f'\\{caminho}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Rescisao')
 pasta_contratuais = f'\\{caminho}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Contratuais'
 
+# change tree docx model files with intern data and save pdfs files
 solicitacao = docx.Document(modelo + r'\Solicitacao MODELO - Copia.docx')
 solicitacao.tables[0].rows[4].cells[0].paragraphs[0].text = str(solicitacao.tables[0].rows[4].cells[0].paragraphs[0].text).replace('#supervisor_estagio', f'{lot[1]}')
 solicitacao.tables[0].rows[5].cells[1].paragraphs[0].text = str(solicitacao.tables[0].rows[5].cells[1].paragraphs[0].text).replace('#cargo', f'{lot[3]}')
@@ -101,12 +103,12 @@ carta_banco.save(pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).spli
 docx2pdf.convert(pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.docx', pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.pdf')
 os.remove(pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.docx')
 
-
+# set up smtpp connection
 s = smtplib.SMTP(host='smtp.office365.com', port=587)
 s.starttls()
 s.login(email_remetente, senha)
 
-# Enviar carta do banco para estag
+# send e-mail to intern with a pdf file so he/she can go to bank to open an account
 msg = MIMEMultipart()
 arquivo = pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.pdf'
 message = f'''
@@ -127,13 +129,13 @@ html = r'''
     </html>
     '''
 
-# setup the parameters of the message
+# set up the parameters of the message
 msg['From'] = email_remetente
 msg['To'] = cadastro['email']
 msg['Subject'] = "Carta para Abertura de conta"
 msg.attach(MIMEText(message, 'plain', _charset='utf-8'))
 msg.attach(MIMEText(html, "html"))
-# Anexo pdf
+# attach pdf file
 part = MIMEBase('application', "octet-stream")
 part.set_payload(open(arquivo, "rb").read())
 encoders.encode_base64(part)
@@ -142,8 +144,7 @@ msg.attach(part)
 s.send_message(msg)
 del msg
 
-
-# Enviar ficha cadastral para Wallace
+# send e-mail to coworker asking to register the intern
 msg = MIMEMultipart()
 arquivo = pasta_contratuais + f'\\Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.pdf'
 message = f'''Oi, Wallace!\n\nSegue a ficha cadastral do(a) estagiário(a) {cadastro["nome"]}.\n\nAbs.,\nFelipe'''
@@ -155,13 +156,13 @@ html = r'''
     </html>
     '''
 
-# setup the parameters of the message
+# set up the parameters of the message
 msg['From'] = email_remetente
 msg['To'] = em_ti
 msg['Subject'] = f"Ficha Cadastral {str(cadastro['nome']).split(' ')[0]}"
 msg.attach(MIMEText(message, 'plain', _charset='utf-8'))
 msg.attach(MIMEText(html, "html"))
-# Anexo pdf
+# attach pdf file
 part = MIMEBase('application', "octet-stream")
 part.set_payload(open(arquivo, "rb").read())
 encoders.encode_base64(part)
@@ -170,7 +171,7 @@ msg.attach(part)
 s.send_message(msg)
 del msg
 
-# Enviar pedido de TCE para IF
+# send document asking for the intern contract
 msg = MIMEMultipart()
 arquivo = pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf'
 message = f'''
@@ -188,13 +189,13 @@ html = r'''
         </body>
     </html>
     '''
-# setup the parameters of the message
+# set up the parameters of the message
 msg['From'] = email_remetente
 msg['To'] = em_if
 msg['Subject'] = f"Pedido TCE {str(cadastro['nome']).split(' ')[0]}"
 msg.attach(MIMEText(message, 'plain', _charset='utf-8'))
 msg.attach(MIMEText(html, "html"))
-# Anexo pdf
+# attach pdf file
 part = MIMEBase('application', "octet-stream")
 part.set_payload(open(arquivo, "rb").read())
 encoders.encode_base64(part)
