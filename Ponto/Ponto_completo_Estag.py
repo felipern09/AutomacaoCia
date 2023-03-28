@@ -2,23 +2,23 @@ from openpyxl import load_workbook as l_w
 from openpyxl.styles import NamedStyle
 import pandas as pd
 from datetime import datetime as dt
-import time as t
-import os
 import win32com.client as client
 from PIL import ImageGrab
-from datetime import timedelta
 import os
 
 # Ler arquivo txt dos registror rejeitados
-geral = pd.read_csv(r'C:\Users\Felipe Rodrigues\Desktop\Relatorios Ponto\Rej - 16-03-2023.txt', sep=' ', header=None, encoding='iso8859-1')
-geral = geral.rename(columns={0: 'matricula',16: 'data', 17: 'dia', 18: 'hora'})
+geral = pd.read_csv(
+    r'C:\Users\Felipe Rodrigues\Desktop\Relatorios Ponto\Rej - 16-03-2023.txt', sep=' ', header=None,
+    encoding='iso8859-1'
+)
+geral = geral.rename(columns={0: 'matricula', 16: 'data', 17: 'dia', 18: 'hora'})
 geral = geral[geral.dia != 'Batida']
 geral = geral[geral.matricula < 9999]
-mat =[]
-mat_unicas=[]
+mat = []
+mat_unicas = []
 for matricula in geral['matricula']:
     mat.append(matricula)
-    mat_unicas= list(set(mat))
+    mat_unicas = list(set(mat))
 for matr in mat_unicas:
     geral2 = geral[geral.matricula == matr]
     geral2 = geral2.set_index('matricula')
@@ -144,7 +144,10 @@ for matr in mat_unicas:
                 # t.sleep(2)
                 # inserir código de envio de email aqui
                 excel = client.Dispatch('Excel.Application')
-                plan = excel.Workbooks.Open(r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Ponto\xls\Ponto Estágio - {}.xlsx'.format(nome))
+                plan = excel.Workbooks.Open(
+                    r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Ponto\xls\Ponto Estágio - {}.xlsx'
+                    .format(nome)
+                )
                 folha = plan.Sheets['Sheet1']
                 excel.visible = 0
                 copyrange = folha.Range(f'B1:F{linha}')
@@ -162,12 +165,9 @@ for matr in mat_unicas:
                 message.To = 'felipe.rodrigs09@gmail.com'
                 message.Subject = 'Relatório de Ponto'
                 message.HTMLBody = html_body
-                message.Attachments.Add(f'C:\\Users\\Felipe Rodrigues\\PycharmProjects\\AutomacaoCia\\Ponto\\Ponto {str(nome).title().split(" ")[0]}.png')
+                message.Attachments.Add(
+                    f'C:\\Users\\Felipe Rodrigues\\PycharmProjects\\AutomacaoCia\\Ponto\\'
+                    f'Ponto {str(nome).title().split(" ")[0]}.png'
+                )
                 message.Send()
-
-
 # # procurar na planilha base.xlsx nome e-mail matricula no ponto e horarios de entrada e saida
-
-
-
-

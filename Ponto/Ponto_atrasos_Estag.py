@@ -7,19 +7,19 @@ import os
 
 # Ler arquivo txt dos registror rejeitados
 geral = pd.read_csv('Rejeitados.txt', sep=' ', header=None, encoding='iso8859-1')
-geral = geral.rename(columns={0: 'matricula',16: 'data', 17: 'dia', 18: 'hora'})
+geral = geral.rename(columns={0: 'matricula', 16: 'data', 17: 'dia', 18: 'hora'})
 geral = geral[geral.dia != 'Batida']
 geral = geral[geral.matricula < 9999]
-mat =[]
-mat_unicas=[]
+mat = []
+mat_unicas = []
 for matricula in geral['matricula']:
     mat.append(matricula)
-    mat_unicas= list(set(mat))
+    mat_unicas = list(set(mat))
 for matr in mat_unicas:
     geral2 = geral[geral.matricula == matr]
     geral2 = geral2.set_index('matricula')
     geral2 = geral2.dropna(axis='columns')
-    geral2 = geral2.drop(geral2.iloc[:, [2,3,4,5]], axis=1)
+    geral2 = geral2.drop(geral2.iloc[:, [2, 3, 4, 5]], axis=1)
     geral2['dia'] = pd.to_datetime(geral2['dia'], format='%d/%m/%Y')
     geral2['dia'] = geral2['dia'].apply(lambda y: dt.strftime(y, '%d/%m/%Y'))
     geral2['hora'] = geral2['hora'].apply(lambda x: f'{x}:00')
@@ -200,9 +200,4 @@ for matr in mat_unicas:
             entradacerta3 = timedelta(hours=ent3.hour, minutes=ent3.minute, seconds=ent3.second)
             saidacerta3 = timedelta(hours=sai3.hour, minutes=sai3.minute, seconds=sai3.second)
             regra = timedelta(hours=0, minutes=10, seconds=0)
-
 # # procurar na planilha base.xlsx nome e-mail matricula no ponto e horarios de entrada e saida
-
-
-
-
