@@ -1,11 +1,9 @@
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy import MetaData
-from sqlalchemy.orm import declarative_base, sessionmaker
-from sqlalchemy import Table, Column, Integer, Float, String, ForeignKey, Boolean, DateTime
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, Integer, Float, String
 
 engine = create_engine("sqlite+pysqlite:///colaboradores.db", echo=True, future=True)
-
 metadata_obj = MetaData()
 Base = declarative_base()
 

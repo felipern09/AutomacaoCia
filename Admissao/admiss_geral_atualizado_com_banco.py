@@ -6,18 +6,16 @@ import time as t
 from models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
 from openpyxl import load_workbook as l_w
-from listas import horarios, cargos, departamentos, tipodecontrato, Faculdades, municipios
+from listas import horarios, cargos, departamentos, tipodecontrato, municipios
 import os
 import tkinter.filedialog
-from tkinter import ttk, messagebox, Text
+from tkinter import ttk, messagebox
 from tkinter import *
-from tkinter import messagebox, ttk
-import tkinter.filedialog
 
 # this code automates the task process necessary for hiring a company employee. Made in tkinter, it was developed for
 # the desktop to be integrated with other HR programs in the company
 # it automates, through different processes, admissions of employees, interns or freelancers.
-# Each one with its specificity
+# each one with its specificity
 
 root = Tk()
 root.title("Atividades DP - Cia BSB")

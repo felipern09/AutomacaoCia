@@ -1,15 +1,16 @@
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.image import MIMEImage
 from dados import host, port, k1, em_rem
 from openpyxl import load_workbook as l_w
-# simple code to send e-mails through smtplib
 
+
+# simple code to send e-mails through smtplib
+# set up smtp connection
 s = smtplib.SMTP(host=host, port=port)
 s.starttls()
 s.login(em_rem, k1)
-
+# send e-mails to a list of employees
 wb = l_w('Nomes e e-mails.xlsx')
 sh = wb['Dados']
 x = 1

@@ -1,10 +1,13 @@
 import urllib
+from urllib import parse
 from openpyxl import load_workbook as l_w
+
+
 # simple code to send whatsapp messages through browser
 wb = l_w("AV.xlsm")
 sh = wb['Planilha1']
-x=1
-while x<139:
+x = 1
+while x < len(sh['A']):
     pessoa = str(sh[f"B{x}"].value).split(' ')[0]
     email = str(sh[f"D{x}"].value)
     numero = str(sh[f"H{x}"].value)
@@ -18,4 +21,4 @@ while x<139:
         print(pessoa)
         print(email)
         print(numero)
-    x=x+1
+    x += 1
