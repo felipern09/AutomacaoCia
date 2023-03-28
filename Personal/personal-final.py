@@ -35,7 +35,7 @@ my_notebook = ttk.Notebook(root)
 my_notebook.pack()
 
 # Variables
-nomesaulas = ['Simples 1h', 'Simples 2h', 'Dupla 1h', 'Dupla 2h','Tripla 1h', 'Tripla 2h']
+nomesaulas = ['Simples 1h', 'Simples 2h', 'Dupla 1h', 'Dupla 2h', 'Tripla 1h', 'Tripla 2h']
 hoje = datetime.today()
 Session = sessionmaker(bind=engine)
 session = Session()
@@ -44,25 +44,27 @@ if session.query(Aulas).filter_by(mes=f'{hoje.month}/{hoje.year}').first():
 else:
     ultima_plan = f'{hoje.month - 1}/{hoje.year}'
 
-referencia = ['1/2023','2/2023','3/2023','4/2023','5/2023','6/2023','7/2023','8/2023','9/2023','10/2023','11/2023','12/2023',
-              '1/2024', '2/2024', '3/2024', '4/2024', '5/2024', '6/2024', '7/2024', '8/2024', '9/2024','10/2024', '11/2024', '12/2024',
-              '1/2025', '2/2025', '3/2025', '4/2025', '5/2025', '6/2025', '7/2025', '8/2025', '9/2025','10/2025', '11/2025', '12/2025',
-              '1/2026', '2/2026', '3/2026', '4/2026', '5/2026', '6/2026', '7/2026', '8/2026', '9/2026','10/2026', '11/2026', '12/2026',
-              '1/2027', '2/2027', '3/2027', '4/2027', '5/2027', '6/2027', '7/2027', '8/2027', '9/2027','10/2027', '11/2027', '12/2027',
-              '1/2028', '2/2028', '3/2028', '4/2028', '5/2028', '6/2028', '7/2028', '8/2028', '9/2028','10/2028', '11/2028', '12/2028',
-              '1/2029', '2/2029', '3/2029', '4/2029', '5/2029', '6/2029', '7/2029', '8/2029', '9/2029','10/2029', '11/2029', '12/2029',
-              '1/2030', '2/2030', '3/2030', '4/2030', '5/2030', '6/2030', '7/2030', '8/2030', '9/2030','10/2030', '11/2030', '12/2030',
-              '1/2031', '2/2031', '3/2031', '4/2031', '5/2031', '6/2031', '7/2031', '8/2031', '9/2031','10/2031', '11/2031', '12/2031',
-              '1/2032', '2/2032', '3/2032', '4/2032', '5/2032', '6/2032', '7/2032', '8/2032', '9/2032','10/2032', '11/2032', '12/2032',
-              '1/2033', '2/2033', '3/2033', '4/2033', '5/2033', '6/2033', '7/2033', '8/2033', '9/2033','10/2033', '11/2033', '12/2033']
+referencia = ['1/2023', '2/2023', '3/2023', '4/2023', '5/2023', '6/2023', '7/2023', '8/2023', '9/2023', '10/2023',
+              '11/2023', '12/2023', '1/2024', '2/2024', '3/2024', '4/2024', '5/2024', '6/2024', '7/2024', '8/2024',
+              '9/2024', '10/2024', '11/2024', '12/2024', '1/2025', '2/2025', '3/2025', '4/2025', '5/2025', '6/2025',
+              '7/2025', '8/2025', '9/2025', '10/2025', '11/2025', '12/2025', '1/2026', '2/2026', '3/2026', '4/2026',
+              '5/2026', '6/2026', '7/2026', '8/2026', '9/2026', '10/2026', '11/2026', '12/2026', '1/2027', '2/2027',
+              '3/2027', '4/2027', '5/2027', '6/2027', '7/2027', '8/2027', '9/2027', '10/2027', '11/2027', '12/2027',
+              '1/2028', '2/2028', '3/2028', '4/2028', '5/2028', '6/2028', '7/2028', '8/2028', '9/2028', '10/2028',
+              '11/2028', '12/2028', '1/2029', '2/2029', '3/2029', '4/2029', '5/2029', '6/2029', '7/2029', '8/2029',
+              '9/2029', '10/2029', '11/2029', '12/2029', '1/2030', '2/2030', '3/2030', '4/2030', '5/2030', '6/2030',
+              '7/2030', '8/2030', '9/2030', '10/2030', '11/2030', '12/2030', '1/2031', '2/2031', '3/2031', '4/2031',
+              '5/2031', '6/2031', '7/2031', '8/2031', '9/2031', '10/2031', '11/2031', '12/2031', '1/2032', '2/2032',
+              '3/2032', '4/2032', '5/2032', '6/2032', '7/2032', '8/2032', '9/2032', '10/2032', '11/2032', '12/2032',
+              '1/2033', '2/2033', '3/2033', '4/2033', '5/2033', '6/2033', '7/2033', '8/2033', '9/2033', '10/2033',
+              '11/2033', '12/2033']
 
 
-# Functions
 def cadastrarpersonal(nome, email, tel, tipo):
     if tipo == 1:
-        tipo='Interno'
+        tipo = 'Interno'
     else:
-        tipo='Externo'
+        tipo = 'Externo'
     pessoa = Personal(nome=str(nome), email=str(email), whatsapp=str(tel), tipo_personal=str(tipo), status='Ativo')
     session.add(pessoa)
     session.commit()
@@ -399,9 +401,12 @@ def gerar_cobranca(caminho):
             else:
                 creditomesp = 0
                 debitomesp = 0
-            aulas = Aulas(personal=prof.id, mes=str(hoje.month)+'/'+str(hoje.year), simples1=simples1,
-                  simples2=simples2, dupla1=dupla1, dupla2=dupla2, tripla1=tripla1, tripla2=tripla2,
-                  valortotalemdia=valor_total - creditomesp + debitomesp, valortotalatraso=valor_totalnd - creditomesp + debitomesp)
+            aulas = Aulas(
+                personal=prof.id, mes=str(hoje.month)+'/'+str(hoje.year), simples1=simples1,
+                simples2=simples2, dupla1=dupla1, dupla2=dupla2, tripla1=tripla1, tripla2=tripla2,
+                valortotalemdia=valor_total - creditomesp + debitomesp,
+                valortotalatraso=valor_totalnd - creditomesp + debitomesp
+            )
             session.add(aulas)
             session.commit()
         else:
@@ -1085,17 +1090,17 @@ def janeladadospers():
     j4l1 = ttk.Label(j4, text=f"Tipo: ")
     j4l1.grid(column=0, row=3, sticky=W, pady=5, padx=15)
     texttipo = StringVar()
-    j4e1 = ttk.Entry(j4, width=35, text=texttipo)
+    j4e1 = ttk.Entry(j4, width=35, textvariable=texttipo)
     j4e1.grid(column=1, row=3, sticky=W, pady=5, padx=15)
     j4l2 = ttk.Label(j4, text=f"Whatsapp: ")
     j4l2.grid(column=0, row=4, sticky=W, pady=5, padx=15)
     textwpp = StringVar()
-    j4e2 = ttk.Entry(j4, width=35, text=textwpp)
+    j4e2 = ttk.Entry(j4, width=35, textvariable=textwpp)
     j4e2.grid(column=1, row=4, sticky=W, pady=5, padx=15)
     j4l3 = ttk.Label(j4, text=f"E-mail: ")
     j4l3.grid(column=0, row=5, sticky=W, pady=5, padx=15)
     textemail = StringVar()
-    j4e3 = ttk.Entry(j4, width=35, text=textemail)
+    j4e3 = ttk.Entry(j4, width=35, textvariable=textemail)
     j4e3.grid(column=1, row=5, sticky=W, pady=5, padx=15)
     quem = StringVar()
 
@@ -1429,7 +1434,7 @@ def valoresrecibo(event):
 
 
 varcomborecibo = StringVar()
-comborecibo = ttk.Combobox(recibos, values=values, textvariable=varcomborecibo, text='Nome', width=50)
+comborecibo = ttk.Combobox(recibos, values=values, textvariable=varcomborecibo, width=50)
 comborecibo.grid(column=1, row=2, padx=20, sticky=E)
 comborecibo.bind("<<ComboboxSelected>>", valoresrecibo)
 ttk.Button(recibos, text="Enviar recibo por e-mail", command=lambda: [gerarecibo(comborecibo.get()),tkinter.messagebox.showinfo(title='Recibo ok!', message='Recibo enviado com sucesso!')]).grid(column=2, row=24, padx=20, pady=20, sticky=W)
@@ -1469,7 +1474,7 @@ def valoresinad(event):
 
 
 varcomboinad = StringVar()
-comboinad = ttk.Combobox(inadimplentes, values=values, textvariable=varcomboinad, text='Nome', width=50)
+comboinad = ttk.Combobox(inadimplentes, values=values, textvariable=varcomboinad, width=50)
 comboinad.grid(column=1, row=2, padx=20, sticky=E)
 comboinad.bind("<<ComboboxSelected>>", valoresinad)
 ttk.Button(inadimplentes, text="Enviar cobrança para todos", command=lambda: [cobrar(), tkinter.messagebox.showinfo(title='Cobrança ok!', message='Cobrança enviada com sucesso!')]).grid(column=2, row=24, padx=20, pady=20, sticky=W)
