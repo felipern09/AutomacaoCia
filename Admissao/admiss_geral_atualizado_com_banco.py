@@ -704,8 +704,8 @@ def cadastro_estagiario(solicitar_contr='', caminho='', editar=0, ondestou=0, no
         solicitacao.tables[0].rows[15].cells[0].paragraphs[0].text = str(
             solicitacao.tables[0].rows[15].cells[0].paragraphs[0].text).replace('#nasc',
                                                                                 datetime.strftime(cadastro['nasc_ed'],
-                                                                                                  '%d/%m/%Y')).replace(
-            '#rg', cadastro['rg']).replace('#cpf', cadastro['cpf'])
+                                                                                                  '%d/%m/%Y')
+                                                                                ).replace('#rg', cadastro['rg']).replace('#cpf', cadastro['cpf'])
         solicitacao.tables[0].rows[16].cells[0].paragraphs[0].text = str(
             solicitacao.tables[0].rows[16].cells[0].paragraphs[0].text).replace('#sexo', cadastro['genero'])
         solicitacao.tables[0].rows[17].cells[0].paragraphs[0].text = str(
@@ -884,126 +884,142 @@ def cadastro_estagiario(solicitar_contr='', caminho='', editar=0, ondestou=0, no
     else:
         if editar == 0:
             if ondestou == 0:
-                pass
+                # Cadastro iniciado na Cia
+                # falta substituir pa.click por cliques nas imagens do dexion
+                wb = l_w(caminho, read_only=False)
+                sh = wb['Respostas ao formulário 1']
+                num, name = nome.strip().split(' - ')
+                linha = int(num)
+                if str(sh[f'E{linha}'].value) == 'Masculino':
+                    cargo = 'ESTAGIÁRIO'
+                else:
+                    cargo = 'ESTAGIÁRIA'
+                brasilia = 5300108
+                pessoa = Colaborador(
+                    matricula=matricula,
+                    nome=str(sh[f'C{linha}'].value).upper(),
+                    admiss=admissao,
+                    nascimento=str(sh[f'D{linha}'].value),
+                    cpf=str(sh[f'V{linha}'].value),
+                    rg=str(sh[f'W{linha}'].value),
+                    email=str(sh[f'B{linha}'].value),
+                    genero=str(sh[f'E{linha}'].value),
+                    estado_civil=str(sh[f'F{linha}'].value),
+                    instru='08',
+                    nacional='Brasileira',
+                    cod_municipionas=brasilia,
+                    cid_nas='Brasília',
+                    uf_nas='DF',
+                    pai=str(sh[f'M{linha}'].value).upper(),
+                    mae=str(sh[f'N{linha}'].value).upper(),
+                    endereco=str(sh[f'O{linha}'].value),
+                    num=str(sh[f'P{linha}'].value),
+                    bairro=str(sh[f'Q{linha}'].value),
+                    cep=str(sh[f'R{linha}'].value),
+                    cidade='Brasília',
+                    uf='DF',
+                    cod_municipioend=brasilia,
+                    tel=str(sh[f'U{linha}'].value),
+                    depto=str(sh[f'AG{linha}'].value),
+                    cargo=cargo,
+                    horario=str(sh[f'AI{linha}'].value),
+                    salario=salario,
+                    tipo_contr=0,
+                    hr_sem='25', hr_mens='100'
+                )
+
+                pasta = '\\\Qnapcia\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{}'.format(
+                    pessoa.nome)
+
+                pa.hotkey('alt', 'tab'), pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(0.5), pa.press(
+                    'i'), t.sleep(5)
+                pa.write(pessoa.matricula), pa.press('enter'), t.sleep(5), pp.copy(pessoa.nome), pa.hotkey('ctrl',
+                                                                                                           'v'), pa.press(
+                    'tab')
+                pa.write(pessoa.cpf), pa.press('tab', 3), pa.write(pessoa.genero), pa.press('tab'), pa.write(
+                    pessoa.raca), pa.press('tab', 2)
+                pa.write(pessoa.instru), pa.press('tab'), pa.write(pessoa.est_civ), pa.press('tab'), pa.write(
+                    pessoa.nacional), pa.press(
+                    'tab', 4)
+                pa.write(pessoa.nasc), pa.press('tab'), pp.copy(pessoa.natu), pa.hotkey('ctrl', 'v'), pa.press(
+                    'tab'), pa.write(
+                    pessoa.uf)
+                pa.press('tab'), pa.write(pessoa.munic), pa.press('tab'), pp.copy(pessoa.pai), pa.hotkey('ctrl',
+                                                                                                         'v'), pa.press(
+                    'tab')
+                pa.write(pessoa.pais), pa.press('tab'), pp.copy(pessoa.mae), pa.hotkey('ctrl', 'v'), pa.press(
+                    'tab'), pa.write(
+                    pessoa.pais)
+
+                # #clique em documentos
+                pa.click(-1035, 405), pa.press('tab'), pa.write(pessoa.rg)
+                # #clique em endereço
+                pa.click(-973, 407), pa.press('tab', 2), pp.copy(pessoa.end), pa.hotkey('ctrl', 'v')
+                pa.press('tab'), pa.write(pessoa.num), pa.press('tab', 2), pp.copy(pessoa.bairro), pa.hotkey('ctrl',
+                                                                                                             'v'), pa.press(
+                    'tab')
+                pp.copy(pessoa.cid), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.uf), pa.press(
+                    'tab'), pa.write(
+                    pessoa.cep)
+                pa.press('tab'), pa.write(pessoa.munic), pa.press('tab'), pa.write(pessoa.tel), pa.press('tab',
+                                                                                                         2), pa.write(
+                    pessoa.email)
+                # #clique em dados contratuais
+                pa.click(-980, 379), pa.press('tab'), pa.write(pessoa.admissao), pa.press('tab'), pa.write(
+                    '901'), pa.press('tab',
+                                     7)
+                pa.press('n'), pa.press('tab'), pa.press('4'), pa.press('tab'), pp.copy(pessoa.area), pa.hotkey('ctrl',
+                                                                                                                'v'), pa.press(
+                    'tab')
+                pa.write('3,33'), pa.press('tab', 2), pa.write(f.prevterm(str(sh["AL3"].value)))
+                # #clique em Instituição de Ensino
+                pa.click(-990, 539, 3), pa.press('tab', 2), pp.copy(pessoa.faculdade), pa.hotkey('ctrl', 'v'), pa.press(
+                    'tab')
+                pa.write('End'), pa.press('tab'), pa.write('1'), pa.press('tab'), pa.write('Bairro')
+                # #clique em Outros
+                pa.click(-1034, 407), t.sleep(1), t.sleep(2), pa.write('CARGO GERAL'), pa.press('tab')
+                if pessoa.genero == 'Masculino':
+                    pp.copy(cargo), pa.hotkey('ctrl', 'v')
+                else:
+                    pp.copy(cargo), pa.hotkey('ctrl', 'v')
+                pa.press('tab'), pa.write(pessoa.salario), pa.press('tab'), pa.write('1'), pa.press('tab', 2), pa.write(
+                    pessoa.hrsemanais)
+                pa.press('tab'), pa.write(pessoa.hrmensais)
+                # #clique em eventos trabalhistas
+                pa.click(-886, 379), t.sleep(1)
+                # #clique em lotação
+                pa.click(-962, 429), pa.press('tab'), pa.press('tab'), pa.write('i'), pa.write(
+                    pessoa.admissao), t.sleep(1)
+                pa.press('enter'), t.sleep(1), pp.copy(pessoa.lotacao), pa.hotkey('ctrl', 'v'), pa.press(
+                    'enter'), pa.press(
+                    'tab'), \
+                    pa.write('4'), pa.press('tab', 7), pa.press('enter')
+                # #clique em fechar lotação
+                pa.click(-464, 333), t.sleep(1)
+                # #clique em Compatibilidade
+                pa.click(-775, 379), t.sleep(1)
+                # #clique em Compatibilidade de novo
+                pa.click(-775, 379), t.sleep(1), pa.press('tab', 2), pa.write('99')
+                # #clique em Salvar
+                pa.click(-564, 766), t.sleep(4)
+                # #clique em fechar novo cadastro
+                pa.click(-452, 252), t.sleep(2)
+                # #clique em fechar trabalhadores
+                pa.click(-451, 310), t.sleep(0.5)
+                os.rename(pasta,
+                          '\\\Qnapcia\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\{}'.format(
+                              pessoa.nome))
             else:
+                # Cadastro iniciado em casa
                 pass
         else:
             if ondestou == 0:
+                # Cadastro EDITADO na Cia
                 pass
             else:
+                # Cadastro EDITADO em casa
                 pass
-        wb = l_w(caminho, read_only=False)
-        sh = wb['Respostas ao formulário 1']
-        num, name = nome.strip().split(' - ')
-        linha = int(num)
-        if str(sh[f'E{linha}'].value) == 'Masculino':
-            cargo = 'ESTAGIÁRIO'
-        else:
-            cargo = 'ESTAGIÁRIA'
-        brasilia = 5300108
-        pessoa = Colaborador(
-            matricula=matricula,
-            nome=str(sh[f'C{linha}'].value).upper(),
-            admiss=admissao,
-            nascimento=str(sh[f'D{linha}'].value),
-            cpf=str(sh[f'V{linha}'].value),
-            rg=str(sh[f'W{linha}'].value),
-            email=str(sh[f'B{linha}'].value),
-            genero=str(sh[f'E{linha}'].value),
-            estado_civil=str(sh[f'F{linha}'].value),
-            instru='08',
-            nacional='Brasileira',
-            cod_municipionas=brasilia,
-            cid_nas=str(sh[f'L{linha}'].value),
-            uf_nas=str(sh[f'AJ{linha}'].value),
-            pai=str(sh[f'M{linha}'].value).upper(),
-            mae=str(sh[f'N{linha}'].value).upper(),
-            endereco=str(sh[f'O{linha}'].value),
-            num=str(sh[f'P{linha}'].value),
-            bairro=str(sh[f'Q{linha}'].value),
-            cep=str(sh[f'R{linha}'].value),
-            cidade='Brasília',
-            uf='DF',
-            cod_municipioend=brasilia,
-            tel=str(sh[f'U{linha}'].value),
-            depto=str(sh[f'AG{linha}'].value),
-            cargo=cargo,
-            horario=str(sh[f'AI{linha}'].value),
-            salario=salario,
-            tipo_contr=0,
-            hr_sem='25', hr_mens='100'
-        )
 
-        pasta = '\\\Qnapcia\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{}'.format(
-            pessoa.nome)
-
-        pa.hotkey('alt', 'tab'), pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(0.5), pa.press('i'), t.sleep(5)
-        pa.write(pessoa.matricula), pa.press('enter'), t.sleep(5), pp.copy(pessoa.nome), pa.hotkey('ctrl',
-                                                                                                   'v'), pa.press(
-            'tab')
-        pa.write(pessoa.cpf), pa.press('tab', 3), pa.write(pessoa.genero), pa.press('tab'), pa.write(
-            pessoa.raca), pa.press('tab', 2)
-        pa.write(pessoa.instru), pa.press('tab'), pa.write(pessoa.est_civ), pa.press('tab'), pa.write(
-            pessoa.nacional), pa.press(
-            'tab', 4)
-        pa.write(pessoa.nasc), pa.press('tab'), pp.copy(pessoa.natu), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(
-            pessoa.uf)
-        pa.press('tab'), pa.write(pessoa.munic), pa.press('tab'), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press(
-            'tab')
-        pa.write(pessoa.pais), pa.press('tab'), pp.copy(pessoa.mae), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(
-            pessoa.pais)
-
-        # #clique em documentos
-        pa.click(-1035, 405), pa.press('tab'), pa.write(pessoa.rg)
-        # #clique em endereço
-        pa.click(-973, 407), pa.press('tab', 2), pp.copy(pessoa.end), pa.hotkey('ctrl', 'v')
-        pa.press('tab'), pa.write(pessoa.num), pa.press('tab', 2), pp.copy(pessoa.bairro), pa.hotkey('ctrl', 'v'), pa.press(
-            'tab')
-        pp.copy(pessoa.cid), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.uf), pa.press('tab'), pa.write(
-            pessoa.cep)
-        pa.press('tab'), pa.write(pessoa.munic), pa.press('tab'), pa.write(pessoa.tel), pa.press('tab', 2), pa.write(
-            pessoa.email)
-        # #clique em dados contratuais
-        pa.click(-980, 379), pa.press('tab'), pa.write(pessoa.admissao), pa.press('tab'), pa.write('901'), pa.press('tab',
-                                                                                                                    7)
-        pa.press('n'), pa.press('tab'), pa.press('4'), pa.press('tab'), pp.copy(pessoa.area), pa.hotkey('ctrl',
-                                                                                                        'v'), pa.press(
-            'tab')
-        pa.write('3,33'), pa.press('tab', 2), pa.write(f.prevterm(str(sh["AL3"].value)))
-        # #clique em Instituição de Ensino
-        pa.click(-990, 539, 3), pa.press('tab', 2), pp.copy(pessoa.faculdade), pa.hotkey('ctrl', 'v'), pa.press('tab')
-        pa.write('End'), pa.press('tab'), pa.write('1'), pa.press('tab'), pa.write('Bairro')
-        # #clique em Outros
-        pa.click(-1034, 407), t.sleep(1), t.sleep(2), pa.write('CARGO GERAL'), pa.press('tab')
-        if pessoa.genero == 'Masculino':
-            pp.copy(cargo), pa.hotkey('ctrl', 'v')
-        else:
-            pp.copy(cargo), pa.hotkey('ctrl', 'v')
-        pa.press('tab'), pa.write(pessoa.salario), pa.press('tab'), pa.write('1'), pa.press('tab', 2), pa.write(
-            pessoa.hrsemanais)
-        pa.press('tab'), pa.write(pessoa.hrmensais)
-        # #clique em eventos trabalhistas
-        pa.click(-886, 379), t.sleep(1)
-        # #clique em lotação
-        pa.click(-962, 429), pa.press('tab'), pa.press('tab'), pa.write('i'), pa.write(pessoa.admissao), t.sleep(1)
-        pa.press('enter'), t.sleep(1), pp.copy(pessoa.lotacao), pa.hotkey('ctrl', 'v'), pa.press('enter'), pa.press(
-            'tab'), \
-        pa.write('4'), pa.press('tab', 7), pa.press('enter')
-        # #clique em fechar lotação
-        pa.click(-464, 333), t.sleep(1)
-        # #clique em Compatibilidade
-        pa.click(-775, 379), t.sleep(1)
-        # #clique em Compatibilidade de novo
-        pa.click(-775, 379), t.sleep(1), pa.press('tab', 2), pa.write('99')
-        # #clique em Salvar
-        pa.click(-564, 766), t.sleep(4)
-        # #clique em fechar novo cadastro
-        pa.click(-452, 252), t.sleep(2)
-        # #clique em fechar trabalhadores
-        pa.click(-451, 310), t.sleep(0.5)
-        os.rename(pasta,
-                  '\\\Qnapcia\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\{}'.format(
-                      pessoa.nome))
 
 
 caminhoaut = StringVar()
