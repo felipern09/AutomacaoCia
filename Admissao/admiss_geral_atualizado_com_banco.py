@@ -85,7 +85,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                                        estado_civil=str(sh[f'F{linha}'].value), cor=str(sh[f'G{linha}'].value),
                                        instru=str(sh[f'J{linha}'].value),
                                        nacional=str(sh[f'K{linha}'].value),
-                                       cod_municipionas=municipios[str(sh[f'AJ{linha}'].value)][str(sh[f'L{linha}'].value)],
+                                       cod_municipionas=municipios[str(sh[f'AJ{linha}'].value).upper().split()][str(sh[f'L{linha}'].value).title().split()],
                                        cid_nas=str(sh[f'L{linha}'].value), uf_nas=str(sh[f'AJ{linha}'].value),
                                        pai=str(sh[f'M{linha}'].value).upper(),
                                        mae=str(sh[f'N{linha}'].value).upper(), endereco=str(sh[f'O{linha}'].value),
@@ -93,7 +93,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                                        bairro=str(sh[f'Q{linha}'].value), cep=str(int(sh[f'R{linha}'].value)),
                                        cidade=str(sh[f'S{linha}'].value),
                                        uf=str(sh[f'T{linha}'].value),
-                                       cod_municipioend=municipios[str(sh[f'T{linha}'].value)][str(sh[f'S{linha}'].value)],
+                                       cod_municipioend=municipios[str(sh[f'T{linha}'].value).upper().split()][str(sh[f'S{linha}'].value).title().split()],
                                        tel=str(int(sh[f'U{linha}'].value)),
                                        tit_eleit=str(sh[f'Z{linha}'].value), zona_eleit=str(sh[f'AA{linha}'].value),
                                        sec_eleit=str(sh[f'AB{linha}'].value),
@@ -246,7 +246,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                                        estado_civil=str(sh[f'F{linha}'].value), cor=str(sh[f'G{linha}'].value),
                                        instru=str(sh[f'J{linha}'].value),
                                        nacional=str(sh[f'K{linha}'].value),
-                                       cod_municipionas=municipios[str(sh[f'AJ{linha}'].value)][str(sh[f'L{linha}'].value)],
+                                       cod_municipionas=municipios[str(sh[f'AJ{linha}'].value).upper().split()][str(sh[f'L{linha}'].value).title().split()],
                                        cid_nas=str(sh[f'L{linha}'].value), uf_nas=str(sh[f'AJ{linha}'].value),
                                        pai=str(sh[f'M{linha}'].value).upper(),
                                        mae=str(sh[f'N{linha}'].value).upper(), endereco=str(sh[f'O{linha}'].value),
@@ -254,7 +254,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                                        bairro=str(sh[f'Q{linha}'].value), cep=str(int(sh[f'R{linha}'].value)),
                                        cidade=str(sh[f'S{linha}'].value),
                                        uf=str(sh[f'T{linha}'].value),
-                                       cod_municipioend=municipios[str(sh[f'T{linha}'].value)][str(sh[f'S{linha}'].value)],
+                                       cod_municipioend=municipios[str(sh[f'T{linha}'].value).upper().split()][str(sh[f'S{linha}'].value).title().split()],
                                        tel=str(int(sh[f'U{linha}'].value)),
                                        tit_eleit=str(sh[f'Z{linha}'].value), zona_eleit=str(sh[f'AA{linha}'].value),
                                        sec_eleit=str(sh[f'AB{linha}'].value),
@@ -390,7 +390,6 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
             if ondestou == 0:
                 # Cadastro EDITADO na Cia
                 wb = l_w(caminho, read_only=False)
-                sh = wb['Respostas ao formulário 1']
                 num, name = nome.strip().split(' - ')
                 linha = int(num)
                 if linha:
@@ -499,11 +498,8 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                 else:
                     # Cadastro EDITADO em casa
                     wb = l_w(caminho, read_only=False)
-                    sh = wb['Respostas ao formulário 1']
                     num, name = nome.strip().split(' - ')
                     linha = int(num)
-                    cod_mun_nas = 5300108  # criar código para pegar numero do município
-                    cod_mun_end = 5300108  # criar código para pegar numero do município
                     if linha:
                         pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
                         pa.click(pa.center(pa.locateOnScreen('./static/Dexion.png')))
