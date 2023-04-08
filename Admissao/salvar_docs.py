@@ -54,8 +54,8 @@ codetic = docx.Document(p_codetic)
 pa.hotkey('alt', 'tab')  # click dexion
 
 # # imprimir recibo entrega e devolução de ctps
-pa.press('alt'), pa.press('r'), pa.press('a'), pa.press('r'), pa.press('e'), pa.press('tab'), pa.write(
-    pessoa.matricula)
+pa.press('alt'), pa.press('r'), pa.press('a'), pa.press('r'), pa.press('e'), pa.press('tab'), pa.write(str(
+    pessoa.matricula))
 pa.press('tab', 3), pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab'), t.sleep(0.5), pa.press('space'), t.sleep(
     0.5), pa.press('tab', 4)
 t.sleep(1), pa.press('enter'), t.sleep(2)
@@ -69,7 +69,7 @@ pa.click(-509, 377)
 
 # # Imprimir Acordo de Banco de horas
 pa.press('alt'), pa.press('r'), pa.press('z'), pa.press('d'), pa.press('d')
-pa.write("(matricula = '00{}')".format(pessoa.matricula)), t.sleep(1), pa.press('tab'), pa.write('2'), pa.press(
+pa.write("(matricula = '00{}')".format(str(pessoa.matricula))), t.sleep(1), pa.press('tab'), pa.write('2'), pa.press(
     'tab')
 pa.press('enter'), t.sleep(10), pa.hotkey('ctrl', 's'), t.sleep(1), pp.copy(ps_acordo), pa.hotkey('ctrl', 'v')
 t.sleep(1), pa.press('enter'), t.sleep(15)
@@ -78,7 +78,7 @@ pa.click(-35, 132), pa.press('enter')
 
 # # imprimir Anotações em CTPS
 pa.press('alt'), pa.press('r'), pa.press('a'), pa.press('c'), pa.press('e'), pa.press('tab'), pa.write(
-    pessoa.matricula)
+    str(pessoa.matricula))
 pa.press('tab', 2), pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab'), pa.write(str(pessoa.admiss).replace('/','')), pa.press(
     'tab', 4), pa.press('space')
 pa.press('tab', 2), pa.press('enter'), t.sleep(1.5)
@@ -92,7 +92,7 @@ pa.press('tab', 6), t.sleep(0.5), pa.write('Anotacoes CTPS'), pa.press('enter'),
 
 # # imprimir Termo VT
 pa.press('alt'), pa.press('r'), pa.press('a'), pa.press('v'), pa.press('e'), pa.press('tab'), pa.write(
-    pessoa.matricula)
+    str(pessoa.matricula))
 pa.press('tab', 2), pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab'), pa.write('d'), pa.press('tab', 4), pa.press(
     'space')
 pa.press('tab', 7), pa.press('enter'), t.sleep(1.5)
@@ -111,7 +111,7 @@ if pessoa.tipo_contr == '1 - Por Hora':
 else:
     pa.press('o')
 
-pa.write("(matricula = '00{}')".format(pessoa.matricula)), t.sleep(1), pa.press('tab'), pa.write('2'), pa.press(
+pa.write("(matricula = '00{}')".format(str(pessoa.matricula))), t.sleep(1), pa.press('tab'), pa.write('2'), pa.press(
     'tab')
 pa.press('enter'), t.sleep(5), pa.hotkey('ctrl', 's'), t.sleep(1), pp.copy(ps_contr), pa.hotkey('ctrl', 'v')
 t.sleep(1), pa.press('enter'), t.sleep(10)
@@ -121,7 +121,7 @@ pa.click(-35, 132), pa.press('enter')
 
 # # Imprimir Folha de rosto de Cadastro
 pa.press('alt'), pa.press('r'), pa.press('i'), pa.press('o'), pa.press('r'), pa.press('e'), pa.press('tab')
-pa.write(pessoa.matricula), pa.press('tab', 2), pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab', 3), pa.press(
+pa.write(str(pessoa.matricula)), pa.press('tab', 2), pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab', 3), pa.press(
     'enter')
 t.sleep(1), pa.press('tab', 6), t.sleep(0.5), pa.press('enter'), t.sleep(0.5), pp.copy(p_contr), pa.hotkey('ctrl', 'v')
 t.sleep(1), pa.press('enter'), t.sleep(3), pa.press('tab', 6), t.sleep(0.5), pa.write('Folha de Registro'), pa.press(
