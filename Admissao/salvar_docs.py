@@ -12,8 +12,22 @@ Sessions = sessionmaker(bind=engine)
 session = Sessions()
 pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
 
+p_pessoa = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
+          r'\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome)
+p_atestado = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
+          r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestado'.format(pessoa.nome)
 p_contr = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
           r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome)
+p_diversos = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
+          r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome)
+p_ferias = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
+          r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome)
+p_ponto = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
+          r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome)
+p_rec = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
+          r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome)
+p_rescisao = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
+          r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome)
 p_ac = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
        r'\000 - Pastas Funcionais\00 - ATIVOS\Modelo\AC Modelo.docx'
 p_abconta = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
@@ -30,6 +44,25 @@ ps_contr = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Func
            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Contrato.pdf'.format(pessoa.nome)
 ps_acordo = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
             r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Acordo Banco de Horas.pdf'.format(pessoa.nome)
+ps_recctps = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
+            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Recibo de Entrega e Dev CTPS.pdf'.format(pessoa.nome)
+ps_anotctps = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
+            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Anotacoes CTPS.pdf'.format(pessoa.nome)
+ps_termovt = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
+            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Termo Opcao VT.pdf'.format(pessoa.nome)
+ps_contrato = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
+            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Contrato de Trabalho.pdf'.format(pessoa.nome)
+ps_ficha = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
+            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Ficha Cadastral.pdf'.format(pessoa.nome)
+
+os.mkdir(p_pessoa)
+os.mkdir(p_atestado)
+os.mkdir(p_contr)
+os.mkdir(p_diversos)
+os.mkdir(p_ferias)
+os.mkdir(p_ponto)
+os.mkdir(p_rec)
+os.mkdir(p_rescisao)
 
 lotacao = {
     'Unidade Park Sul - Qualquer Departamento': ['0013', 'Thais Feitosa', 'thais.morais@ciaathletica.com.br', 'Líder Park Sul'],
@@ -51,58 +84,56 @@ recibos = docx.Document(p_recibos)
 recibovt = docx.Document(p_recibovt)
 codetic = docx.Document(p_codetic)
 
-pa.hotkey('alt', 'tab')  # click dexion
+# click dexion
+pa.click(pa.center(pa.locateOnScreen('./static/Dexion.png')))
 
 # # imprimir recibo entrega e devolução de ctps
 pa.press('alt'), pa.press('r'), pa.press('a'), pa.press('r'), pa.press('e'), pa.press('tab'), pa.write(str(
     pessoa.matricula))
-pa.press('tab', 3), pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab'), t.sleep(0.5), pa.press('space'), t.sleep(
-    0.5), pa.press('tab', 4)
+pa.press('tab', 3), pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab'), t.sleep(0.5), pa.press('space')
+t.sleep(0.5), pa.press('tab'), pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab', 2)
 t.sleep(1), pa.press('enter'), t.sleep(2)
 
 # # clique no endereço de salvamento do recibo
-pa.write('Recibo de Entrega CTPS'), t.sleep(0.5), pa.press('tab', 6), t.sleep(0.5), pa.press('enter'), pp.copy(
-    p_contr), pa.hotkey('ctrl', 'v'), t.sleep(1)
-pa.press('enter'), t.sleep(0.5), pa.press('tab', 9), pa.press('enter'), t.sleep(5)
+pa.click(pa.center(pa.locateOnScreen('./static/salvar.png'))), t.sleep(1)
+pp.copy(ps_recctps), pa.hotkey('ctrl', 'v'), t.sleep(0.5)
+pa.press('tab', 2), t.sleep(0.5), pa.press('enter')
+t.sleep(5)
 # # clique para fechar recibo ctps
-pa.click(-509, 377)
+pa.click(pa.center(pa.locateOnScreen('./static/fechar_janela.png'))), t.sleep(0.5)
+pa.click(pa.center(pa.locateOnScreen('./static/fechar_janela.png')))
 
 # # Imprimir Acordo de Banco de horas
 pa.press('alt'), pa.press('r'), pa.press('z'), pa.press('d'), pa.press('d')
-pa.write("(matricula = '00{}')".format(str(pessoa.matricula))), t.sleep(1), pa.press('tab'), pa.write('2'), pa.press(
-    'tab')
-pa.press('enter'), t.sleep(10), pa.hotkey('ctrl', 's'), t.sleep(1), pp.copy(ps_acordo), pa.hotkey('ctrl', 'v')
-t.sleep(1), pa.press('enter'), t.sleep(15)
+pa.write("(matricula = '00{}')".format(str(pessoa.matricula))), t.sleep(1), pa.press('tab'), pa.write('2')
+pa.press('tab'), pa.press('enter'), t.sleep(10)
+pa.click(pa.center(pa.locateOnScreen('./static/salvar.png')))
+t.sleep(1), pp.copy(ps_acordo)
+pa.hotkey('ctrl', 'v'), t.sleep(1), pa.press('enter'), t.sleep(15)
 # # clique para fechar acordo
-pa.click(-35, 132), pa.press('enter')
+pa.click(pa.center(pa.locateOnScreen('./static/fechar_janela.png'))), t.sleep(0.5)
+pa.click(pa.center(pa.locateOnScreen('./static/fechar_janela.png')))
 
 # # imprimir Anotações em CTPS
-pa.press('alt'), pa.press('r'), pa.press('a'), pa.press('c'), pa.press('e'), pa.press('tab'), pa.write(
-    str(pessoa.matricula))
-pa.press('tab', 2), pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab'), pa.write(str(pessoa.admiss).replace('/','')), pa.press(
-    'tab', 4), pa.press('space')
-pa.press('tab', 2), pa.press('enter'), t.sleep(1.5)
-
-# # clique no endereço de salvamento do recibo
-pa.press('tab', 6), t.sleep(1), pa.press('enter'), t.sleep(1), pp.copy(p_contr), pa.hotkey('ctrl', 'v'), t.sleep(1)
-pa.press('enter'), t.sleep(3)
-
-# # clique no nome do arquivo
-pa.press('tab', 6), t.sleep(0.5), pa.write('Anotacoes CTPS'), pa.press('enter'), t.sleep(6), pa.press('enter')
+pa.press('alt'), pa.press('r'), pa.press('a'), pa.press('c'), pa.press('e'), pa.press('tab')
+pa.write(str(pessoa.matricula))
+pa.press('tab', 2), pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab')
+pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab', 4), pa.press('space')
+pa.press('tab'), pa.press('enter'), t.sleep(1.5)
+pa.click(pa.center(pa.locateOnScreen('./static/salvar.png'))), t.sleep(1)
+pp.copy(ps_anotctps), pa.hotkey('ctrl', 'v'), t.sleep(0.5), pa.press('enter')
+t.sleep(2), pa.click(pa.center(pa.locateOnScreen('./static/fechar_janela.png'))), t.sleep(0.5)
+pa.click(pa.center(pa.locateOnScreen('./static/fechar_janela.png')))
 
 # # imprimir Termo VT
-pa.press('alt'), pa.press('r'), pa.press('a'), pa.press('v'), pa.press('e'), pa.press('tab'), pa.write(
-    str(pessoa.matricula))
-pa.press('tab', 2), pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab'), pa.write('d'), pa.press('tab', 4), pa.press(
-    'space')
-pa.press('tab', 7), pa.press('enter'), t.sleep(1.5)
-
-# # clique no endereço de salvamento do recibo
-pa.press('tab', 6), t.sleep(0.5), pa.press('enter'), t.sleep(0.5), pp.copy(p_contr), pa.hotkey('ctrl', 'v')
-t.sleep(1), pa.press('enter'), t.sleep(3)
-
-# # clique no nome do arquivo
-pa.press('tab', 6), t.sleep(0.5), pa.write('Termo VT'), pa.press('enter'), t.sleep(6), pa.press('enter')
+pa.press('alt'), pa.press('r'), pa.press('a'), pa.press('v'), pa.press('e'), pa.press('tab')
+pa.write(str(pessoa.matricula)), pa.press('tab', 2), pa.write(str(pessoa.admiss).replace('/',''))
+pa.press('tab'), pa.write('d'), pa.press('tab', 4), pa.press('space')
+pa.press('tab', 6), pa.press('enter'), t.sleep(1.5)
+pa.click(pa.center(pa.locateOnScreen('./static/salvar.png')))
+pp.copy(ps_termovt), pa.hotkey('ctrl', 'v'), t.sleep(0.5), pa.press('enter')
+t.sleep(2), pa.click(pa.center(pa.locateOnScreen('./static/fechar_janela.png'))), t.sleep(0.5)
+pa.click(pa.center(pa.locateOnScreen('./static/fechar_janela.png')))
 
 # # Imprimir Contrato
 pa.press('alt'), pa.press('r'), pa.press('z'), pa.press('d')
@@ -111,22 +142,21 @@ if pessoa.tipo_contr == '1 - Por Hora':
 else:
     pa.press('o')
 
-pa.write("(matricula = '00{}')".format(str(pessoa.matricula))), t.sleep(1), pa.press('tab'), pa.write('2'), pa.press(
-    'tab')
-pa.press('enter'), t.sleep(5), pa.hotkey('ctrl', 's'), t.sleep(1), pp.copy(ps_contr), pa.hotkey('ctrl', 'v')
-t.sleep(1), pa.press('enter'), t.sleep(10)
-
-# # clique para fechar contrato
-pa.click(-35, 132), pa.press('enter')
+pa.write("(matricula = '00{}')".format(str(pessoa.matricula))), t.sleep(1), pa.press('tab'), pa.write('2')
+pa.press('tab'), pa.press('enter'), t.sleep(5)
+pa.click(pa.center(pa.locateOnScreen('./static/salvar.png')))
+pp.copy(ps_contrato), pa.hotkey('ctrl', 'v'), t.sleep(0.5), pa.press('enter')
+t.sleep(10), pa.click(pa.center(pa.locateOnScreen('./static/fechar_janela.png'))), t.sleep(0.5)
+pa.click(pa.center(pa.locateOnScreen('./static/fechar_janela.png')))
 
 # # Imprimir Folha de rosto de Cadastro
 pa.press('alt'), pa.press('r'), pa.press('i'), pa.press('o'), pa.press('r'), pa.press('e'), pa.press('tab')
-pa.write(str(pessoa.matricula)), pa.press('tab', 2), pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab', 3), pa.press(
-    'enter')
-t.sleep(1), pa.press('tab', 6), t.sleep(0.5), pa.press('enter'), t.sleep(0.5), pp.copy(p_contr), pa.hotkey('ctrl', 'v')
-t.sleep(1), pa.press('enter'), t.sleep(3), pa.press('tab', 6), t.sleep(0.5), pa.write('Folha de Registro'), pa.press(
-    'enter')
-t.sleep(6), pa.press('enter')
+pa.write(str(pessoa.matricula)), pa.press('tab', 2), pa.write(str(pessoa.admiss).replace('/','')), pa.press('tab', 2)
+pa.press('enter'), t.sleep(3)
+pa.click(pa.center(pa.locateOnScreen('./static/salvar.png')))
+pp.copy(ps_ficha), pa.hotkey('ctrl', 'v'), t.sleep(0.5), pa.press('enter')
+t.sleep(3), pa.click(pa.center(pa.locateOnScreen('./static/fechar_janela.png'))), t.sleep(0.5)
+pa.click(pa.center(pa.locateOnScreen('./static/fechar_janela.png')))
 
 # # Alterar AC e Salvar na pasta
 ac.paragraphs[1].text = str(ac.paragraphs[1].text).replace('#gerente', lotacao[str(pessoa.depto).title()][1])
