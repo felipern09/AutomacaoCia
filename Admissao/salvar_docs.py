@@ -17,7 +17,7 @@ p_pessoa = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Func
 p_atestado = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
           r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestado'.format(pessoa.nome)
 p_contr = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
-          r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome)
+          r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Docs Contratuais'.format(pessoa.nome)
 p_diversos = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
           r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome)
 p_ferias = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
@@ -41,19 +41,19 @@ p_recibovt = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Fu
 p_codetic = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
             r'\000 - Pastas Funcionais\00 - ATIVOS\Modelo\Cod Etica MODELO.docx'
 ps_contr = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
-           r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Contrato.pdf'.format(pessoa.nome)
+           r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Docs Contratuais\Contrato.pdf'.format(pessoa.nome)
 ps_acordo = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
-            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Acordo Banco de Horas.pdf'.format(pessoa.nome)
+            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Docs Contratuais\Acordo Banco de Horas.pdf'.format(pessoa.nome)
 ps_recctps = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
-            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Recibo de Entrega e Dev CTPS.pdf'.format(pessoa.nome)
+            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Docs Contratuais\Recibo de Entrega e Dev CTPS.pdf'.format(pessoa.nome)
 ps_anotctps = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
-            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Anotacoes CTPS.pdf'.format(pessoa.nome)
+            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Docs Contratuais\Anotacoes CTPS.pdf'.format(pessoa.nome)
 ps_termovt = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
-            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Termo Opcao VT.pdf'.format(pessoa.nome)
+            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Docs Contratuais\Termo Opcao VT.pdf'.format(pessoa.nome)
 ps_contrato = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
-            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Contrato de Trabalho.pdf'.format(pessoa.nome)
+            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Docs Contratuais\Contrato de Trabalho.pdf'.format(pessoa.nome)
 ps_ficha = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
-            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Ficha Cadastral.pdf'.format(pessoa.nome)
+            r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Docs Contratuais\Folha de Registro.pdf'.format(pessoa.nome)
 
 os.mkdir(p_pessoa)
 os.mkdir(p_atestado)
