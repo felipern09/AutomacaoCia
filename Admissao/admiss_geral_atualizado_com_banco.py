@@ -622,9 +622,10 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
 caminhoest = StringVar()
 
 
-def cadastro_estagiario(solicitar_contr='', caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
-                         horario='', salario=5.10, cargo='', depto='', tipo_contr='horista',
+def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
+                         cargo='', depto='', tipo_contr='horista',
                          hrsem='', hrmens=''):
+    salario = 5.10
     if solicitar_contr == 1:
         hoje = datetime.today()
         wb = l_w(caminho)
@@ -1089,7 +1090,7 @@ labelcargo.grid(column=1, row=18, padx=25, pady=1, sticky=W)
 combocargo = ttk.Combobox(funcionario, values=cargos, textvariable=cargo, width=50)
 combocargo.grid(column=1, row=18, padx=125, pady=1, sticky=W)
 # aparecer dropdown para escolher depto
-labeldepto = ttk.Label(funcionario, width=20, text="Departamento")
+labeldepto = ttk.Label(funcionario, width=20, text="Departamento:")
 labeldepto.grid(column=1, row=19, padx=25, pady=1, sticky=W)
 combodepto = ttk.Combobox(funcionario, values=departamentos, textvariable=departamento, width=50)
 combodepto.grid(column=1, row=19, padx=125, pady=1, sticky=W)
@@ -1115,7 +1116,7 @@ editar = ttk.Checkbutton(funcionario, text='Editar cadastro feito manualmente.',
 editar.grid(column=1, row=26, padx=26, pady=1, sticky=W)
 feitonde = IntVar()
 onde = ttk.Checkbutton(funcionario, text='Cadastro realizado fora da Cia.', variable=feitonde)
-onde.grid(column=1, row=27, padx=25, pady=1, sticky=W)
+onde.grid(column=1, row=27, padx=26, pady=1, sticky=W)
 
 
 def mostrarhorario(event):
@@ -1150,14 +1151,47 @@ funcionario.pack(fill='both', expand=0)
 estagiario = Frame(my_notebook, width=60, height=50)
 ttk.Label(estagiario, width=40, text="Escolher planilha de novos estagiários").grid(column=1, row=2, padx=25, pady=1, sticky=W)
 ttk.Button(estagiario, text="Escolha a planilha", command=selecionarest).grid(column=1, row=2, padx=350, pady=1, sticky=E)
+labelnomest = ttk.Label(estagiario, width=20, text="Nome:")
+labelnomest.grid(column=1, row=10, padx=25, pady=1, sticky=W)
 combonomest = ttk.Combobox(estagiario, values=nomesplan, textvariable=nome, width=50)
 combonomest.grid(column=1, row=10, padx=125, pady=1, sticky=W)
+# aparecer entry para preencher matricula
+labelmatrest = ttk.Label(estagiario, width=20, text="Matrícula:")
+labelmatrest.grid(column=1, row=11, padx=25, pady=1, sticky=W)
+entrymatrest = ttk.Entry(estagiario, width=20)
+entrymatrest.grid(column=1, row=11, padx=125, pady=1, sticky=W)
+# aparecer entry para preencher admissao
+labeladmissest = ttk.Label(estagiario, width=20, text="Admissão:")
+labeladmissest.grid(column=1, row=12, padx=25, pady=1, sticky=W)
+entryadmissest = ttk.Entry(estagiario, width=20)
+entryadmissest.grid(column=1, row=12, padx=125, pady=1, sticky=W)
+# aparecer dropdown para escolher depto
+labeldeptoest = ttk.Label(estagiario, width=20, text="Departamento:")
+labeldeptoest.grid(column=1, row=19, padx=25, pady=1, sticky=W)
+combodeptoest = ttk.Combobox(estagiario, values=departamentos, textvariable=departamento, width=50)
+combodeptoest.grid(column=1, row=19, padx=125, pady=1, sticky=W)
+solicitarest = IntVar()
+solictest = ttk.Checkbutton(estagiario, text='Apenas solicitar contrato.', variable=solicitarest)
+solictest.grid(column=1, row=25, padx=26, pady=1, sticky=W)
+edicaoest = IntVar()
+editarest = ttk.Checkbutton(estagiario, text='Editar cadastro feito manualmente.', variable=edicaoest)
+editarest.grid(column=1, row=26, padx=26, pady=1, sticky=W)
+feitondeest = IntVar()
+ondeest = ttk.Checkbutton(estagiario, text='Cadastro realizado fora da Cia.', variable=feitondeest)
+ondeest.grid(column=1, row=27, padx=26, pady=1, sticky=W)
+cargoest = StringVar()
+
+ttk.Button(estagiario, width=20, text="Cadastrar Funcionário",
+           command=lambda: [cadastro_estagiario(solicitarest.get(), caminhoest.get(),edicaoest.get(),feitondeest.get(),combonomest.get(),
+                                                 entrymatrest.get(), entryadmissest.get(), combocargo.get(), combodeptoest.get(),
+                                                 combocontr.get(), hrs.get(),
+                                                 hrm.get())]).grid(column=1, row=28, padx=520, pady=1, sticky=W)
 
 
 def carregarest(local):
     planwb = l_w(local)
     plansh = planwb['Respostas ao formulário 1']
-    lista=[]
+    lista = []
     for x, pessoa in enumerate(plansh):
         lista.append(f'{x+1} - {pessoa[2].value}')
     combonomest.config(values=lista)
