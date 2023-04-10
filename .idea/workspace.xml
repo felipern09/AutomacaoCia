@@ -5,6 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Admissao/salvar_docs.py" beforeDir="false" afterPath="$PROJECT_DIR$/Admissao/salvar_docs.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -30,7 +31,7 @@
     &quot;last_opened_file_path&quot;: &quot;C:/Users/Felipe/PycharmProjects/AutomacaoCia&quot;
   }
 }</component>
-  <component name="RunManager" selected="Python.salvar_docs">
+  <component name="RunManager" selected="Python.admiss_geral_atualizado_com_banco">
     <configuration name="admiss_geral_atualizado_com_banco" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -96,9 +97,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.salvar_docs" />
         <item itemvalue="Python.admiss_geral_atualizado_com_banco" />
         <item itemvalue="Python.cadastrar_banco" />
+        <item itemvalue="Python.salvar_docs" />
       </list>
     </recent_temporary>
   </component>

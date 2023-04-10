@@ -137,7 +137,7 @@ pa.click(pa.center(pa.locateOnScreen('./static/fechar_janela.png')))
 
 # # Imprimir Contrato
 pa.press('alt'), pa.press('r'), pa.press('z'), pa.press('d')
-if pessoa.tipo_contr == '1 - Por Hora':
+if pessoa.tipo_contr == 'Horista':
     pa.press('c')
 else:
     pa.press('o')
