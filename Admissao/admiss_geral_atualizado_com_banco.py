@@ -64,7 +64,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
             message='Preencha todos os campos antes de cadastrar o funcionário!'
         )
     else:
-        lotacao={'UNIDADE PARK SUL - QUALQUER DEPARTAMENTO':'0013','KIDS':'0010','MUSCULAÇÃO':'0007',
+        lotacao = {'UNIDADE PARK SUL - QUALQUER DEPARTAMENTO':'0013','KIDS':'0010','MUSCULAÇÃO':'0007',
                  'ESPORTES E LUTAS':'0008','CROSSFIT':'0012','GINÁSTICA':'0006','GESTANTES':'0008','RECEPÇÃO':'0003',
                  'FINANCEIRO':'0001','TI':'0001','MARKETING':'0001','MANUTENÇÃO':'0004'}
         if editar == 0:
@@ -623,8 +623,9 @@ caminhoest = StringVar()
 
 
 def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
-                         cargo='', depto='', tipo_contr='horista',
-                         hrsem='', hrmens=''):
+                         cargo='', depto='', tipo_contr='Horista',
+                         hrsem='25', hrmens='100'):
+    pa.FAILSAFE = False
     salario = 5.10
     if solicitar_contr == 1:
         hoje = datetime.today()
@@ -1011,11 +1012,194 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pass
         else:
             if ondestou == 0:
-                # Cadastro EDITADO na Cia
-                pass
+                # Editando o cadastro na Cia
+                hoje = datetime.today()
+                wb = l_w(caminho)
+                sh = wb['Respostas ao formulário 1']
+                num, name = nome.strip().split(' - ')
+                linha = int(num)
+                lotacao = {
+                    'Unidade Park Sul - qualquer departamento': ['0013', 'Thais Feitosa',
+                                                                 'thais.morais@ciaathletica.com.br',
+                                                                 'Líder Park Sul'],
+                    'Kids': ['0010', 'Cindy Stefanie', 'cindy.neves@ciaathletica.com.br', 'Líder Kids'],
+                    'Musculação': ['0007', 'Aline Kanyó', 'aline.kanyo@soucia.com.br', 'Líder Musculação'],
+                    'Esportes e Lutas': ['0008', 'Morgana Rossini', 'morganalourenco@yahoo.com.br', 'Líder Natação'],
+                    'Crossfit': ['0012', 'Guilherme Salles', 'gmoreirasalles@gmail.com', 'Líder Crossfit'],
+                    'Ginástica': ['0006', 'Hugo Albuquerque', 'hugo.albuquerque@ciaathletica.com.br',
+                                  'Líder Ginástica'],
+                    'Gestantes': ['0006', 'Hugo Albuquerque', 'hugo.albuquerque@ciaathletica.com.br',
+                                  'Líder Ginástica'],
+                    'Recepção': ['0003', 'Paulo Renato', 'paulo.simoes@ciaathletica.com.br', 'Gerente Vendas'],
+                    'Administrativo': ['0001', 'Felipe Rodrigues', 'felipe.rodrigues@ciaathletica.com.br',
+                                       'Gerente RH'],
+                    'Manutenção': ['0004', 'José Aparecido', 'aparecido.grota@ciaathletica.com.br',
+                                   'Gerente Manutenção'],
+                }
+                cadastro = {'nome': str(sh[f"C{linha}"].value).title().strip(), 'nasc_ed': sh[f"D{linha}"].value,
+                            'genero': str(sh[f"E{linha}"].value), 'est_civ': str(sh[f"F{linha}"].value),
+                            'pai': str(sh[f"M{linha}"].value), 'mae': str(sh[f"N{linha}"].value),
+                            'end': str(sh[f"O{linha}"].value),
+                            'num': str(sh[f"P{linha}"].value), 'bairro': str(sh[f"Q{linha}"].value),
+                            'cep': str(sh[f"R{linha}"].value).replace('.', '').replace('-', ''),
+                            'cid_end': str(sh[f"S{linha}"].value), 'uf_end': str(sh[f"T{linha}"].value),
+                            'tel': str(sh[f"U{linha}"].value).replace('(', '').replace(')', '').replace('-',
+                                                                                                        '').replace(' ',
+                                                                                                                    ''),
+                            'mun_end': str(sh[f"AP{linha}"].value),
+                            'cpf': str(sh[f"V{linha}"].value).strip().replace('.', '').replace('-', '').replace(' ',
+                                                                                                                '').zfill(
+                                11),
+                            'rg': str(sh[f"W{linha}"].value).strip().replace('.', '').replace('-', '').replace(' ', ''),
+                            'emissor': str(sh[f"X{linha}"].value),
+                            'lotacao': str(lotacao[f'{sh[f"AG{linha}"].value}'][0]).zfill(4),
+                            'cargo': str(sh[f"AH{linha}"].value), 'horario': str(sh[f"AI{linha}"].value),
+                            'email': str(sh[f"B{linha}"].value).strip(),
+                            'admissao_ed': str(sh[f"AL{linha}"].value),
+                            'faculdade': str(sh[f"AV{linha}"].value), 'semestre': str(sh[f"AS{linha}"].value),
+                            'turno': str(sh[f"AT{linha}"].value), 'conclusao': str(sh[f"AU{linha}"].value),
+                            'salario': str(sh[f"AM{linha}"].value),
+                            'hrsemanais': str(sh[f"AQ{linha}"].value), 'hrmensais': str(sh[f"AR{linha}"].value)}
             else:
-                # Cadastro EDITADO em casa
-                pass
+                # Editando o cadastro em Casa
+                wb = l_w(caminho)
+                sh = wb['Respostas ao formulário 1']
+                num, name = nome.strip().split(' - ')
+                linha = int(num)
+                lotacao = {'UNIDADE PARK SUL - QUALQUER DEPARTAMENTO': '0013', 'KIDS': '0010', 'MUSCULAÇÃO': '0007',
+                           'ESPORTES E LUTAS': '0008', 'CROSSFIT': '0012', 'GINÁSTICA': '0006', 'GESTANTES': '0008',
+                           'RECEPÇÃO': '0003',
+                           'FINANCEIRO': '0001', 'TI': '0001', 'MARKETING': '0001', 'MANUTENÇÃO': '0004'}
+                if str(sh[f'E{linha}'].value) == 'Masculino':
+                    cargo = 'ESTAGIARIO'
+                else:
+                    cargo = 'ESTAGIARIA'
+
+                estag = session.query(Colaborador).filter_by(matricula=matricula).first()
+                if estag:
+                    pass
+                else:
+                    estag_cadastrado = Colaborador(
+                        matricula=matricula, nome=name.upper(), admiss=admissao,
+                        nascimento=str(sh[f'D{linha}'].value),
+                        cpf=str(int(sh[f'V{linha}'].value)).zfill(11),
+                        rg=str(int(sh[f'W{linha}'].value)),
+                        emissor='SSP/DF', email=str(sh[f'B{linha}'].value),
+                        genero=str(sh[f'E{linha}'].value),
+                        estado_civil=str(sh[f'F{linha}'].value), cor='9',
+                        instru='08 - Educação Superior Incompleta',
+                        nacional='Brasileiro(a)',
+                        pai=str(sh[f'M{linha}'].value).upper(),
+                        mae=str(sh[f'N{linha}'].value).upper(), endereco=str(sh[f'O{linha}'].value),
+                        num='1',
+                        bairro=str(sh[f'Q{linha}'].value), cep=str(sh[f'R{linha}'].value).replace('.','').replace('-',''),
+                        cidade='Brasília', cid_nas='Brasília - DF',
+                        uf='DF',
+                        cod_municipioend=municipios['DF']['Brasília'],
+                        tel=str(sh[f'U{linha}'].value).replace('(','').replace(')','').replace('.','').replace('-',''),
+                        depto=depto, cargo=cargo,
+                        horario=str(sh[f'AI{linha}'].value), salario=salario, tipo_contr=tipo_contr, 
+                        hr_sem='25', hr_mens='100',
+                        est_semestre=str(sh[f'AS{linha}'].value),
+                        est_turno=str(sh[f'AT{linha}'].value),
+                        est_prev_conclu=str(sh[f'AU{linha}'].value),
+                        est_faculdade=str(sh[f'AV{linha}'].value),
+                        est_endfacul='End',
+                        est_numendfacul='1',
+                        est_bairroendfacul='Bairro'
+                    )
+                    session.add(estag_cadastrado)
+                    session.commit()
+                pasta = r'\192.168.0.250'
+                try:
+                    os.makedirs(
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}')
+                    os.makedirs(
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Atestados')
+                    os.makedirs(
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Diversos')
+                    os.makedirs(
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Contratuais')
+                    os.makedirs(
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ferias')
+                    os.makedirs(
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ponto')
+                    os.makedirs(
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Recibo')
+                    os.makedirs(
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Rescisao')
+                except:
+                    pass
+                # abrir cadastro no dexion e atualizar informações campo a campo
+                pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
+                pa.click(pa.center(pa.locateOnScreen('./static/Dexion.png')))
+                pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
+                    'a'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(20)
+                pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.cpf)
+                t.sleep(1), pa.press('tab', 3), pa.write(pessoa.genero), pa.press('tab'), pa.write(pessoa.cor)
+                t.sleep(1), pa.press('tab', 2), pa.write(pessoa.instru)
+                t.sleep(1), pa.press('tab')
+                if str(pessoa.estado_civil) == 'Casado(a)':
+                    pa.write('2')
+                    pa.press('tab', 6)
+                else:
+                    pa.write('1')
+                    pa.press('tab', 5)
+                pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
+                t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
+                t.sleep(1), pa.write(pessoa.uf), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press('tab')
+                t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press('tab')
+                t.sleep(1), pp.copy(pessoa.mae), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105')
+                # # clique em documentos
+                pa.click(pa.center(pa.locateOnScreen('./static/Documentos.png')))
+                pa.press('tab'), pa.write(str(pessoa.rg)), pa.press('tab'), pa.write(
+                    pessoa.emissor), pa.press('tab', 3), pa.write(pessoa.cod_municipioend)
+                # #clique em endereço
+                pa.click(pa.center(pa.locateOnScreen('./static/Endereco.png')))
+                pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
+                    'tab'), pa.write(pessoa.num), pa.press('tab', 2)
+                pp.copy(pessoa.bairro), pa.hotkey('ctrl', 'v'), pa.press('tab'), pp.copy(pessoa.cidade), pa.hotkey(
+                    'ctrl', 'v'), pa.press('tab'), pa.write(pessoa.uf)
+                pa.press('tab'), pa.write(pessoa.cep), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press(
+                    'tab'), pa.write(str(pessoa.tel)), pa.press('tab', 2), pa.write(pessoa.email)
+                # #clique em dados contratuais
+                pa.click(pa.center(pa.locateOnScreen('./static/Contratuais.png')))
+                pa.press('tab'), pa.write(str(pessoa.admiss).replace('/', '')), t.sleep(1)
+                pa.press('tab'), pa.write('9')
+                pa.press('tab', 7), pa.write('n'), pa.press('tab'), pa.write('4')
+                pa.press('tab'), pa.write('Ed. Fisica')
+                # #clique em instituição de ensino
+                pa.click(pa.center(pa.locateOnScreen('./static/faculdade.png')))
+                pa.press('tab'), pp.copy(pessoa.est_faculdade), pa.hotkey('ctrl', 'v')
+                pa.press('tab'), pp.copy(pessoa.est_endfacul), pa.hotkey('ctrl', 'v')
+                pa.press('tab'), pp.copy(pessoa.est_numendfacul), pa.hotkey('ctrl', 'v')
+                pa.press('tab'), pp.copy(pessoa.est_bairroendfacul), pa.hotkey('ctrl', 'v')
+                # #clique em Outros
+                try:
+                    pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
+                except:
+                    t.sleep(5)
+                    pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
+                t.sleep(2), pa.write('CARGO GERAL')
+                pa.press('tab'), pa.write(pessoa.cargo)
+                t.sleep(1), pa.press('tab'), pa.write(pessoa.salario), pa.press('tab')
+                if str(pessoa.tipo_contr) == 'Horista':
+                    pa.press('1')
+                else:
+                    pa.press('5')
+                pa.press('tab', 2), t.sleep(1), pa.write(str(pessoa.hr_sem)), pa.press('tab'), t.sleep(1)
+                pa.write(str(pessoa.hr_mens))
+                # #clique em Compatibilidade
+                pa.click(pa.center(pa.locateOnScreen('./static/Compatibilidade3.png'))), t.sleep(1)
+                # #clique em Compatibilidade de novo
+                pa.click(pa.center(pa.locateOnScreen('./static/Compatibilidade2.png'))), t.sleep(1)
+                pa.press('tab', 2), pa.write('9')
+                # #clique em Salvar
+                pa.click(pa.center(pa.locateOnScreen('./static/Salvarcadastro.png'))), t.sleep(10)
+                # #clique em fechar novo cadastro
+                pa.click(pa.center(pa.locateOnScreen('./static/Fecharnovo1.png'))), t.sleep(2)
+                # #clique em fechar trabalhadores
+                pa.click(pa.center(pa.locateOnScreen('./static/Fechartrab1.png'))), t.sleep(0.5)
 
 
 
@@ -1150,7 +1334,7 @@ funcionario.pack(fill='both', expand=0)
 
 estagiario = Frame(my_notebook, width=60, height=50)
 ttk.Label(estagiario, width=40, text="Escolher planilha de novos estagiários").grid(column=1, row=2, padx=25, pady=1, sticky=W)
-ttk.Button(estagiario, text="Escolha a planilha", command=selecionarest).grid(column=1, row=2, padx=350, pady=1, sticky=E)
+ttk.Button(estagiario, text="Escolha a planilha", command=selecionarest).grid(column=1, row=2, padx=350, pady=1, sticky=W)
 labelnomest = ttk.Label(estagiario, width=20, text="Nome:")
 labelnomest.grid(column=1, row=10, padx=25, pady=1, sticky=W)
 combonomest = ttk.Combobox(estagiario, values=nomesplan, textvariable=nome, width=50)
