@@ -1168,6 +1168,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pa.press('tab'), pa.write('9')
                 pa.press('tab', 7), pa.write('n'), pa.press('tab'), pa.write('4')
                 pa.press('tab'), pa.write('Ed. Fisica')
+                pa.press('tab', 2), pa.write(str(int(str(pessoa.admiss).replace('/', ''))+2).zfill(8))
                 # #clique em instituição de ensino
                 pa.click(pa.center(pa.locateOnScreen('./static/faculdade.png')))
                 pa.press('tab'), pp.copy(pessoa.est_faculdade), pa.hotkey('ctrl', 'v')
