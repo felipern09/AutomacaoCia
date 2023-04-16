@@ -1407,7 +1407,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
 caminhoaut = StringVar()
 
 
-def cadastrarautonomo(caminhoaut, nome, depto, salario):
+def cadastrar_autonomo(caminhoaut, nomeaut, matriculaaut, admissaoaut, cargoaut, deptoaut, ondeaut):
     pass
 
 
@@ -1586,14 +1586,55 @@ ttk.Button(estagiario, text="Carregar planilha", command=lambda: [carregarest(ca
 estagiario.pack(fill='both', expand=0)
 
 
-def carregaraut():
-    pass
+def carregaraut(local):
+    planwb = l_w(local)
+    plansh = planwb['Respostas ao formulário 1']
+    lista=[]
+    for x, pessoa in enumerate(plansh):
+        lista.append(f'{x+1} - {pessoa[2].value}')
+    combonomeaut.config(values=lista)
 
 
 autonomo = Frame(my_notebook, width=660, height=550)
-ttk.Label(autonomo, width=20, text="Escolher planilha de autônomos").grid(column=1, row=3, padx=25, pady=1, sticky=W)
-ttk.Button(autonomo, text="Planilha Autônomos", command=selecionaraut).grid(column=1, row=3, padx=20, pady=1, sticky=E)
-ttk.Button(autonomo, text="Carregar planilha", command=lambda: [carregaraut]).grid(column=1, row=9, padx=20, pady=25, sticky=E)
+ttk.Label(autonomo, width=40, text="Escolher planilha de novos funcionários").grid(column=1, row=1, padx=25, pady=1, sticky=W)
+ttk.Button(autonomo, text="Escolha a planilha", command=selecionaraut).grid(column=1, row=1, padx=350, pady=1, sticky=W)
+nomeaut = StringVar()
+cargo = StringVar()
+departamento = StringVar()
+nomesplanaut = []
+# aparecer dropdown com nomes da plan
+labelnomeaut = ttk.Label(autonomo, width=20, text="Nome:")
+labelnomeaut.grid(column=1, row=10, padx=25, pady=1, sticky=W)
+combonomeaut = ttk.Combobox(autonomo, values=nomesplan, textvariable=nome, width=50)
+combonomeaut.grid(column=1, row=10, padx=125, pady=1, sticky=W)
+# aparecer entry para preencher matricula
+labelmatraut = ttk.Label(autonomo, width=20, text="Matrícula:")
+labelmatraut.grid(column=1, row=11, padx=25, pady=1, sticky=W)
+entrymatraut = ttk.Entry(autonomo, width=20)
+entrymatraut.grid(column=1, row=11, padx=125, pady=1, sticky=W)
+# aparecer entry para preencher admissao
+labeladmissaut = ttk.Label(autonomo, width=20, text="Admissão:")
+labeladmissaut.grid(column=1, row=12, padx=25, pady=1, sticky=W)
+entryadmissaut = ttk.Entry(autonomo, width=20)
+entryadmissaut.grid(column=1, row=12, padx=125, pady=1, sticky=W)
+# aparecer dropdown para escolher cargo
+labelcargoaut = ttk.Label(autonomo, width=20, text="Cargo")
+labelcargoaut.grid(column=1, row=18, padx=25, pady=1, sticky=W)
+combocargoaut = ttk.Combobox(autonomo, values=cargos, textvariable=cargo, width=50)
+combocargoaut.grid(column=1, row=18, padx=125, pady=1, sticky=W)
+# aparecer dropdown para escolher depto
+labeldeptoaut = ttk.Label(autonomo, width=20, text="Departamento:")
+labeldeptoaut.grid(column=1, row=19, padx=25, pady=1, sticky=W)
+combodeptoaut = ttk.Combobox(autonomo, values=departamentos, textvariable=departamento, width=50)
+combodeptoaut.grid(column=1, row=19, padx=125, pady=1, sticky=W)
+feitondeaut = IntVar()
+ondeaut = ttk.Checkbutton(autonomo, text='Cadastro realizado fora da Cia.', variable=feitonde)
+ondeaut.grid(column=1, row=27, padx=26, pady=1, sticky=W)
+ttk.Button(autonomo, text="Carregar planilha", command=lambda: [carregaraut(caminho.get())]).grid(column=1, row=9, padx=350, pady=25, sticky=W)
+ttk.Button(autonomo, width=20, text="Cadastrar funcionário",
+           command=lambda: [cadastrar_autonomo(caminho.get(),combonomeaut.get(),
+                                               entrymatraut.get(), entryadmissaut.get(), combocargoaut.get(),
+                                               combodeptoaut.get(), feitondeaut.get())]).grid(column=1, row=28, padx=520, pady=1, sticky=W)
 autonomo.pack(fill='both', expand=1)
 
 
