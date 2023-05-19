@@ -11,6 +11,8 @@ from email import encoders
 from dados_servd import em_rem, em_ti, em_if, k1
 
 
+
+
 # this code automate the process of creation of tree documents for a new intern
 # set up interns datas and serv path
 hoje = datetime.today()

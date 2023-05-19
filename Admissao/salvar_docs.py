@@ -54,15 +54,17 @@ ps_contrato = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - F
             r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Contrato de Trabalho.pdf'.format(pessoa.nome)
 ps_ficha = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
             r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Folha de Registro.pdf'.format(pessoa.nome)
-
-os.mkdir(p_pessoa)
-os.mkdir(p_atestado)
-os.mkdir(p_contr)
-os.mkdir(p_diversos)
-os.mkdir(p_ferias)
-os.mkdir(p_ponto)
-os.mkdir(p_rec)
-os.mkdir(p_rescisao)
+try:
+    os.mkdir(p_pessoa)
+    os.mkdir(p_atestado)
+    os.mkdir(p_contr)
+    os.mkdir(p_diversos)
+    os.mkdir(p_ferias)
+    os.mkdir(p_ponto)
+    os.mkdir(p_rec)
+    os.mkdir(p_rescisao)
+except:
+    pass
 
 lotacao = {
     'Unidade Park Sul - Qualquer Departamento': ['0013', 'Thais Feitosa', 'thais.morais@ciaathletica.com.br', 'Líder Park Sul'],

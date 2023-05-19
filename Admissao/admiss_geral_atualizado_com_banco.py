@@ -665,7 +665,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                     'hrsemanais': str(sh[f"AQ{linha}"].value), 'hrmensais': str(sh[f"AR{linha}"].value)}
         email_remetente = em_rem
         senha = k1
-        lot = lotacao[f'{sh["AG3"].value}']
+        lot = lotacao[f'{sh[f"AG{linha}"].value}']
         pasta = r'\192.168.0.250'
         modelo = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\Modelo'
         os.makedirs(
