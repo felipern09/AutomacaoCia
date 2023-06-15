@@ -1734,7 +1734,146 @@ caminhoaut = StringVar()
 
 
 def cadastrar_autonomo(caminhoaut, nomeaut, matriculaaut, admissaoaut, cargoaut, deptoaut, ondeaut):
-    pass
+    # Cadastro iniciado em casa
+    wb = l_w(caminhoaut)
+    sh = wb['Respostas ao formulário 1']
+    num, name = nomeaut.strip().split(' - ')
+    linha = int(num)
+    lotacao = {'UNIDADE PARK SUL - QUALQUER DEPARTAMENTO': '0013', 'KIDS': '0010', 'MUSCULAÇÃO': '0007',
+               'ESPORTES E LUTAS': '0008', 'CROSSFIT': '0012', 'GINÁSTICA': '0006', 'GESTANTES': '0008',
+               'RECEPÇÃO': '0003',
+               'FINANCEIRO': '0001', 'TI': '0001', 'MARKETING': '0001', 'MANUTENÇÃO': '0004'}
+    aut = session.query(Colaborador).filter_by(matricula=matriculaaut).first()
+    if aut:
+        pass
+    else:
+        aut_cadastrado = Colaborador(
+            matricula=matriculaaut, nome=name.upper(), admiss=admissaoaut,
+            nascimento=str(sh[f'D{linha}'].value), pis=str(sh[f'S{linha}'].value).zfill(11),
+            cpf=str(int(sh[f'P{linha}'].value)).zfill(11),
+            rg=str(int(sh[f'Q{linha}'].value)),
+            emissor='SSP/DF', email=str(sh[f'B{linha}'].value),
+            genero=str(sh[f'E{linha}'].value), cor='9',
+            instru=str(sh[f'F{linha}'].value),
+            nacional='Brasileiro(a)', estado_civil='Solteiro(a)',
+            endereco=str(sh[f'I{linha}'].value),
+            num=str(sh[f'J{linha}'].value),
+            bairro=str(sh[f'K{linha}'].value), cep=str(sh[f'L{linha}'].value).replace('.', '').replace('-', ''),
+            cidade=str(sh[f'M{linha}'].value), cid_nas='Brasília - DF', uf='DF',
+            cod_municipioend=municipios['DF']['Brasília'],
+            tel=str(sh[f'O{linha}'].value).replace('(', '').replace(')', '').replace('.', '').replace('-', ''),
+            depto=deptoaut, cargo=cargoaut,
+        )
+        session.add(aut_cadastrado)
+        session.commit()
+    # abrir cadastro no dexion e atualizar informações campo a campo
+    pessoa = session.query(Colaborador).filter_by(matricula=matriculaaut).first()
+    pa.click(pa.center(pa.locateOnScreen('./static/Dexion.png')))
+    pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
+        'i'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(20)
+    pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.cpf)
+    t.sleep(1), pa.press('tab', 3), pa.write(pessoa.genero), pa.press('tab'), pa.write(pessoa.cor)
+    t.sleep(1), pa.press('tab', 2), pa.write(pessoa.instru)
+    t.sleep(1), pa.press('tab')
+    if str(pessoa.estado_civil) == 'Casado(a)':
+        pa.write('2')
+        pa.press('tab', 6)
+    else:
+        pa.write('1')
+        pa.press('tab', 5)
+    pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
+    t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v')
+    # # clique em documentos
+    pa.click(pa.center(pa.locateOnScreen('./static/Documentos.png')))
+    pa.press('tab'), pa.write(str(pessoa.rg)), pa.press('tab'), pa.write(
+        pessoa.emissor), pa.press('tab', 3), pa.write(pessoa.cod_municipioend), pa.press('tab')
+    pa.write(pessoa.pis)
+    # #clique em endereço
+    pa.click(pa.center(pa.locateOnScreen('./static/Endereco.png')))
+    pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
+        'tab'), pa.write(pessoa.num), pa.press('tab', 2)
+    pp.copy(pessoa.bairro), pa.hotkey('ctrl', 'v'), pa.press('tab'), pp.copy(pessoa.cidade), pa.hotkey(
+        'ctrl', 'v'), pa.press('tab'), pa.write(pessoa.uf)
+    pa.press('tab'), pa.write(pessoa.cep), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press(
+        'tab'), pa.write(str(pessoa.tel)), pa.press('tab', 2), pa.write(pessoa.email)
+    # #clique em dados contratuais
+    pa.click(pa.center(pa.locateOnScreen('./static/Contratuais.png')))
+    pa.press('tab'), pa.write(str(pessoa.admiss).replace('/', '')), t.sleep(1)
+    pa.press('tab'), pa.write('7')
+    # #clique em Outros
+    try:
+        pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
+    except:
+        t.sleep(5)
+        pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
+    t.sleep(2), pa.write('CARGO GERAL')
+    pa.press('tab'), pa.write(pessoa.cargo)
+    # #clique em eventos trabalhistas
+    pa.click(pa.center(pa.locateOnScreen('./static/EVTrab.png')))
+    t.sleep(1)
+    # #clique em lotação
+    pa.click(pa.center(pa.locateOnScreen('./static/Lotacoes.png')))
+    pa.press('tab'), pa.press('tab'), pa.write('i'), pa.write(str(pessoa.admiss).replace('/', ''))
+    t.sleep(1), pa.press('enter'), t.sleep(1)
+    pp.copy(lotacao[f'{pessoa.depto}']), pa.hotkey('ctrl', 'v'), pa.press('enter'), pa.write('3')
+    # #clique em salvar lotação
+    pa.click(pa.center(pa.locateOnScreen('./static/Salvarbtn.png'))), t.sleep(1)
+    # #clique em fechar lotação
+    try:
+        pa.click(pa.center(pa.locateOnScreen('./static/Fecharlot.png'))), t.sleep(1)
+    except:
+        t.sleep(4)
+        pa.click(pa.center(pa.locateOnScreen('./static/Fecharlot.png')))
+    # #clique em Compatibilidade
+    pa.click(pa.center(pa.locateOnScreen('./static/Compatibilidade3.png'))), t.sleep(1)
+    # #clique em Compatibilidade de novo
+    pa.click(pa.center(pa.locateOnScreen('./static/Compatibilidade2.png'))), t.sleep(1)
+    pa.press('tab', 2), pa.write('13')
+    # #clique em Salvar
+    pa.click(pa.center(pa.locateOnScreen('./static/Salvarcadastro.png'))), t.sleep(10)
+    # #clique em fechar novo cadastro
+    pa.click(pa.center(pa.locateOnScreen('./static/Fecharnovo1.png'))), t.sleep(2)
+    # #clique em fechar trabalhadores
+    pa.click(pa.center(pa.locateOnScreen('./static/Fechartrab1.png'))), t.sleep(0.5)
+    tkinter.messagebox.showinfo(
+        title='Cadastro ok!',
+        message='Cadastro realizado com sucesso!'
+    )
+
+
+def validarpis(local, nome):
+    wb = l_w(local, read_only=False)
+    sh = wb['Respostas ao formulário 1']
+    num, name = nome.strip().split(' - ')
+    x = int(num)
+    pis = str(sh[f'S{x}'].value).zfill(11)
+    v1 = int(pis[0]) * 3
+    v2 = int(pis[1]) * 2
+    v3 = int(pis[2]) * 9
+    v4 = int(pis[3]) * 8
+    v5 = int(pis[4]) * 7
+    v6 = int(pis[5]) * 6
+    v7 = int(pis[6]) * 5
+    v8 = int(pis[7]) * 4
+    v9 = int(pis[8]) * 3
+    v10 = int(pis[9]) * 2
+    d = int(pis[10])
+    soma = v1 + v2 + v3 + v4 + v5 + v6 + v7 + v8 + v9 + v10
+    divisao = soma % 11
+    resultado = 11 - divisao
+    if resultado != d:
+        if resultado == 10 & d == 0 | resultado == 11 & d == 0:
+            pass
+        else:
+            tkinter.messagebox.showinfo(
+                title='Erro!',
+                message='PIS inválido!'
+            )
+    else:
+        tkinter.messagebox.showinfo(
+            title='Ok!',
+            message='PIS ok!'
+        )
 
 
 def selecionarfunc():
@@ -1845,7 +1984,7 @@ combonome.bind("<<ComboboxSelected>>", mostrarhorario)
 def carregarfunc(local):
     planwb = l_w(local)
     plansh = planwb['Respostas ao formulário 1']
-    lista=[]
+    lista = []
     for x, pessoa in enumerate(plansh):
         lista.append(f'{x+1} - {pessoa[2].value}')
     combonome.config(values=lista)
@@ -1920,14 +2059,14 @@ estagiario.pack(fill='both', expand=0)
 def carregaraut(local):
     planwb = l_w(local)
     plansh = planwb['Respostas ao formulário 1']
-    lista=[]
+    lista = []
     for x, pessoa in enumerate(plansh):
         lista.append(f'{x+1} - {pessoa[2].value}')
     combonomeaut.config(values=lista)
 
 
 autonomo = Frame(my_notebook, width=660, height=550)
-ttk.Label(autonomo, width=40, text="Escolher planilha de novos funcionários").grid(column=1, row=1, padx=25, pady=1, sticky=W)
+ttk.Label(autonomo, width=40, text="Escolher planilha de autônomos").grid(column=1, row=1, padx=25, pady=1, sticky=W)
 ttk.Button(autonomo, text="Escolha a planilha", command=selecionaraut).grid(column=1, row=1, padx=350, pady=1, sticky=W)
 nomeaut = StringVar()
 cargo = StringVar()
@@ -1961,8 +2100,11 @@ combodeptoaut.grid(column=1, row=19, padx=125, pady=1, sticky=W)
 feitondeaut = IntVar()
 ondeaut = ttk.Checkbutton(autonomo, text='Cadastro realizado fora da Cia.', variable=feitonde)
 ondeaut.grid(column=1, row=27, padx=26, pady=1, sticky=W)
-ttk.Button(autonomo, text="Carregar planilha", command=lambda: [carregaraut(caminho.get())]).grid(column=1, row=9, padx=350, pady=25, sticky=W)
-ttk.Button(autonomo, width=20, text="Cadastrar funcionário no Dexion",
+ttk.Button(autonomo, text="Carregar planilha", command=lambda: [carregaraut(caminhoaut.get())]).grid(column=1, row=9, padx=350, pady=25, sticky=W)
+ttk.Button(autonomo, width=20, text="Validar PIS",
+           command=lambda: [validarpis(caminhoaut.get(),combonomeaut.get())]).grid(column=1, row=10, padx=520, pady=1, sticky=W)
+
+ttk.Button(autonomo, width=20, text="Cadastrar autônomo",
            command=lambda: [cadastrar_autonomo(caminho.get(),combonomeaut.get(),
                                                entrymatraut.get(), entryadmissaut.get(), combocargoaut.get(),
                                                combodeptoaut.get(), feitondeaut.get())]).grid(column=1, row=28, padx=520, pady=1, sticky=W)
