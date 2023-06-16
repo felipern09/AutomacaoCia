@@ -15,6 +15,7 @@ import docx2pdf
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 from email.mime.base import MIMEBase
 from email import encoders
 from dados_servd import em_rem, em_ti, em_if, k1
@@ -854,37 +855,29 @@ def enviaemailsfunc(matricula):
               r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome)
     email_remetente = em_rem
     senha = k1
-    # set up smtpp connection
+    # set up smtp connection
     s = smtplib.SMTP(host='smtp.office365.com', port=587)
     s.starttls()
     s.login(email_remetente, senha)
 
     # send e-mail to employee with a pdf file so he/she can go to bank to open an account
-    msg = MIMEMultipart()
-    arquivo = p_contr + '\\Abertura Conta.pdf'
-    message = f'''
-                Olá, {str(pessoa.nome).title().split(" ")[0]}!\n
-                \n
-                Segue sua carta para abertura de conta bancária no Itaú.\n
-                Você deve abrir a conta antes de iniciar seu contrato de trabalho. Ok?\n
-                \n
-                Atenciosamente,\n
-                Felipe Rodrigues
-                '''
-    html = r'''
-        <html>
-            <body>
-                <img src="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png">
-            </body>
-        </html>
-        '''
-
-    # set up the parameters of the message
+    msg = MIMEMultipart('alternative')
     msg['From'] = email_remetente
     msg['To'] = pessoa.email
     msg['Subject'] = "Carta para Abertura de conta"
-    msg.attach(MIMEText(message, 'plain', _charset='utf-8'))
-    msg.attach(MIMEText(html, "html"))
+    arquivo = p_contr + '\\Abertura Conta.pdf'
+    text = MIMEText(f'''Olá, {str(pessoa.nome).title().split(" ")[0]}!<br><br>
+    Segue sua carta para abertura de conta bancária no Itaú.<br>
+    Você deve abrir a conta antes de iniciar seu contrato de trabalho. Ok?<br><br>
+    Atenciosamente,<br>
+    <img src="cid:image1">''', 'html')
+    
+    # set up the parameters of the message
+    msg.attach(text)
+    image = MIMEImage(
+        open(r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
+    image.add_header('Content-ID', '<image1>')
+    msg.attach(image)
     # attach pdf file
     part = MIMEBase('application', "octet-stream")
     part.set_payload(open(arquivo, "rb").read())
@@ -892,26 +885,22 @@ def enviaemailsfunc(matricula):
     part.add_header('Content-Disposition', 'attachment',
                     filename=f'Carta Banco {str(pessoa.nome).title().split(" ")[0]}.pdf')
     msg.attach(part)
-    s.send_message(msg)
+    s.sendmail(email_remetente, pessoa.email, msg.as_string())
     del msg
 
     # send e-mail to coworker asking to register the ner employee
-    msg = MIMEMultipart()
+    msg = MIMEMultipart('alternative')
     arquivo = p_contr + '\\Ficha Cadastral.pdf'
-    message = f'''Oi, Wallace!\n\nSegue a ficha cadastral do(a) {pessoa.nome}.\n\nAbs.,\nFelipe'''
-    html = r'''
-        <html>
-            <body>
-                <img src="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png">
-            </body>
-        </html>
-        '''
+    text = MIMEText(f'''Oi, Wallace!<br><br>Segue a ficha cadastral do(a) {pessoa.nome}.<br><br>Abs.,<br><img src="cid:image1">''', 'html')
+    msg.attach(text)
+    image = MIMEImage(
+        open(r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
+    image.add_header('Content-ID', '<image1>')
+    msg.attach(image)
     # set up the parameters of the message
     msg['From'] = email_remetente
     msg['To'] = em_ti
     msg['Subject'] = f"Ficha Cadastral {str(pessoa.nome).title().split(' ')[0]}"
-    msg.attach(MIMEText(message, 'plain', _charset='utf-8'))
-    msg.attach(MIMEText(html, "html"))
     # attach pdf file
     part = MIMEBase('application', "octet-stream")
     part.set_payload(open(arquivo, "rb").read())
@@ -919,7 +908,7 @@ def enviaemailsfunc(matricula):
     part.add_header('Content-Disposition', 'attachment',
                     filename=f'Ficha Cadastral {str(pessoa.nome).title().split(" ")[0]}.pdf')
     msg.attach(part)
-    s.send_message(msg)
+    s.sendmail(email_remetente, em_ti, msg.as_string())
     del msg
     s.quit()
     tkinter.messagebox.showinfo(
@@ -1090,32 +1079,23 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         s.login(email_remetente, senha)
 
         # send e-mail to intern with a pdf file so he/she can go to bank to open an account
-        msg = MIMEMultipart()
+        msg = MIMEMultipart('alternative')
         arquivo = pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.pdf'
-        message = f'''
-                    Olá, {str(cadastro["nome"]).split(" ")[0]}!\n
-                    \n
-                    Segue sua carta para abertura de conta bancária no Itaú.\n
-                    Você deve abrir a conta antes de iniciar os trabalhos no estágio. Ok?\n
-                    Você já pode buscar seu contrato no IF. Será necessário levar uma declaração de matrícula do seu curso.\n
-                    \n
-                    Atenciosamente,\n
-                    Felipe Rodrigues
-                    '''
-        html = r'''
-            <html>
-                <body>
-                    <img src="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png">
-                </body>
-            </html>
-            '''
-
+        text = MIMEText(f'''Olá, {str(cadastro["nome"]).split(" ")[0]}!<br><br>
+        Segue sua carta para abertura de conta bancária no Itaú.<br>
+        Você deve abrir a conta antes de iniciar os trabalhos no estágio. Ok?<br>
+        Você já pode buscar seu contrato no IF. Será necessário levar uma declaração de matrícula do seu curso.<br><br>
+        Atenciosamente,<br>
+        <img src="cid:image1">''', 'html')
+        msg.attach(text)
+        image = MIMEImage(
+            open(r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
+        image.add_header('Content-ID', '<image1>')
+        msg.attach(image)
         # set up the parameters of the message
         msg['From'] = email_remetente
         msg['To'] = cadastro['email']
         msg['Subject'] = "Carta para Abertura de conta"
-        msg.attach(MIMEText(message, 'plain', _charset='utf-8'))
-        msg.attach(MIMEText(html, "html"))
         # attach pdf file
         part = MIMEBase('application', "octet-stream")
         part.set_payload(open(arquivo, "rb").read())
@@ -1123,27 +1103,26 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         part.add_header('Content-Disposition', 'attachment',
                         filename=f'Carta Banco {str(cadastro["nome"]).split(" ")[0]}.pdf')
         msg.attach(part)
-        s.send_message(msg)
+        s.sendmail(email_remetente, cadastro['email'], msg.as_string())
         del msg
 
         # send e-mail to coworker asking to register the intern
-        msg = MIMEMultipart()
+        msg = MIMEMultipart('alternative')
         arquivo = pasta_contratuais + f'\\Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.pdf'
-        message = f'''Oi, Wallace!\n\nSegue a ficha cadastral do(a) estagiário(a) {cadastro["nome"]}.\n\nAbs.,\nFelipe'''
-        html = r'''
-            <html>
-                <body>
-                    <img src="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png">
-                </body>
-            </html>
-            '''
-
+        text = MIMEText(f'''Oi, Wallace!<br><br>
+        Segue a ficha cadastral do(a) estagiário(a) {cadastro["nome"]}.<br><br>
+        Abs.,<br>
+        <img src="cid:image1">''', 'html')
+        msg.attach(text)
+        image = MIMEImage(
+            open(r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
+        # Define the image's ID as referenced in the HTML body above
+        image.add_header('Content-ID', '<image1>')
+        msg.attach(image)
         # set up the parameters of the message
         msg['From'] = email_remetente
         msg['To'] = em_ti
         msg['Subject'] = f"Ficha Cadastral {str(cadastro['nome']).split(' ')[0]}"
-        msg.attach(MIMEText(message, 'plain', _charset='utf-8'))
-        msg.attach(MIMEText(html, "html"))
         # attach pdf file
         part = MIMEBase('application', "octet-stream")
         part.set_payload(open(arquivo, "rb").read())
@@ -1151,33 +1130,23 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         part.add_header('Content-Disposition', 'attachment',
                         filename=f'Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.pdf')
         msg.attach(part)
-        s.send_message(msg)
+        s.sendmail(email_remetente, em_ti, msg.as_string())
         del msg
 
         # send document asking for the intern contract
-        msg = MIMEMultipart()
+        msg = MIMEMultipart('alternative')
         arquivo = pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf'
-        message = f'''
-                    Olá!\n
-                    \n
-                    Segue pedido de TCE do(a) estagiário(a) {cadastro["nome"]}.\n
-                    \n
-                    Atenciosamente,\n
-                    Felipe Rodrigues
-                    '''
-        html = r'''
-            <html>
-                <body>
-                    <img src="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png">
-                </body>
-            </html>
-            '''
+        text = MIMEText(f'''Olá!\n\nSegue pedido de TCE do(a) estagiário(a) {cadastro["nome"]}.\n\nAtenciosamente,<br><img src="cid:image1">''', 'html')
+        msg.attach(text)
+        image = MIMEImage(
+            open(r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
+        # Define the image's ID as referenced in the HTML body above
+        image.add_header('Content-ID', '<image1>')
+        msg.attach(image)
         # set up the parameters of the message
         msg['From'] = email_remetente
         msg['To'] = em_if
         msg['Subject'] = f"Pedido TCE {str(cadastro['nome']).split(' ')[0]}"
-        msg.attach(MIMEText(message, 'plain', _charset='utf-8'))
-        msg.attach(MIMEText(html, "html"))
         # attach pdf file
         part = MIMEBase('application', "octet-stream")
         part.set_payload(open(arquivo, "rb").read())
@@ -1185,7 +1154,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         part.add_header('Content-Disposition', 'attachment',
                         filename=f'Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf')
         msg.attach(part)
-        s.send_message(msg)
+        s.sendmail(email_remetente, em_if, msg.as_string())
         del msg
         s.quit()
         tkinter.messagebox.showinfo(
