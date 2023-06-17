@@ -19,6 +19,7 @@ from email.mime.image import MIMEImage
 from email.mime.base import MIMEBase
 from email import encoders
 from dados_servd import em_rem, em_ti, em_if, k1
+from difflib import SequenceMatcher
 
 
 # this code automates the task process necessary for hiring a company employee. Made in tkinter, it was developed for
@@ -64,16 +65,43 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
             message='Preencha todos os campos antes de cadastrar o funcionário!'
         )
     else:
+        wb = l_w(caminho, read_only=False)
+        sh = wb['Respostas ao formulário 1']
+        num, name = nome.strip().split(' - ')
+        linha = int(num)
+
+        # search for the highest compatibility between the city filled in the form and the cities in the lists to define codmunnas value
+        pn = l_w('Cadastro de Funcionário (respostas).xlsx', read_only=False)
+        sn = pn['Respostas ao formulário 1']
+        x = 2
+        while x <= len(sn['L']):
+            est = str(sn[f'AJ{x}'].value)
+            cidade = str(sn[f'L{x}'].value).title()
+            lista = []
+            dicion = {}
+            for cid in municipios[est]:
+                dicion[SequenceMatcher(None, cidade, cid).ratio()] = cid
+                lista.append(SequenceMatcher(None, cidade, cid).ratio())
+            codmunnas = municipios[str(sh[f'AJ{linha}'].value).upper().strip()][dicion[max(lista)]]
+
+        # search for the highest compatibility between the city filled in the form and the cities in the lists to define codmunend value
+        x = 2
+        while x <= len(sn['L']):
+            est = str(sn[f'AJ{x}'].value)
+            cidade = str(sn[f'L{x}'].value).title()
+            listaend = []
+            dicionend = {}
+            for cid in municipios[est]:
+                dicionend[SequenceMatcher(None, cidade, cid).ratio()] = cid
+                listaend.append(SequenceMatcher(None, cidade, cid).ratio())
+            codmunend = municipios[str(sh[f'T{linha}'].value).upper().strip()][dicionend[max(listaend)]]
+
         lotacao = {'UNIDADE PARK SUL - QUALQUER DEPARTAMENTO':'0013','KIDS':'0010','MUSCULAÇÃO':'0007',
                  'ESPORTES E LUTAS':'0008','CROSSFIT':'0012','GINÁSTICA':'0006','GESTANTES':'0008','RECEPÇÃO':'0003',
                  'FINANCEIRO':'0001','TI':'0001','MARKETING':'0001','MANUTENÇÃO':'0004'}
         if editar == 0:
             if ondestou == 0:
                 # Cadastro iniciado na Cia
-                wb = l_w(caminho, read_only=False)
-                sh = wb['Respostas ao formulário 1']
-                num, name = nome.strip().split(' - ')
-                linha = int(num)
                 if linha:
                     pess = Colaborador(matricula=matricula, nome=name.upper(), admiss=admissao,
                                        nascimento=str(sh[f'D{linha}'].value),
@@ -85,7 +113,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                                        estado_civil=str(sh[f'F{linha}'].value), cor=str(sh[f'G{linha}'].value),
                                        instru=str(sh[f'J{linha}'].value),
                                        nacional=str(sh[f'K{linha}'].value),
-                                       cod_municipionas=municipios[str(sh[f'AJ{linha}'].value).upper().strip()][str(sh[f'L{linha}'].value).title().strip()],
+                                       cod_municipionas=codmunnas,                                       
                                        cid_nas=str(sh[f'L{linha}'].value), uf_nas=str(sh[f'AJ{linha}'].value),
                                        pai=str(sh[f'M{linha}'].value).upper(),
                                        mae=str(sh[f'N{linha}'].value).upper(), endereco=str(sh[f'O{linha}'].value),
@@ -93,7 +121,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                                        bairro=str(sh[f'Q{linha}'].value), cep=str(int(sh[f'R{linha}'].value)),
                                        cidade=str(sh[f'S{linha}'].value),
                                        uf=str(sh[f'T{linha}'].value),
-                                       cod_municipioend=municipios[str(sh[f'T{linha}'].value).upper().strip()][str(sh[f'S{linha}'].value).title().strip()],
+                                       cod_municipioend=codmunend,
                                        tel=str(int(sh[f'U{linha}'].value)),
                                        tit_eleit=str(sh[f'Z{linha}'].value), zona_eleit=str(sh[f'AA{linha}'].value),
                                        sec_eleit=str(sh[f'AB{linha}'].value),
@@ -249,7 +277,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                                        estado_civil=str(sh[f'F{linha}'].value), cor=str(sh[f'G{linha}'].value),
                                        instru=str(sh[f'J{linha}'].value),
                                        nacional=str(sh[f'K{linha}'].value),
-                                       cod_municipionas=municipios[str(sh[f'AJ{linha}'].value).upper().strip()][str(sh[f'L{linha}'].value).title().strip()],
+                                       cod_municipionas=codmunnas,
                                        cid_nas=str(sh[f'L{linha}'].value), uf_nas=str(sh[f'AJ{linha}'].value),
                                        pai=str(sh[f'M{linha}'].value).upper(),
                                        mae=str(sh[f'N{linha}'].value).upper(), endereco=str(sh[f'O{linha}'].value),
@@ -257,7 +285,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                                        bairro=str(sh[f'Q{linha}'].value), cep=str(int(sh[f'R{linha}'].value)),
                                        cidade=str(sh[f'S{linha}'].value),
                                        uf=str(sh[f'T{linha}'].value),
-                                       cod_municipioend=municipios[str(sh[f'T{linha}'].value).upper().strip()][str(sh[f'S{linha}'].value).title().strip()],
+                                       cod_municipioend=codmunend,
                                        tel=str(int(sh[f'U{linha}'].value)),
                                        tit_eleit=str(sh[f'Z{linha}'].value), zona_eleit=str(sh[f'AA{linha}'].value),
                                        sec_eleit=str(sh[f'AB{linha}'].value),
