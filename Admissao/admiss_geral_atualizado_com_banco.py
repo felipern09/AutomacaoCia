@@ -1845,6 +1845,10 @@ def validarpis(local, nome):
         )
 
 
+def desligar(estag, func, apedido, acordo, mandado, comaviso, semaviso):
+    pass
+
+
 def selecionarfunc():
     try:
         caminhoplan = tkinter.filedialog.askopenfilename(title='Planilha Funcionários')
@@ -1969,7 +1973,6 @@ ttk.Button(funcionario, width=20, text="Salvar Docs",
            command=lambda: [salvadocsfunc(entrymatr.get())]).grid(column=1, row=29, padx=520, pady=1, sticky=W)
 ttk.Button(funcionario, width=20, text="Enviar e-mails",
            command=lambda: [enviaemailsfunc(entrymatr.get())]).grid(column=1, row=30, padx=520, pady=1, sticky=W)
-
 funcionario.pack(fill='both', expand=0)
 
 estagiario = Frame(my_notebook, width=60, height=50)
@@ -2112,15 +2115,30 @@ ttk.Button(ferias, text="Planilha Autônomos", command=selecionaraut).grid(colum
 ttk.Button(ferias, text="Carregar planilha", command=lambda: [enviarmsgferias]).grid(column=1, row=9, padx=20, pady=25, sticky=E)
 ferias.pack(fill='both', expand=1)
 
-
-def desligar():
-    pass
-
-
+desl = session.query(Colaborador).filter_by(desligamento=None).all()
+ativos = []
+for p in desl:
+    ativos.append(str(p.nome).title())
+adesligar = sorted(ativos)
+desligado = StringVar()
 desligamento = Frame(my_notebook, width=660, height=550)
-ttk.Label(desligamento, width=20, text="Escolher planilha de autônomos").grid(column=1, row=3, padx=25, pady=1, sticky=W)
-ttk.Button(desligamento, text="Planilha Autônomos", command=selecionaraut).grid(column=1, row=3, padx=20, pady=1, sticky=E)
-ttk.Button(desligamento, text="Carregar planilha", command=lambda: [desligar]).grid(column=1, row=9, padx=20, pady=25, sticky=E)
+labelnomdeslig = ttk.Label(desligamento, width=20, text="Nome:")
+labelnomdeslig.grid(column=1, row=10, padx=25, pady=1, sticky=W)
+combonomdeslig = ttk.Combobox(desligamento, values=adesligar, textvariable=desligado, width=50)
+combonomdeslig.grid(column=1, row=10, padx=125, pady=1, sticky=W)
+solicitardeslig = IntVar()
+solictdeslig = ttk.Checkbutton(desligamento, text='Apenas solicitar contrato.', variable=solicitardeslig)
+solictdeslig.grid(column=1, row=25, padx=26, pady=1, sticky=W)
+edicaodeslig = IntVar()
+editardeslig = ttk.Checkbutton(desligamento, text='Editar cadastro feito manualmente.', variable=edicaodeslig)
+editardeslig.grid(column=1, row=26, padx=26, pady=1, sticky=W)
+feitondedeslig = IntVar()
+ondedeslig = ttk.Checkbutton(desligamento, text='Cadastro realizado fora da Cia.', variable=feitondedeslig)
+ondedeslig.grid(column=1, row=27, padx=26, pady=1, sticky=W)
+cargodeslig = StringVar()
+
+ttk.Button(desligamento, width=20, text="Realizar desligamento",
+           command=lambda: []).grid(column=1, row=28, padx=520, pady=1, sticky=W)
 desligamento.pack(fill='both', expand=1)
 
 my_notebook.add(funcionario, text='Cadastrar Funcionário')
