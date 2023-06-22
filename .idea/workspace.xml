@@ -42,7 +42,7 @@
       <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.teste">
+  <component name="RunManager" selected="Python.admiss_geral_atualizado_com_banco">
     <configuration name="Lanca_folha" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -150,9 +150,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.teste" />
-        <item itemvalue="Python.cadastrar_banco" />
         <item itemvalue="Python.admiss_geral_atualizado_com_banco" />
+        <item itemvalue="Python.cadastrar_banco" />
+        <item itemvalue="Python.teste" />
         <item itemvalue="Python.teste_email" />
         <item itemvalue="Python.Lanca_folha" />
       </list>

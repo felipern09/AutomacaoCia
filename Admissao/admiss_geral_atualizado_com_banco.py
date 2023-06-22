@@ -1746,7 +1746,7 @@ def cadastrar_autonomo(caminhoaut, nomeaut, matriculaaut, admissaoaut, cargoaut,
     else:
         aut_cadastrado = Colaborador(
             matricula=matriculaaut, nome=name.upper(), admiss=admissaoaut,
-            nascimento=str(sh[f'D{linha}'].value), pis=str(sh[f'S{linha}'].value).zfill(11),
+            nascimento=str(sh[f'D{linha}'].value), pis=str(sh[f'S{linha}'].value).replace('.','').replace('-','').zfill(11),
             cpf=str(int(sh[f'P{linha}'].value)).zfill(11),
             rg=str(int(sh[f'Q{linha}'].value)),
             emissor='SSP/DF', email=str(sh[f'B{linha}'].value),
@@ -1843,7 +1843,7 @@ def validarpis(local, nome):
     sh = wb['Respostas ao formulário 1']
     num, name = nome.strip().split(' - ')
     x = int(num)
-    pis = str(sh[f'S{x}'].value).zfill(11)
+    pis = str(sh[f'S{x}'].value).replace('-','').replace('.','').zfill(11)
     v1 = int(pis[0]) * 3
     v2 = int(pis[1]) * 2
     v3 = int(pis[2]) * 9
@@ -2105,7 +2105,7 @@ ttk.Button(autonomo, width=20, text="Validar PIS",
            command=lambda: [validarpis(caminhoaut.get(),combonomeaut.get())]).grid(column=1, row=10, padx=520, pady=1, sticky=W)
 
 ttk.Button(autonomo, width=20, text="Cadastrar autônomo",
-           command=lambda: [cadastrar_autonomo(caminho.get(),combonomeaut.get(),
+           command=lambda: [cadastrar_autonomo(caminhoaut.get(),combonomeaut.get(),
                                                entrymatraut.get(), entryadmissaut.get(), combocargoaut.get(),
                                                combodeptoaut.get(), feitondeaut.get())]).grid(column=1, row=28, padx=520, pady=1, sticky=W)
 autonomo.pack(fill='both', expand=1)
