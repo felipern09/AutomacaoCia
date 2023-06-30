@@ -1214,7 +1214,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                     estag_cadastrado = Colaborador(
                         matricula=matricula, nome=name.upper(), admiss=admissao,
                         nascimento=str(sh[f'D{linha}'].value),
-                        cpf=str(int(sh[f'V{linha}'].value)).zfill(11),
+                        cpf=str(sh[f'V{linha}'].value).replace('.','').replace('-','').zfill(11),
                         rg=str(int(sh[f'W{linha}'].value)),
                         emissor='SSP/DF', email=str(sh[f'B{linha}'].value),
                         genero=str(sh[f'E{linha}'].value),

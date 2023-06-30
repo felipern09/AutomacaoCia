@@ -7,7 +7,6 @@ wb = l_w("Lancamentos.xlsx")
 # # lançamento de faltas
 sh = wb['Faltas']
 x = 2
-
 while x <= len(sh['A']):
     mat = str(sh[f'A{x}'].value)
     rub = str(sh[f'C{x}'].value)
@@ -22,9 +21,9 @@ x = 2
 while x <= len(sh['A']):
     rub = ['1006', '1007', '1010', '1011', '1012', '1037']
     mat = str(sh[f'A{x}'].value)
-    pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(0.5), pa.press('d')
+    pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(1), pa.press('d')
     for r in rub:
-        pa.write(r), t.sleep(0.5), pa.press('enter'), t.sleep(0.5), pa.press('left'), t.sleep(0.5), pa.press('enter')
+        pa.write(r), t.sleep(0.8), pa.press('enter'), t.sleep(0.5), pa.press('left'), t.sleep(0.5), pa.press('enter')
     pa.press('enter', 2)
     x += 1
 
@@ -46,7 +45,6 @@ while x <= len(sh['A']):
             dsrlancado = True
         except:
             dsrlancado = False
-    print(dsrlancado)
     pa.press('a'), t.sleep(0.5), pa.write(rub)
     pa.press('enter'), t.sleep(0.5), pa.write(hr), t.sleep(0.5), pa.press('enter', 2)
     if dsrlancado:
