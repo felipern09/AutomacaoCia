@@ -178,38 +178,6 @@ class Frame1(ttk.Frame):
         except ValueError:
             pass
 
-        def carregarfunc(local):
-            planwb = l_w(local)
-            plansh = planwb['Respostas ao formulário 1']
-            lista = []
-            for x, pessoa in enumerate(plansh):
-                lista.append(f'{x + 1} - {pessoa[2].value}')
-            self.combonome.config(values=lista)
-
-        self.botaocarregar = ttk.Button(self, text="Carregar planilha",
-                                        command=lambda: [carregarfunc(self.caminho.get())])
-        self.botaocarregar.grid(column=1, row=9, padx=350, pady=25, sticky=W)
-        self.botaocadastrar = ttk.Button(self, width=20, text="Cadastrar no Dexion",
-                                         command=lambda: [cadastro_funcionario(self.caminho.get(), self.edicao.get(),
-                                                                               self.feitonde.get(),
-                                                                               self.combonome.get(),
-                                                                               self.entrymatr.get(),
-                                                                               self.entryadmiss.get(),
-                                                                               self.combohor.get(),
-                                                                               self.entrysal.get(),
-                                                                               self.combocargo.get(),
-                                                                               self.combodepto.get(),
-                                                                               self.combocontr.get(),
-                                                                               self.hrs.get(),
-                                                                               self.hrm.get())])
-        self.botaocadastrar.grid(column=1, row=28, padx=520, pady=1, sticky=W)
-        self.botaosalvar = ttk.Button(self, width=20, text="Salvar Docs",
-                                      command=lambda: [salvadocsfunc(self.entrymatr.get())])
-        self.botaosalvar.grid(column=1, row=29, padx=520, pady=1, sticky=W)
-        self.botaoenviaemail = ttk.Button(self, width=20, text="Enviar e-mails",
-                                          command=lambda: [enviaemailsfunc(self.entrymatr.get())])
-        self.botaoenviaemail.grid(column=1, row=30, padx=520, pady=1, sticky=W)
-
 
 def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
                          horario='', salario='', cargo='', depto='', tipo_contr='',
