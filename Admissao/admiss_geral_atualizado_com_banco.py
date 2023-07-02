@@ -1,6 +1,9 @@
+import tkinter as tk
+from tkcalendar import DateEntry
+from datetime import datetime
+import tkinter.filedialog
 import pyautogui as pa
 import pyperclip as pp
-from datetime import datetime
 import time as t
 from models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
@@ -22,42 +25,197 @@ from dados_servd import em_rem, em_ti, em_if, k1
 from difflib import SequenceMatcher
 
 
-# this code automates the task process necessary for hiring a company employee. Made in tkinter, it was developed for
-# the desktop to be integrated with other HR programs in the company
-# it automates, through different processes, admissions of employees, interns or freelancers.
-# each one with its specificity
+class MainApplication(tk.Tk):
+    def __init__(self):
+        super().__init__()
 
-root = Tk()
-root.title("Atividades DP - Cia BSB")
-img = PhotoImage(file='./static/icone.png')
-root.iconphoto(False, img)
-root.geometry('661x550')
-root.columnconfigure(0, weight=5)
-root.rowconfigure(0, weight=5)
+        self.title("Atividades DP - Cia BSB")
+        self.geometry('661x550')
+        self.img = PhotoImage(file='../Solicitacao de pagamento/static/Icone.png')
+        self.iconphoto(False, self.img)
+        self.columnconfigure(0, weight=5)
+        self.rowconfigure(0, weight=5)
+        for child in self.winfo_children():
+            child.grid_configure(padx=1, pady=3)
+        self.notebook = ttk.Notebook(self)
 
-for child in root.winfo_children():
-    child.grid_configure(padx=1, pady=3)
+        self.Frame1 = Frame1(self.notebook)
+        self.Frame2 = Frame2(self.notebook)
+        self.Frame3 = Frame3(self.notebook)
+        self.Frame4 = Frame4(self.notebook)
 
-my_notebook = ttk.Notebook(root)
-my_notebook.pack()
+        self.notebook.add(self.Frame1, text='Cadastrar Funcionário')
+        self.notebook.add(self.Frame2, text='Cadastrar Estagiário')
+        self.notebook.add(self.Frame3, text='Cadastrar Autônomo')
+        self.notebook.add(self.Frame4, text='Desligamento')
 
-menubar = Menu(root)
-filemenu = Menu(menubar, tearoff=0)
-filemenu.add_command(label="Configurações", command='')
-filemenu.add_separator()
-filemenu.add_command(label="Solicitar Suporte", command='')
-filemenu.add_command(label="Sair", command=root.quit)
-menubar.add_cascade(label="Configurações", menu=filemenu)
-geral = StringVar()
+        self.notebook.pack()
 
-Sessions = sessionmaker(bind=engine)
-session = Sessions()
-caminho = StringVar()
+
+class Frame1(ttk.Frame):
+    def __init__(self, container):
+        super().__init__()
+
+        self.hoje = datetime.today()
+        self.geral = StringVar()
+        self.caminho = StringVar()
+        self.labelescolh = ttk.Label(self, width=40, text="Escolher planilha de novos funcionários")
+        self.labelescolh.grid(column=1, row=1, padx=25, pady=1, sticky=W)
+        self.botaoescolha = ttk.Button(self, text="Escolha a planilha", command=self.selecionarfunc)
+        self.botaoescolha.grid(column=1, row=1, padx=350, pady=1, sticky=W)
+        self.nome = StringVar()
+        self.horario = StringVar()
+        self.cargo = StringVar()
+        self.departamento = StringVar()
+        self.tipocontr = StringVar()
+        self.nomesplan = []
+        # aparecer dropdown com nomes da plan
+        self.labelnome = ttk.Label(self, width=20, text="Nome:")
+        self.labelnome.grid(column=1, row=10, padx=25, pady=1, sticky=W)
+        self.combonome = ttk.Combobox(self, values=self.nomesplan, textvariable=self.nome, width=50)
+        self.combonome.grid(column=1, row=10, padx=125, pady=1, sticky=W)
+        # aparecer entry para preencher matricula
+        self.labelmatr = ttk.Label(self, width=20, text="Matrícula:")
+        self.labelmatr.grid(column=1, row=11, padx=25, pady=1, sticky=W)
+        self.entrymatr = ttk.Entry(self, width=20)
+        self.entrymatr.grid(column=1, row=11, padx=125, pady=1, sticky=W)
+        # aparecer entry para preencher admissao
+        self.labeladmiss = ttk.Label(self, width=20, text="Admissão:")
+        self.labeladmiss.grid(column=1, row=12, padx=25, pady=1, sticky=W)
+        self.entryadmiss = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month,
+                                     day=self.hoje.day, locale='pt_BR')
+        self.entryadmiss.grid(column=1, row=12, padx=125, pady=1, sticky=W)
+        # aparecer horario preenchido e dropdown para escolher horario
+        self.labelhor = ttk.Label(self, width=55, text="Horário preenchido: ")
+        self.labelhor.grid(column=1, row=14, padx=25, pady=1, sticky=W)
+        self.combohor = ttk.Combobox(self, values=horarios, textvariable=self.horario, width=50)
+        self.combohor.grid(column=1, row=15, padx=125, pady=1, sticky=W)
+        # aparecer entry para preencher salario
+        self.labelsal = ttk.Label(self, width=20, text="Salário:")
+        self.labelsal.grid(column=1, row=16, padx=25, pady=1, sticky=W)
+        self.entrysal = ttk.Entry(self, width=20)
+        self.entrysal.grid(column=1, row=16, padx=125, pady=1, sticky=W)
+        # aparecer dropdown para escolher cargo
+        self.labelcargo = ttk.Label(self, width=20, text="Cargo")
+        self.labelcargo.grid(column=1, row=18, padx=25, pady=1, sticky=W)
+        self.combocargo = ttk.Combobox(self, values=cargos, textvariable=self.cargo, width=50)
+        self.combocargo.grid(column=1, row=18, padx=125, pady=1, sticky=W)
+        # aparecer dropdown para escolher depto
+        self.labeldepto = ttk.Label(self, width=20, text="Departamento:")
+        self.labeldepto.grid(column=1, row=19, padx=25, pady=1, sticky=W)
+        self.combodepto = ttk.Combobox(self, values=departamentos, textvariable=self.departamento, width=50)
+        self.combodepto.grid(column=1, row=19, padx=125, pady=1, sticky=W)
+        # aparecer dropdown para escolher tipo_contr
+        self.labelcontr = ttk.Label(self, width=20, text="Tipo de contrato:")
+        self.labelcontr.grid(column=1, row=21, padx=25, pady=1, sticky=W)
+        self.combocontr = ttk.Combobox(self, values=tipodecontrato, textvariable=self.tipocontr, width=50)
+        self.combocontr.grid(column=1, row=21, padx=125, pady=1, sticky=W)
+        self.hrs = StringVar()
+        self.hrm = StringVar()
+        # aparecer entry para preencher hrsem
+        self.labelhrsem = ttk.Label(self, width=20, text="Hrs Sem.:")
+        self.labelhrsem.grid(column=1, row=24, padx=25, pady=1, sticky=W)
+        self.entryhrsem = ttk.Entry(self, width=20, textvariable=self.hrs)
+        self.entryhrsem.grid(column=1, row=24, padx=125, pady=1, sticky=W)
+        # aparecer entry para preencher hrmens
+        self.labelhrmen = ttk.Label(self, width=20, text="Hrs Mens.:")
+        self.labelhrmen.grid(column=1, row=25, padx=25, pady=1, sticky=W)
+        self.entryhrmen = ttk.Entry(self, width=20, textvariable=self.hrm)
+        self.entryhrmen.grid(column=1, row=25, padx=125, pady=1, sticky=W)
+        self.edicao = IntVar()
+        self.editar = ttk.Checkbutton(self, text='Editar cadastro feito manualmente.', variable=self.edicao)
+        self.editar.grid(column=1, row=26, padx=26, pady=1, sticky=W)
+        self.feitonde = IntVar()
+        self.onde = ttk.Checkbutton(self, text='Cadastro realizado fora da Cia.', variable=self.feitonde)
+        self.onde.grid(column=1, row=27, padx=26, pady=1, sticky=W)
+
+        def mostrarhorario(event):
+            nome = event.widget.get()
+            num, name = nome.split(' - ')
+            linha = int(num)
+            planwb = l_w(self.caminho.get())
+            plansh = planwb['Respostas ao formulário 1']
+            self.labelhor.config(text='Horário preenchido: ' + plansh[f'AI{linha + 1}'].value)
+
+        self.combonome.bind("<<ComboboxSelected>>", mostrarhorario)
+
+        def carregarfunc(local):
+            planwb = l_w(local)
+            plansh = planwb['Respostas ao formulário 1']
+            lista = []
+            for x, pessoa in enumerate(plansh):
+                lista.append(f'{x + 1} - {pessoa[2].value}')
+            self.combonome.config(values=lista)
+
+        self.botaocarregar = ttk.Button(self, text="Carregar planilha",
+                                        command=lambda: [carregarfunc(self.caminho.get())])
+        self.botaocarregar.grid(column=1, row=9, padx=350, pady=25, sticky=W)
+        self.botaocadastrar = ttk.Button(self, width=20, text="Cadastrar no Dexion",
+                                         command=lambda: [cadastro_funcionario(self.caminho.get(), self.edicao.get(),
+                                                                               self.feitonde.get(),
+                                                                               self.combonome.get(),
+                                                                               self.entrymatr.get(),
+                                                                               self.entryadmiss.get(),
+                                                                               self.combohor.get(),
+                                                                               self.entrysal.get(),
+                                                                               self.combocargo.get(),
+                                                                               self.combodepto.get(),
+                                                                               self.combocontr.get(),
+                                                                               self.hrs.get(),
+                                                                               self.hrm.get())])
+        self.botaocadastrar.grid(column=1, row=28, padx=520, pady=1, sticky=W)
+        self.botaosalvar = ttk.Button(self, width=20, text="Salvar Docs",
+                                      command=lambda: [salvadocsfunc(self.entrymatr.get())])
+        self.botaosalvar.grid(column=1, row=29, padx=520, pady=1, sticky=W)
+        self.botaoenviaemail = ttk.Button(self, width=20, text="Enviar e-mails",
+                                          command=lambda: [enviaemailsfunc(self.entrymatr.get())])
+        self.botaoenviaemail.grid(column=1, row=30, padx=520, pady=1, sticky=W)
+
+    def selecionarfunc(self):
+        try:
+            caminhoplan = tkinter.filedialog.askopenfilename(title='Planilha Funcionários')
+            self.caminho.set(str(caminhoplan))
+        except ValueError:
+            pass
+
+        def carregarfunc(local):
+            planwb = l_w(local)
+            plansh = planwb['Respostas ao formulário 1']
+            lista = []
+            for x, pessoa in enumerate(plansh):
+                lista.append(f'{x + 1} - {pessoa[2].value}')
+            self.combonome.config(values=lista)
+
+        self.botaocarregar = ttk.Button(self, text="Carregar planilha",
+                                        command=lambda: [carregarfunc(self.caminho.get())])
+        self.botaocarregar.grid(column=1, row=9, padx=350, pady=25, sticky=W)
+        self.botaocadastrar = ttk.Button(self, width=20, text="Cadastrar no Dexion",
+                                         command=lambda: [cadastro_funcionario(self.caminho.get(), self.edicao.get(),
+                                                                               self.feitonde.get(),
+                                                                               self.combonome.get(),
+                                                                               self.entrymatr.get(),
+                                                                               self.entryadmiss.get(),
+                                                                               self.combohor.get(),
+                                                                               self.entrysal.get(),
+                                                                               self.combocargo.get(),
+                                                                               self.combodepto.get(),
+                                                                               self.combocontr.get(),
+                                                                               self.hrs.get(),
+                                                                               self.hrm.get())])
+        self.botaocadastrar.grid(column=1, row=28, padx=520, pady=1, sticky=W)
+        self.botaosalvar = ttk.Button(self, width=20, text="Salvar Docs",
+                                      command=lambda: [salvadocsfunc(self.entrymatr.get())])
+        self.botaosalvar.grid(column=1, row=29, padx=520, pady=1, sticky=W)
+        self.botaoenviaemail = ttk.Button(self, width=20, text="Enviar e-mails",
+                                          command=lambda: [enviaemailsfunc(self.entrymatr.get())])
+        self.botaoenviaemail.grid(column=1, row=30, padx=520, pady=1, sticky=W)
 
 
 def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
                          horario='', salario='', cargo='', depto='', tipo_contr='',
                          hrsem='', hrmens=''):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
     if caminho == '' or nome == '' or matricula == '' or admissao == '' or horario == '' or salario == '' or \
             cargo == '' or depto == '' or tipo_contr == '' or hrsem == '' or hrmens == '':
         tkinter.messagebox.showinfo(
@@ -70,7 +228,8 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
         num, name = nome.strip().split(' - ')
         linha = int(num)
 
-        # search for the highest compatibility between the city filled in the form and the cities in the lists to define codmunnas value
+        # search for the highest compatibility between the city filled in the form and the cities in the lists to
+        # define codmunnas value
         pn = l_w('Cadastro de Funcionário (respostas).xlsx', read_only=False)
         sn = pn['Respostas ao formulário 1']
         x = 2
@@ -84,7 +243,8 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                 lista.append(SequenceMatcher(None, cidade, cid).ratio())
             codmunnas = municipios[str(sh[f'AJ{linha}'].value).upper().strip()][dicion[max(lista)]]
 
-        # search for the highest compatibility between the city filled in the form and the cities in the lists to define codmunend value
+        # search for the highest compatibility between the city filled in the form and the cities in the lists to
+        # define codmunend value
         x = 2
         while x <= len(sn['L']):
             est = str(sn[f'AJ{x}'].value)
@@ -96,9 +256,10 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                 listaend.append(SequenceMatcher(None, cidade, cid).ratio())
             codmunend = municipios[str(sh[f'T{linha}'].value).upper().strip()][dicionend[max(listaend)]]
 
-        lotacao = {'UNIDADE PARK SUL - QUALQUER DEPARTAMENTO':'0013','KIDS':'0010','MUSCULAÇÃO':'0007',
-                 'ESPORTES E LUTAS':'0008','CROSSFIT':'0012','GINÁSTICA':'0006','GESTANTES':'0008','RECEPÇÃO':'0003',
-                 'FINANCEIRO':'0001','TI':'0001','MARKETING':'0001','MANUTENÇÃO':'0004'}
+        lotacao = {'UNIDADE PARK SUL - QUALQUER DEPARTAMENTO': '0013', 'KIDS': '0010', 'MUSCULAÇÃO': '0007',
+                   'ESPORTES E LUTAS': '0008', 'CROSSFIT': '0012', 'GINÁSTICA': '0006', 'GESTANTES': '0008',
+                   'RECEPÇÃO': '0003',
+                   'FINANCEIRO': '0001', 'TI': '0001', 'MARKETING': '0001', 'MANUTENÇÃO': '0004'}
         if editar == 0:
             if ondestou == 0:
                 # Cadastro iniciado na Cia
@@ -113,7 +274,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                                        estado_civil=str(sh[f'F{linha}'].value), cor=str(sh[f'G{linha}'].value),
                                        instru=str(sh[f'J{linha}'].value),
                                        nacional=str(sh[f'K{linha}'].value),
-                                       cod_municipionas=codmunnas,                                       
+                                       cod_municipionas=codmunnas,
                                        cid_nas=str(sh[f'L{linha}'].value), uf_nas=str(sh[f'AJ{linha}'].value),
                                        pai=str(sh[f'M{linha}'].value).upper(),
                                        mae=str(sh[f'N{linha}'].value).upper(), endereco=str(sh[f'O{linha}'].value),
@@ -241,22 +402,30 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pa.click(pa.center(pa.locateOnScreen('./static/Fecharnovo1.png'))), t.sleep(2)
                     # #clique em fechar trabalhadores
                     pa.click(pa.center(pa.locateOnScreen('./static/Fechartrab1.png'))), t.sleep(0.5)
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestados'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestados'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome))
                     tkinter.messagebox.showinfo(
                         title='Cadastro ok!',
                         message='Cadastro realizado com sucesso!'
@@ -270,7 +439,8 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                 if linha:
                     pess = Colaborador(matricula=matricula, nome=name.upper(), admiss=admissao,
                                        nascimento=str(sh[f'D{linha}'].value),
-                                       pis=str(int(sh[f'Y{linha}'].value)).zfill(11), cpf=str(int(sh[f'V{linha}'].value)).zfill(11),
+                                       pis=str(int(sh[f'Y{linha}'].value)).zfill(11),
+                                       cpf=str(int(sh[f'V{linha}'].value)).zfill(11),
                                        rg=str(int(sh[f'W{linha}'].value)),
                                        emissor=str(sh[f'X{linha}'].value), email=str(sh[f'B{linha}'].value),
                                        genero=str(sh[f'E{linha}'].value),
@@ -293,7 +463,8 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                                        uf_ctps=str(sh[f'AE{linha}'].value),
                                        emiss_ctps=str(sh[f'AF{linha}'].value), depto=depto,
                                        cargo=cargo,
-                                       horario=horario, salario=salario, tipo_contr=tipo_contr, hr_sem=hrsem, hr_mens=hrmens)
+                                       horario=horario, salario=salario, tipo_contr=tipo_contr, hr_sem=hrsem,
+                                       hr_mens=hrmens)
                     session.add(pess)
                     session.commit()
                     pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
@@ -310,18 +481,22 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         pa.press('tab', 5)
                     pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
                     t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
-                    t.sleep(1), pa.write(pessoa.uf_nas), pa.press('tab'), pa.write(pessoa.cod_municipionas), pa.press('tab')
-                    t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press('tab')
+                    t.sleep(1), pa.write(pessoa.uf_nas), pa.press('tab'), pa.write(pessoa.cod_municipionas), pa.press(
+                        'tab')
+                    t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press(
+                        'tab')
                     t.sleep(1), pp.copy(pessoa.mae), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105')
                     # #clique em documentos
                     pa.click(pa.center(pa.locateOnScreen('./static/Documentos.png')))
                     pa.press('tab'), pa.write(str(pessoa.rg)), pa.press('tab'), pa.write(
                         pessoa.emissor), pa.press('tab', 3), pa.write(pessoa.cod_municipioend),
                     pa.press('tab'), pa.write(pessoa.pis), pa.press('enter')
-                    pa.press('tab'), pa.write(pessoa.tit_eleit), pa.press('tab'), pa.write(pessoa.zona_eleit), pa.press('tab'), pa.write(
+                    pa.press('tab'), pa.write(pessoa.tit_eleit), pa.press('tab'), pa.write(pessoa.zona_eleit), pa.press(
+                        'tab'), pa.write(
                         pessoa.sec_eleit), pa.press('tab'), pa.write(pessoa.ctps)
                     pa.press('tab'), pa.write(pessoa.serie_ctps), pa.press('tab'), pa.write(pessoa.uf_ctps), pa.press(
-                        'tab'), pa.write(datetime.strftime(datetime.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'), '%d%m%Y')), pa.press('tab')
+                        'tab'), pa.write(datetime.strftime(datetime.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
+                                                           '%d%m%Y')), pa.press('tab')
                     # #clique em endereço
                     pa.click(pa.center(pa.locateOnScreen('./static/Endereco.png')))
                     pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
@@ -353,7 +528,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     t.sleep(2), pa.write('CARGO GERAL')
                     # #clique em lupa de descrição de cargos
                     pa.click(pa.center(pa.locateOnScreen('./static/Lupa.png')))
-                    t.sleep(2), pp.copy(pessoa.cargo), pa.hotkey('ctrl', 'v'), t.sleep(1.5), pa.press('enter',2)
+                    t.sleep(2), pp.copy(pessoa.cargo), pa.hotkey('ctrl', 'v'), t.sleep(1.5), pa.press('enter', 2)
                     t.sleep(1), pa.press('tab'), pa.write(pessoa.salario), pa.press('tab')
                     if str(pessoa.tipo_contr) == 'Horista':
                         pa.press('1')
@@ -367,7 +542,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     t.sleep(1)
                     # #clique em lotação
                     pa.click(pa.center(pa.locateOnScreen('./static/Lotacoes.png')))
-                    pa.press('tab'), pa.press('tab'), pa.write('i'), pa.write(str(pessoa.admiss).replace('/',''))
+                    pa.press('tab'), pa.press('tab'), pa.write('i'), pa.write(str(pessoa.admiss).replace('/', ''))
                     t.sleep(1), pa.press('enter'), t.sleep(1)
                     pp.copy(lotacao[f'{pessoa.depto}']), pa.hotkey('ctrl', 'v'), pa.press('enter'), pa.write('f')
                     pa.press('tab'), pa.write('4')
@@ -401,22 +576,30 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     # #clique em fechar trabalhadores
                     pa.click(pa.center(pa.locateOnScreen('./static/Fechartrab1.png'))), t.sleep(0.5)
 
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestados'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestados'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome))
                     tkinter.messagebox.showinfo(
                         title='Cadastro ok!',
                         message='Cadastro realizado com sucesso!'
@@ -425,7 +608,6 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
         else:
             if ondestou == 0:
                 # Cadastro EDITADO na Cia
-                wb = l_w(caminho, read_only=False)
                 num, name = nome.strip().split(' - ')
                 linha = int(num)
                 if linha:
@@ -451,10 +633,12 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pa.press('tab'), pa.write(str(pessoa.rg)), pa.press('tab'), pa.write(
                         pessoa.emissor), pa.press('tab', 3), pa.write(pessoa.cod_municipioend),
                     pa.press('tab'), pa.write(pessoa.pis), pa.press('enter')
-                    pa.press('tab'), pa.write(pessoa.tit_eleit), pa.press('tab'), pa.write(pessoa.zona_eleit), pa.press('tab'), pa.write(
+                    pa.press('tab'), pa.write(pessoa.tit_eleit), pa.press('tab'), pa.write(pessoa.zona_eleit), pa.press(
+                        'tab'), pa.write(
                         pessoa.sec_eleit), pa.press('tab'), pa.write(pessoa.ctps)
                     pa.press('tab'), pa.write(pessoa.serie_ctps), pa.press('tab'), pa.write(pessoa.uf_ctps), pa.press(
-                        'tab'), pa.write(datetime.strftime(datetime.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'), '%d%m%Y')), pa.press('tab')
+                        'tab'), pa.write(datetime.strftime(datetime.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
+                                                           '%d%m%Y')), pa.press('tab')
                     # #clique em endereço
                     pa.click(pa.center(pa.locateOnScreen('./static/Endereco.png')))
                     pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
@@ -486,7 +670,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     t.sleep(2), pa.write('CARGO GERAL')
                     # #clique em lupa de descrição de cargos
                     pa.click(pa.center(pa.locateOnScreen('./static/Lupa.png')))
-                    t.sleep(2), pp.copy(pessoa.cargo), pa.hotkey('ctrl', 'v'), t.sleep(1.5), pa.press('enter',2)
+                    t.sleep(2), pp.copy(pessoa.cargo), pa.hotkey('ctrl', 'v'), t.sleep(1.5), pa.press('enter', 2)
                     t.sleep(1), pa.press('tab'), pa.write(pessoa.salario), pa.press('tab')
                     if str(pessoa.tipo_contr) == 'Horista':
                         pa.press('1')
@@ -513,27 +697,34 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     # #clique em fechar trabalhadores
                     pa.click(pa.center(pa.locateOnScreen('./static/Fechartrab1.png'))), t.sleep(0.5)
 
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestados'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome))
-                    os.makedirs(r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestados'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome))
+                    os.makedirs(
+                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome))
                     tkinter.messagebox.showinfo(title='Cadastro ok!',
                                                 message='Cadastro editado com sucesso!')
                 else:
                     # Cadastro EDITADO em casa
-                    wb = l_w(caminho, read_only=False)
                     num, name = nome.strip().split(' - ')
                     linha = int(num)
                     if linha:
@@ -660,6 +851,8 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
 
 
 def salvadocsfunc(matricula):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
     pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
     pa.click(pa.center(pa.locateOnScreen('./static/Dexion.png')))
     p_pessoa = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
@@ -690,8 +883,6 @@ def salvadocsfunc(matricula):
                  r'\000 - Pastas Funcionais\00 - ATIVOS\Modelo\Recibo VT MODELO.docx'
     p_codetic = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
                 r'\000 - Pastas Funcionais\00 - ATIVOS\Modelo\Cod Etica MODELO.docx'
-    ps_contr = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
-               r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Contrato.pdf'.format(pessoa.nome)
     ps_acordo = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
                 r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Acordo Banco de Horas.pdf'.format(pessoa.nome)
     ps_recctps = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
@@ -735,7 +926,6 @@ def salvadocsfunc(matricula):
     ac = docx.Document(p_ac)
     fch_c = docx.Document(p_fcadas)
     recibos = docx.Document(p_recibos)
-    recibovt = docx.Document(p_recibovt)
     codetic = docx.Document(p_codetic)
 
     # # imprimir recibo entrega e devolução de ctps
@@ -841,13 +1031,17 @@ def salvadocsfunc(matricula):
     fch_c.paragraphs[15].text = str(fch_c.paragraphs[15].text).replace('#ident', pessoa.rg).replace('#cpf#',
                                                                                                     pessoa.cpf)
     fch_c.paragraphs[13].text = str(fch_c.paragraphs[13].text).replace('#telefone', pessoa.tel)
-    fch_c.paragraphs[12].text = str(fch_c.paragraphs[12].text).replace('#codigo', pessoa.cep).replace('#cid', pessoa.cidade).replace(
+    fch_c.paragraphs[12].text = str(fch_c.paragraphs[12].text).replace('#codigo', pessoa.cep).replace('#cid',
+                                                                                                      pessoa.cidade).replace(
         '#uf',
         pessoa.uf)
-    fch_c.paragraphs[11].text = str(fch_c.paragraphs[11].text).replace('#local', pessoa.endereco).replace('#qd', pessoa.bairro)
-    fch_c.paragraphs[10].text = str(fch_c.paragraphs[10].text).replace('#nasc', datetime.strftime(datetime.strptime(pessoa.nascimento,'%Y-%m-%d %H:%M:%S'), '%d/%m/%Y')).replace('#gen',
-                                                                                                           pessoa.genero).replace(
-        '#est_civ', str(pessoa.estado_civil).replace('1 - ','').replace('2 - ','').replace('3 - ','').replace('4 - ',''))
+    fch_c.paragraphs[11].text = str(fch_c.paragraphs[11].text).replace('#local', pessoa.endereco).replace('#qd',
+                                                                                                          pessoa.bairro)
+    fch_c.paragraphs[10].text = str(fch_c.paragraphs[10].text).replace('#nasc', datetime.strftime(
+        datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y')).replace('#gen',
+                                                                                        pessoa.genero).replace(
+        '#est_civ',
+        str(pessoa.estado_civil).replace('1 - ', '').replace('2 - ', '').replace('3 - ', '').replace('4 - ', ''))
     fch_c.save(p_contr + '\\Ficha Cadastral.docx')
     docx2pdf.convert(p_contr + '\\Ficha Cadastral.docx', p_contr + '\\Ficha Cadastral.pdf')
     os.remove(p_contr + '\\Ficha Cadastral.docx')
@@ -878,6 +1072,8 @@ def salvadocsfunc(matricula):
 
 
 def enviaemailsfunc(matricula):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
     pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
     p_contr = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
               r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome)
@@ -899,7 +1095,7 @@ def enviaemailsfunc(matricula):
     Você deve abrir a conta antes de iniciar seu contrato de trabalho. Ok?<br><br>
     Atenciosamente,<br>
     <img src="cid:image1">''', 'html')
-    
+
     # set up the parameters of the message
     msg.attach(text)
     image = MIMEImage(
@@ -919,7 +1115,9 @@ def enviaemailsfunc(matricula):
     # send e-mail to coworker asking to register the ner employee
     msg = MIMEMultipart('alternative')
     arquivo = p_contr + '\\Ficha Cadastral.pdf'
-    text = MIMEText(f'''Oi, Wallace!<br><br>Segue a ficha cadastral do(a) {pessoa.nome}.<br><br>Abs.,<br><img src="cid:image1">''', 'html')
+    text = MIMEText(
+        f'''Oi, Wallace!<br><br>Segue a ficha cadastral do(a) {pessoa.nome}.<br><br>Abs.,<br><img src="cid:image1">''',
+        'html')
     msg.attach(text)
     image = MIMEImage(
         open(r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
@@ -945,12 +1143,89 @@ def enviaemailsfunc(matricula):
     )
 
 
-caminhoest = StringVar()
+class Frame2(ttk.Frame):
+    def __init__(self, container):
+        super().__init__()
+        self.hoje = datetime.today()
+        self.caminhoest = StringVar()
+        self.nomeest = StringVar()
+        self.horarioest = StringVar()
+        self.cargoest = StringVar()
+        self.departamentoest = StringVar()
+        self.tipocontrest = StringVar()
+        self.nomesplanest = []
+        self.labelescolhest = ttk.Label(self, width=40, text="Escolher planilha de novos estagiários")
+        self.labelescolhest.grid(column=1, row=2, padx=25, pady=1, sticky=W)
+        self.botaoescolhest = ttk.Button(self, text="Escolha a planilha", command=self.selecionarest)
+        self.botaoescolhest.grid(column=1, row=2, padx=350, pady=1, sticky=W)
+        self.labelnomest = ttk.Label(self, width=20, text="Nome:")
+        self.labelnomest.grid(column=1, row=10, padx=25, pady=1, sticky=W)
+        self.combonomest = ttk.Combobox(self, values=self.nomesplanest, textvariable=self.nomeest, width=50)
+        self.combonomest.grid(column=1, row=10, padx=125, pady=1, sticky=W)
+        # aparecer entry para preencher matricula
+        self.labelmatrest = ttk.Label(self, width=20, text="Matrícula:")
+        self.labelmatrest.grid(column=1, row=11, padx=25, pady=1, sticky=W)
+        self.entrymatrest = ttk.Entry(self, width=20)
+        self.entrymatrest.grid(column=1, row=11, padx=125, pady=1, sticky=W)
+        # aparecer entry para preencher admissao
+        self.labeladmissest = ttk.Label(self, width=20, text="Admissão:")
+        self.labeladmissest.grid(column=1, row=12, padx=25, pady=1, sticky=W)
+        self.entryadmissest = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month,
+                                        day=self.hoje.day, locale='pt_BR')
+        self.entryadmissest.grid(column=1, row=12, padx=125, pady=1, sticky=W)
+        self.labeldeptoest = ttk.Label(self, width=20, text="Departamento:")
+        self.labeldeptoest.grid(column=1, row=19, padx=25, pady=1, sticky=W)
+        self.combodeptoest = ttk.Combobox(self, values=departamentos, textvariable=self.departamentoest, width=50)
+        self.combodeptoest.grid(column=1, row=19, padx=125, pady=1, sticky=W)
+        self.solicitarest = IntVar()
+        self.solictest = ttk.Checkbutton(self, text='Apenas solicitar contrato.', variable=self.solicitarest)
+        self.solictest.grid(column=1, row=25, padx=26, pady=1, sticky=W)
+        self.edicaoest = IntVar()
+        self.editarest = ttk.Checkbutton(self, text='Editar cadastro feito manualmente.', variable=self.edicaoest)
+        self.editarest.grid(column=1, row=26, padx=26, pady=1, sticky=W)
+        self.feitondeest = IntVar()
+        self.ondeest = ttk.Checkbutton(self, text='Cadastro realizado fora da Cia.', variable=self.feitondeest)
+        self.ondeest.grid(column=1, row=27, padx=26, pady=1, sticky=W)
+        self.cargoest = StringVar()
+        self.botaocadastrarest = ttk.Button(self, width=20, text="Cadastrar Estagiário",
+                                            command=lambda: [
+                                                cadastro_estagiario(
+                                                    self.solicitarest.get(), self.caminhoest.get(),
+                                                    self.edicaoest.get(), self.feitondeest.get(),
+                                                    self.combonomest.get(),
+                                                    self.entrymatrest.get(), self.entryadmissest.get(),
+                                                    '',
+                                                    self.combodeptoest.get(),
+                                                    '', '', '')
+                                            ]
+                                            )
+        self.botaocadastrarest.grid(column=1, row=28, padx=520, pady=1, sticky=W)
+
+        def carregarest(local):
+            planwb = l_w(local)
+            plansh = planwb['Respostas ao formulário 1']
+            lista = []
+            for x, pessoa in enumerate(plansh):
+                lista.append(f'{x + 1} - {pessoa[2].value}')
+            self.combonomest.config(values=lista)
+
+        self.botaocarregest = ttk.Button(self, text="Carregar planilha",
+                                         command=lambda: [carregarest(self.caminhoest.get())])
+        self.botaocarregest.grid(column=1, row=4, padx=350, pady=25, sticky=W)
+
+    def selecionarest(self):
+        try:
+            caminhoplanest = tkinter.filedialog.askopenfilename(title='Planilha Estagiários')
+            self.caminhoest.set(str(caminhoplanest))
+        except ValueError:
+            pass
 
 
 def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
-                         cargo='', depto='', tipo_contr='Horista',
-                         hrsem='25', hrmens='100'):
+                        cargo='', depto='', tipo_contr='Horista',
+                        hrsem='25', hrmens='100'):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
     pa.FAILSAFE = False
     salario = 5.10
     if solicitar_contr == 1:
@@ -974,13 +1249,16 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         }
         cadastro = {'nome': str(sh[f"C{linha}"].value).title().strip(), 'nasc_ed': sh[f"D{linha}"].value,
                     'genero': str(sh[f"E{linha}"].value), 'est_civ': str(sh[f"F{linha}"].value),
-                    'pai': str(sh[f"M{linha}"].value), 'mae': str(sh[f"N{linha}"].value), 'end': str(sh[f"O{linha}"].value),
+                    'pai': str(sh[f"M{linha}"].value), 'mae': str(sh[f"N{linha}"].value),
+                    'end': str(sh[f"O{linha}"].value),
                     'num': str(sh[f"P{linha}"].value), 'bairro': str(sh[f"Q{linha}"].value),
                     'cep': str(sh[f"R{linha}"].value).replace('.', '').replace('-', ''),
                     'cid_end': str(sh[f"S{linha}"].value), 'uf_end': str(sh[f"T{linha}"].value),
-                    'tel': str(sh[f"U{linha}"].value).replace('(', '').replace(')', '').replace('-', '').replace(' ', ''),
+                    'tel': str(sh[f"U{linha}"].value).replace('(', '').replace(')', '').replace('-', '').replace(' ',
+                                                                                                                 ''),
                     'mun_end': str(sh[f"AP{linha}"].value),
-                    'cpf': str(sh[f"V{linha}"].value).strip().replace('.', '').replace('-', '').replace(' ', '').zfill(11),
+                    'cpf': str(sh[f"V{linha}"].value).strip().replace('.', '').replace('-', '').replace(' ', '').zfill(
+                        11),
                     'rg': str(sh[f"W{linha}"].value).strip().replace('.', '').replace('-', '').replace(' ', ''),
                     'emissor': str(sh[f"X{linha}"].value),
                     'lotacao': str(lotacao[f'{sh[f"AG{linha}"].value}'][0]).zfill(4),
@@ -988,7 +1266,8 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                     'email': str(sh[f"B{linha}"].value).strip(),
                     'admissao_ed': str(sh[f"AL{linha}"].value),
                     'faculdade': str(sh[f"AV{linha}"].value), 'semestre': str(sh[f"AS{linha}"].value),
-                    'turno': str(sh[f"AT{linha}"].value), 'conclusao': str(sh[f"AU{linha}"].value), 'salario': str(sh[f"AM{linha}"].value),
+                    'turno': str(sh[f"AT{linha}"].value), 'conclusao': str(sh[f"AU{linha}"].value),
+                    'salario': str(sh[f"AM{linha}"].value),
                     'hrsemanais': str(sh[f"AQ{linha}"].value), 'hrmensais': str(sh[f"AR{linha}"].value)}
         email_remetente = em_rem
         senha = k1
@@ -1029,7 +1308,9 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
             solicitacao.tables[0].rows[15].cells[0].paragraphs[0].text).replace('#nasc',
                                                                                 datetime.strftime(cadastro['nasc_ed'],
                                                                                                   '%d/%m/%Y')
-                                                                                ).replace('#rg', cadastro['rg']).replace('#cpf', cadastro['cpf'])
+                                                                                ).replace('#rg',
+                                                                                          cadastro['rg']).replace(
+            '#cpf', cadastro['cpf'])
         solicitacao.tables[0].rows[16].cells[0].paragraphs[0].text = str(
             solicitacao.tables[0].rows[16].cells[0].paragraphs[0].text).replace('#sexo', cadastro['genero'])
         solicitacao.tables[0].rows[17].cells[0].paragraphs[0].text = str(
@@ -1092,7 +1373,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
             modelo + r'\Abertura Conta MODELO.docx')
         carta_banco.paragraphs[14].text = str(carta_banco.paragraphs[14].text).replace('#nome_completo',
                                                                                        cadastro['nome']
-                                                                                       ).replace('#rg',cadastro['rg']
+                                                                                       ).replace('#rg', cadastro['rg']
                                                                                                  ).replace(
             '#cpf', cadastro['cpf']).replace('#endereço', cadastro['end']).replace('#cep', cadastro['cep']).replace(
             '#bairro', cadastro['bairro']).replace('#desde#', datetime.strftime(hoje, '%d/%m/%Y'))
@@ -1164,7 +1445,9 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         # send document asking for the intern contract
         msg = MIMEMultipart('alternative')
         arquivo = pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf'
-        text = MIMEText(f'''Olá!\n\nSegue pedido de TCE do(a) estagiário(a) {cadastro["nome"]}.\n\nAtenciosamente,<br><img src="cid:image1">''', 'html')
+        text = MIMEText(
+            f'''Olá!\n\nSegue pedido de TCE do(a) estagiário(a) {cadastro["nome"]}.\n\nAtenciosamente,<br><img src="cid:image1">''',
+            'html')
         msg.attach(text)
         image = MIMEImage(
             open(r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
@@ -1214,7 +1497,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                     estag_cadastrado = Colaborador(
                         matricula=matricula, nome=name.upper(), admiss=admissao,
                         nascimento=str(sh[f'D{linha}'].value),
-                        cpf=str(sh[f'V{linha}'].value).replace('.','').replace('-','').zfill(11),
+                        cpf=str(sh[f'V{linha}'].value).replace('.', '').replace('-', '').zfill(11),
                         rg=str(int(sh[f'W{linha}'].value)),
                         emissor='SSP/DF', email=str(sh[f'B{linha}'].value),
                         genero=str(sh[f'E{linha}'].value),
@@ -1224,11 +1507,13 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                         pai=str(sh[f'M{linha}'].value).upper(),
                         mae=str(sh[f'N{linha}'].value).upper(), endereco=str(sh[f'O{linha}'].value),
                         num='1',
-                        bairro=str(sh[f'Q{linha}'].value), cep=str(sh[f'R{linha}'].value).replace('.','').replace('-',''),
+                        bairro=str(sh[f'Q{linha}'].value),
+                        cep=str(sh[f'R{linha}'].value).replace('.', '').replace('-', ''),
                         cidade='Brasília', cid_nas='Brasília - DF',
                         uf='DF',
                         cod_municipioend=municipios['DF']['Brasília'],
-                        tel=str(sh[f'U{linha}'].value).replace('(','').replace(')','').replace('.','').replace('-',''),
+                        tel=str(sh[f'U{linha}'].value).replace('(', '').replace(')', '').replace('.', '').replace('-',
+                                                                                                                  ''),
                         depto=depto, cargo=cargo,
                         horario=str(sh[f'AI{linha}'].value), salario=salario, tipo_contr=tipo_contr,
                         hr_sem='25', hr_mens='100',
@@ -1281,7 +1566,8 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
                 t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
                 t.sleep(1), pa.write(pessoa.uf), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press('tab')
-                t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press('tab')
+                t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press(
+                    'tab')
                 t.sleep(1), pp.copy(pessoa.mae), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105')
                 # # clique em documentos
                 pa.click(pa.center(pa.locateOnScreen('./static/Documentos.png')))
@@ -1301,7 +1587,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pa.press('tab'), pa.write('9')
                 pa.press('tab', 7), pa.write('n'), pa.press('tab'), pa.write('4')
                 pa.press('tab'), pa.write('Ed. Fisica')
-                pa.press('tab', 2), pa.write(str(int(str(pessoa.admiss).replace('/', ''))+2).zfill(8))
+                pa.press('tab', 2), pa.write(str(int(str(pessoa.admiss).replace('/', '')) + 2).zfill(8))
                 # #clique em instituição de ensino
                 try:
                     pa.click(pa.center(pa.locateOnScreen('./static/faculdade.png')))
@@ -1393,11 +1679,13 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                         pai=str(sh[f'M{linha}'].value).upper(),
                         mae=str(sh[f'N{linha}'].value).upper(), endereco=str(sh[f'O{linha}'].value),
                         num='1',
-                        bairro=str(sh[f'Q{linha}'].value), cep=str(sh[f'R{linha}'].value).replace('.','').replace('-',''),
+                        bairro=str(sh[f'Q{linha}'].value),
+                        cep=str(sh[f'R{linha}'].value).replace('.', '').replace('-', ''),
                         cidade='Brasília', cid_nas='Brasília - DF',
                         uf='DF',
                         cod_municipioend=municipios['DF']['Brasília'],
-                        tel=str(sh[f'U{linha}'].value).replace('(','').replace(')','').replace('.','').replace('-',''),
+                        tel=str(sh[f'U{linha}'].value).replace('(', '').replace(')', '').replace('.', '').replace('-',
+                                                                                                                  ''),
                         depto=depto, cargo=cargo,
                         horario=str(sh[f'AI{linha}'].value), salario=salario, tipo_contr=tipo_contr,
                         hr_sem='25', hr_mens='100',
@@ -1450,7 +1738,8 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
                 t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
                 t.sleep(1), pa.write(pessoa.uf), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press('tab')
-                t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press('tab')
+                t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press(
+                    'tab')
                 t.sleep(1), pp.copy(pessoa.mae), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105')
                 # # clique em documentos
                 pa.click(pa.center(pa.locateOnScreen('./static/Documentos.png')))
@@ -1470,7 +1759,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pa.press('tab'), pa.write('9')
                 pa.press('tab', 7), pa.write('n'), pa.press('tab'), pa.write('4')
                 pa.press('tab'), pa.write('Ed. Fisica')
-                pa.press('tab', 2), pa.write(str(int(str(pessoa.admiss).replace('/', ''))+2).zfill(8))
+                pa.press('tab', 2), pa.write(str(int(str(pessoa.admiss).replace('/', '')) + 2).zfill(8))
                 # #clique em instituição de ensino
                 try:
                     pa.click(pa.center(pa.locateOnScreen('./static/faculdade.png')))
@@ -1612,13 +1901,15 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                         pai=str(sh[f'M{linha}'].value).upper(),
                         mae=str(sh[f'N{linha}'].value).upper(), endereco=str(sh[f'O{linha}'].value),
                         num='1',
-                        bairro=str(sh[f'Q{linha}'].value), cep=str(sh[f'R{linha}'].value).replace('.','').replace('-',''),
+                        bairro=str(sh[f'Q{linha}'].value),
+                        cep=str(sh[f'R{linha}'].value).replace('.', '').replace('-', ''),
                         cidade='Brasília', cid_nas='Brasília - DF',
                         uf='DF',
                         cod_municipioend=municipios['DF']['Brasília'],
-                        tel=str(sh[f'U{linha}'].value).replace('(','').replace(')','').replace('.','').replace('-',''),
+                        tel=str(sh[f'U{linha}'].value).replace('(', '').replace(')', '').replace('.', '').replace('-',
+                                                                                                                  ''),
                         depto=depto, cargo=cargo,
-                        horario=str(sh[f'AI{linha}'].value), salario=salario, tipo_contr=tipo_contr, 
+                        horario=str(sh[f'AI{linha}'].value), salario=salario, tipo_contr=tipo_contr,
                         hr_sem='25', hr_mens='100',
                         est_semestre=str(sh[f'AS{linha}'].value),
                         est_turno=str(sh[f'AT{linha}'].value),
@@ -1668,7 +1959,8 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
                 t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
                 t.sleep(1), pa.write(pessoa.uf), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press('tab')
-                t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press('tab')
+                t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press(
+                    'tab')
                 t.sleep(1), pp.copy(pessoa.mae), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105')
                 # # clique em documentos
                 pa.click(pa.center(pa.locateOnScreen('./static/Documentos.png')))
@@ -1688,7 +1980,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pa.press('tab'), pa.write('9')
                 pa.press('tab', 7), pa.write('n'), pa.press('tab'), pa.write('4')
                 pa.press('tab'), pa.write('Ed. Fisica')
-                pa.press('tab', 2), pa.write(str(int(str(pessoa.admiss).replace('/', ''))+2).zfill(8))
+                pa.press('tab', 2), pa.write(str(int(str(pessoa.admiss).replace('/', '')) + 2).zfill(8))
                 # #clique em instituição de ensino
                 pa.click(pa.center(pa.locateOnScreen('./static/faculdade.png')))
                 pa.press('tab'), pp.copy(pessoa.est_faculdade), pa.hotkey('ctrl', 'v')
@@ -1727,10 +2019,89 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 )
 
 
-caminhoaut = StringVar()
+class Frame3(ttk.Frame):
+    def __init__(self, container):
+        super().__init__()
+        self.hoje = datetime.today()
+        self.caminhoaut = StringVar()
+        self.nomeaut = StringVar()
+        self.horarioaut = StringVar()
+        self.cargoaut = StringVar()
+        self.departamentoaut = StringVar()
+        self.tipocontraut = StringVar()
+        self.nomesplanaut = []
+        self.labelescolh = ttk.Label(self, width=40, text="Escolher planilha de autônomos")
+        self.labelescolh.grid(column=1, row=1, padx=25, pady=1, sticky=W)
+        self.botaoescolh = ttk.Button(self, text="Escolha a planilha", command=self.selecionaraut)
+        self.botaoescolh.grid(column=1, row=1, padx=350, pady=1, sticky=W)
+        self.nomeaut = StringVar()
+        self.cargo = StringVar()
+        self.departamento = StringVar()
+        self.nomesplanaut = []
+        # aparecer dropdown com nomes da plan
+        self.labelnomeaut = ttk.Label(self, width=20, text="Nome:")
+        self.labelnomeaut.grid(column=1, row=10, padx=25, pady=1, sticky=W)
+        self.combonomeaut = ttk.Combobox(self, values=self.nomesplanaut, textvariable=self.nomeaut, width=50)
+        self.combonomeaut.grid(column=1, row=10, padx=125, pady=1, sticky=W)
+        # aparecer entry para preencher matricula
+        self.labelmatraut = ttk.Label(self, width=20, text="Matrícula:")
+        self.labelmatraut.grid(column=1, row=11, padx=25, pady=1, sticky=W)
+        self.entrymatraut = ttk.Entry(self, width=20)
+        self.entrymatraut.grid(column=1, row=11, padx=125, pady=1, sticky=W)
+        # aparecer entry para preencher admissao
+        self.labeladmissaut = ttk.Label(self, width=20, text="Admissão:")
+        self.labeladmissaut.grid(column=1, row=12, padx=25, pady=1, sticky=W)
+        self.entryadmissaut = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month,
+                                        day=self.hoje.day, locale='pt_BR')
+        self.entryadmissaut.grid(column=1, row=12, padx=125, pady=1, sticky=W)
+        # aparecer dropdown para escolher cargo
+        self.labelcargoaut = ttk.Label(self, width=20, text="Cargo")
+        self.labelcargoaut.grid(column=1, row=18, padx=25, pady=1, sticky=W)
+        self.combocargoaut = ttk.Combobox(self, values=cargos, textvariable=self.cargo, width=50)
+        self.combocargoaut.grid(column=1, row=18, padx=125, pady=1, sticky=W)
+        # aparecer dropdown para escolher depto
+        self.labeldeptoaut = ttk.Label(self, width=20, text="Departamento:")
+        self.labeldeptoaut.grid(column=1, row=19, padx=25, pady=1, sticky=W)
+        self.combodeptoaut = ttk.Combobox(self, values=departamentos, textvariable=self.departamento, width=50)
+        self.combodeptoaut.grid(column=1, row=19, padx=125, pady=1, sticky=W)
+        self.feitondeaut = IntVar()
+        self.ondeaut = ttk.Checkbutton(self, text='Cadastro realizado fora da Cia.', variable=self.feitondeaut)
+        self.ondeaut.grid(column=1, row=27, padx=26, pady=1, sticky=W)
+
+        def carregaraut(local):
+            planwb = l_w(local)
+            plansh = planwb['Respostas ao formulário 1']
+            lista = []
+            for x, pessoa in enumerate(plansh):
+                lista.append(f'{x + 1} - {pessoa[2].value}')
+            self.combonomeaut.config(values=lista)
+
+        self.botaocarregar = ttk.Button(self, text="Carregar planilha",
+                                        command=lambda: [carregaraut(self.caminhoaut.get())])
+        self.botaocarregar.grid(column=1, row=9, padx=350, pady=25, sticky=W)
+        self.botaovalidarpis = ttk.Button(self, width=20, text="Validar PIS",
+                                          command=lambda: [validarpis(self.caminhoaut.get(), self.combonomeaut.get())])
+        self.botaovalidarpis.grid(column=1, row=10, padx=520, pady=1, sticky=W)
+
+        self.botaocarregar = ttk.Button(self, width=20, text="Cadastrar autônomo",
+                                        command=lambda: [
+                                            cadastrar_autonomo(self.caminhoaut.get(), self.combonomeaut.get(),
+                                                               self.entrymatraut.get(), self.entryadmissaut.get(),
+                                                               self.combocargoaut.get(),
+                                                               self.combodeptoaut.get(), self.feitondeaut.get())])
+        self.botaocarregar.grid(column=1, row=28, padx=520, pady=1, sticky=W)
+
+    def selecionaraut(self):
+        try:
+            caminhoplanaut = tkinter.filedialog.askopenfilename(title='Planilha Autônomos')
+            self.caminhoaut.set(str(caminhoplanaut))
+        except ValueError:
+            pass
 
 
 def cadastrar_autonomo(caminhoaut, nomeaut, matriculaaut, admissaoaut, cargoaut, deptoaut, ondeaut):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
     # Cadastro iniciado em casa
     wb = l_w(caminhoaut)
     sh = wb['Respostas ao formulário 1']
@@ -1746,7 +2117,8 @@ def cadastrar_autonomo(caminhoaut, nomeaut, matriculaaut, admissaoaut, cargoaut,
     else:
         aut_cadastrado = Colaborador(
             matricula=matriculaaut, nome=name.upper(), admiss=admissaoaut,
-            nascimento=str(sh[f'D{linha}'].value), pis=str(sh[f'S{linha}'].value).replace('.','').replace('-','').zfill(11),
+            nascimento=str(sh[f'D{linha}'].value),
+            pis=str(sh[f'S{linha}'].value).replace('.', '').replace('-', '').zfill(11),
             cpf=str(int(sh[f'P{linha}'].value)).zfill(11),
             rg=str(int(sh[f'Q{linha}'].value)),
             emissor='SSP/DF', email=str(sh[f'B{linha}'].value),
@@ -1843,7 +2215,7 @@ def validarpis(local, nome):
     sh = wb['Respostas ao formulário 1']
     num, name = nome.strip().split(' - ')
     x = int(num)
-    pis = str(sh[f'S{x}'].value).replace('-','').replace('.','').zfill(11)
+    pis = str(sh[f'S{x}'].value).replace('-', '').replace('.', '').zfill(11)
     v1 = int(pis[0]) * 3
     v2 = int(pis[1]) * 2
     v3 = int(pis[2]) * 9
@@ -1873,309 +2245,11 @@ def validarpis(local, nome):
         )
 
 
-def desligar(estag, func, apedido, acordo, mandado, comaviso, semaviso):
-    pass
+class Frame4(ttk.Frame):
+    def __init__(self, container):
+        super().__init__()
 
 
-def selecionarfunc():
-    try:
-        caminhoplan = tkinter.filedialog.askopenfilename(title='Planilha Funcionários')
-        caminho.set(str(caminhoplan))
-    except ValueError:
-        pass
-
-
-def selecionarest():
-    try:
-        caminhoplanest = tkinter.filedialog.askopenfilename(title='Planilha Estagiários')
-        caminhoest.set(str(caminhoplanest))
-    except ValueError:
-        pass
-
-
-def selecionaraut():
-    try:
-        caminhoplanaut = tkinter.filedialog.askopenfilename(title='Planilha Autônomos')
-        caminhoaut.set(str(caminhoplanaut))
-    except ValueError:
-        pass
-
-
-funcionario = Frame(my_notebook, width=10, height=20)
-ttk.Label(funcionario, width=40, text="Escolher planilha de novos funcionários").grid(column=1, row=1, padx=25, pady=1, sticky=W)
-ttk.Button(funcionario, text="Escolha a planilha", command=selecionarfunc).grid(column=1, row=1, padx=350, pady=1, sticky=W)
-nome = StringVar()
-horario = StringVar()
-cargo = StringVar()
-departamento = StringVar()
-tipocontr = StringVar()
-nomesplan = []
-# aparecer dropdown com nomes da plan
-labelnome = ttk.Label(funcionario, width=20, text="Nome:")
-labelnome.grid(column=1, row=10, padx=25, pady=1, sticky=W)
-combonome = ttk.Combobox(funcionario, values=nomesplan, textvariable=nome, width=50)
-combonome.grid(column=1, row=10, padx=125, pady=1, sticky=W)
-# aparecer entry para preencher matricula
-labelmatr = ttk.Label(funcionario, width=20, text="Matrícula:")
-labelmatr.grid(column=1, row=11, padx=25, pady=1, sticky=W)
-entrymatr = ttk.Entry(funcionario, width=20)
-entrymatr.grid(column=1, row=11, padx=125, pady=1, sticky=W)
-# aparecer entry para preencher admissao
-labeladmiss = ttk.Label(funcionario, width=20, text="Admissão:")
-labeladmiss.grid(column=1, row=12, padx=25, pady=1, sticky=W)
-entryadmiss = ttk.Entry(funcionario, width=20)
-entryadmiss.grid(column=1, row=12, padx=125, pady=1, sticky=W)
-# aparecer horario preenchido e dropdown para escolher horario
-labelhor = ttk.Label(funcionario, width=55, text="Horário preenchido: ")
-labelhor.grid(column=1, row=14, padx=25, pady=1, sticky=W)
-combohor = ttk.Combobox(funcionario, values=horarios, textvariable=horario, width=50)
-combohor.grid(column=1, row=15, padx=125, pady=1, sticky=W)
-# aparecer entry para preencher salario
-labelsal = ttk.Label(funcionario, width=20, text="Salário:")
-labelsal.grid(column=1, row=16, padx=25, pady=1, sticky=W)
-entrysal = ttk.Entry(funcionario, width=20)
-entrysal.grid(column=1, row=16, padx=125, pady=1, sticky=W)
-# aparecer dropdown para escolher cargo
-labelcargo = ttk.Label(funcionario, width=20, text="Cargo")
-labelcargo.grid(column=1, row=18, padx=25, pady=1, sticky=W)
-combocargo = ttk.Combobox(funcionario, values=cargos, textvariable=cargo, width=50)
-combocargo.grid(column=1, row=18, padx=125, pady=1, sticky=W)
-# aparecer dropdown para escolher depto
-labeldepto = ttk.Label(funcionario, width=20, text="Departamento:")
-labeldepto.grid(column=1, row=19, padx=25, pady=1, sticky=W)
-combodepto = ttk.Combobox(funcionario, values=departamentos, textvariable=departamento, width=50)
-combodepto.grid(column=1, row=19, padx=125, pady=1, sticky=W)
-# aparecer dropdown para escolher tipo_contr
-labelcontr = ttk.Label(funcionario, width=20, text="Tipo de contrato:")
-labelcontr.grid(column=1, row=21, padx=25, pady=1, sticky=W)
-combocontr = ttk.Combobox(funcionario, values=tipodecontrato, textvariable=tipocontr, width=50)
-combocontr.grid(column=1, row=21, padx=125, pady=1, sticky=W)
-hrs = StringVar()
-hrm = StringVar()
-# aparecer entry para preencher hrsem
-labelhrsem = ttk.Label(funcionario, width=20, text="Hrs Sem.:")
-labelhrsem.grid(column=1, row=24, padx=25, pady=1, sticky=W)
-entryhrsem = ttk.Entry(funcionario, width=20, textvariable=hrs)
-entryhrsem.grid(column=1, row=24, padx=125, pady=1, sticky=W)
-# aparecer entry para preencher hrmens
-labelhrmen = ttk.Label(funcionario, width=20, text="Hrs Mens.:")
-labelhrmen.grid(column=1, row=25, padx=25, pady=1, sticky=W)
-entryhrmen = ttk.Entry(funcionario, width=20, textvariable=hrm)
-entryhrmen.grid(column=1, row=25, padx=125, pady=1, sticky=W)
-edicao = IntVar()
-editar = ttk.Checkbutton(funcionario, text='Editar cadastro feito manualmente.', variable=edicao)
-editar.grid(column=1, row=26, padx=26, pady=1, sticky=W)
-feitonde = IntVar()
-onde = ttk.Checkbutton(funcionario, text='Cadastro realizado fora da Cia.', variable=feitonde)
-onde.grid(column=1, row=27, padx=26, pady=1, sticky=W)
-
-
-def mostrarhorario(event):
-    nome = event.widget.get()
-    num, name = nome.split(' - ')
-    linha = int(num)
-    planwb = l_w(caminho.get())
-    plansh = planwb['Respostas ao formulário 1']
-    labelhor.config(text='Horário preenchido: ' + plansh[f'AI{linha+1}'].value)
-
-
-combonome.bind("<<ComboboxSelected>>", mostrarhorario)
-
-
-def carregarfunc(local):
-    planwb = l_w(local)
-    plansh = planwb['Respostas ao formulário 1']
-    lista = []
-    for x, pessoa in enumerate(plansh):
-        lista.append(f'{x+1} - {pessoa[2].value}')
-    combonome.config(values=lista)
-
-
-ttk.Button(funcionario, text="Carregar planilha", command=lambda: [carregarfunc(caminho.get())]).grid(column=1, row=9, padx=350, pady=25, sticky=W)
-ttk.Button(funcionario, width=20, text="Cadastrar no Dexion",
-           command=lambda: [cadastro_funcionario(caminho.get(),edicao.get(),feitonde.get(),combonome.get(),
-                                                 entrymatr.get(), entryadmiss.get(), combohor.get(),entrysal.get(),
-                                                 combocargo.get(), combodepto.get(),combocontr.get(), hrs.get(),
-                                                 hrm.get())]).grid(column=1, row=28, padx=520, pady=1, sticky=W)
-ttk.Button(funcionario, width=20, text="Salvar Docs",
-           command=lambda: [salvadocsfunc(entrymatr.get())]).grid(column=1, row=29, padx=520, pady=1, sticky=W)
-ttk.Button(funcionario, width=20, text="Enviar e-mails",
-           command=lambda: [enviaemailsfunc(entrymatr.get())]).grid(column=1, row=30, padx=520, pady=1, sticky=W)
-funcionario.pack(fill='both', expand=0)
-
-estagiario = Frame(my_notebook, width=60, height=50)
-ttk.Label(estagiario, width=40, text="Escolher planilha de novos estagiários").grid(column=1, row=2, padx=25, pady=1, sticky=W)
-ttk.Button(estagiario, text="Escolha a planilha", command=selecionarest).grid(column=1, row=2, padx=350, pady=1, sticky=W)
-labelnomest = ttk.Label(estagiario, width=20, text="Nome:")
-labelnomest.grid(column=1, row=10, padx=25, pady=1, sticky=W)
-combonomest = ttk.Combobox(estagiario, values=nomesplan, textvariable=nome, width=50)
-combonomest.grid(column=1, row=10, padx=125, pady=1, sticky=W)
-# aparecer entry para preencher matricula
-labelmatrest = ttk.Label(estagiario, width=20, text="Matrícula:")
-labelmatrest.grid(column=1, row=11, padx=25, pady=1, sticky=W)
-entrymatrest = ttk.Entry(estagiario, width=20)
-entrymatrest.grid(column=1, row=11, padx=125, pady=1, sticky=W)
-# aparecer entry para preencher admissao
-labeladmissest = ttk.Label(estagiario, width=20, text="Admissão:")
-labeladmissest.grid(column=1, row=12, padx=25, pady=1, sticky=W)
-entryadmissest = ttk.Entry(estagiario, width=20)
-entryadmissest.grid(column=1, row=12, padx=125, pady=1, sticky=W)
-# aparecer dropdown para escolher depto
-labeldeptoest = ttk.Label(estagiario, width=20, text="Departamento:")
-labeldeptoest.grid(column=1, row=19, padx=25, pady=1, sticky=W)
-combodeptoest = ttk.Combobox(estagiario, values=departamentos, textvariable=departamento, width=50)
-combodeptoest.grid(column=1, row=19, padx=125, pady=1, sticky=W)
-solicitarest = IntVar()
-solictest = ttk.Checkbutton(estagiario, text='Apenas solicitar contrato.', variable=solicitarest)
-solictest.grid(column=1, row=25, padx=26, pady=1, sticky=W)
-edicaoest = IntVar()
-editarest = ttk.Checkbutton(estagiario, text='Editar cadastro feito manualmente.', variable=edicaoest)
-editarest.grid(column=1, row=26, padx=26, pady=1, sticky=W)
-feitondeest = IntVar()
-ondeest = ttk.Checkbutton(estagiario, text='Cadastro realizado fora da Cia.', variable=feitondeest)
-ondeest.grid(column=1, row=27, padx=26, pady=1, sticky=W)
-cargoest = StringVar()
-
-ttk.Button(estagiario, width=20, text="Cadastrar Funcionário",
-           command=lambda: [cadastro_estagiario(solicitarest.get(), caminhoest.get(),edicaoest.get(),feitondeest.get(),combonomest.get(),
-                                                 entrymatrest.get(), entryadmissest.get(), combocargo.get(), combodeptoest.get(),
-                                                 combocontr.get(), hrs.get(),
-                                                 hrm.get())]).grid(column=1, row=28, padx=520, pady=1, sticky=W)
-
-
-def carregarest(local):
-    planwb = l_w(local)
-    plansh = planwb['Respostas ao formulário 1']
-    lista = []
-    for x, pessoa in enumerate(plansh):
-        lista.append(f'{x+1} - {pessoa[2].value}')
-    combonomest.config(values=lista)
-
-
-ttk.Button(estagiario, text="Carregar planilha", command=lambda: [carregarest(caminhoest.get())]).grid(column=1, row=4, padx=350, pady=25, sticky=W)
-estagiario.pack(fill='both', expand=0)
-
-
-def carregaraut(local):
-    planwb = l_w(local)
-    plansh = planwb['Respostas ao formulário 1']
-    lista = []
-    for x, pessoa in enumerate(plansh):
-        lista.append(f'{x+1} - {pessoa[2].value}')
-    combonomeaut.config(values=lista)
-
-
-autonomo = Frame(my_notebook, width=660, height=550)
-ttk.Label(autonomo, width=40, text="Escolher planilha de autônomos").grid(column=1, row=1, padx=25, pady=1, sticky=W)
-ttk.Button(autonomo, text="Escolha a planilha", command=selecionaraut).grid(column=1, row=1, padx=350, pady=1, sticky=W)
-nomeaut = StringVar()
-cargo = StringVar()
-departamento = StringVar()
-nomesplanaut = []
-# aparecer dropdown com nomes da plan
-labelnomeaut = ttk.Label(autonomo, width=20, text="Nome:")
-labelnomeaut.grid(column=1, row=10, padx=25, pady=1, sticky=W)
-combonomeaut = ttk.Combobox(autonomo, values=nomesplan, textvariable=nome, width=50)
-combonomeaut.grid(column=1, row=10, padx=125, pady=1, sticky=W)
-# aparecer entry para preencher matricula
-labelmatraut = ttk.Label(autonomo, width=20, text="Matrícula:")
-labelmatraut.grid(column=1, row=11, padx=25, pady=1, sticky=W)
-entrymatraut = ttk.Entry(autonomo, width=20)
-entrymatraut.grid(column=1, row=11, padx=125, pady=1, sticky=W)
-# aparecer entry para preencher admissao
-labeladmissaut = ttk.Label(autonomo, width=20, text="Admissão:")
-labeladmissaut.grid(column=1, row=12, padx=25, pady=1, sticky=W)
-entryadmissaut = ttk.Entry(autonomo, width=20)
-entryadmissaut.grid(column=1, row=12, padx=125, pady=1, sticky=W)
-# aparecer dropdown para escolher cargo
-labelcargoaut = ttk.Label(autonomo, width=20, text="Cargo")
-labelcargoaut.grid(column=1, row=18, padx=25, pady=1, sticky=W)
-combocargoaut = ttk.Combobox(autonomo, values=cargos, textvariable=cargo, width=50)
-combocargoaut.grid(column=1, row=18, padx=125, pady=1, sticky=W)
-# aparecer dropdown para escolher depto
-labeldeptoaut = ttk.Label(autonomo, width=20, text="Departamento:")
-labeldeptoaut.grid(column=1, row=19, padx=25, pady=1, sticky=W)
-combodeptoaut = ttk.Combobox(autonomo, values=departamentos, textvariable=departamento, width=50)
-combodeptoaut.grid(column=1, row=19, padx=125, pady=1, sticky=W)
-feitondeaut = IntVar()
-ondeaut = ttk.Checkbutton(autonomo, text='Cadastro realizado fora da Cia.', variable=feitonde)
-ondeaut.grid(column=1, row=27, padx=26, pady=1, sticky=W)
-ttk.Button(autonomo, text="Carregar planilha", command=lambda: [carregaraut(caminhoaut.get())]).grid(column=1, row=9, padx=350, pady=25, sticky=W)
-ttk.Button(autonomo, width=20, text="Validar PIS",
-           command=lambda: [validarpis(caminhoaut.get(),combonomeaut.get())]).grid(column=1, row=10, padx=520, pady=1, sticky=W)
-
-ttk.Button(autonomo, width=20, text="Cadastrar autônomo",
-           command=lambda: [cadastrar_autonomo(caminhoaut.get(),combonomeaut.get(),
-                                               entrymatraut.get(), entryadmissaut.get(), combocargoaut.get(),
-                                               combodeptoaut.get(), feitondeaut.get())]).grid(column=1, row=28, padx=520, pady=1, sticky=W)
-autonomo.pack(fill='both', expand=1)
-
-
-def enviarcontracheque():
-    pass
-
-
-contracheque = Frame(my_notebook, width=660, height=550)
-ttk.Label(contracheque, width=20, text="Escolher planilha de autônomos").grid(column=1, row=3, padx=25, pady=1, sticky=W)
-ttk.Button(contracheque, text="Planilha Autônomos", command=selecionaraut).grid(column=1, row=3, padx=20, pady=1, sticky=E)
-ttk.Button(contracheque, text="Carregar planilha", command=lambda: [enviarcontracheque]).grid(column=1, row=9, padx=20, pady=25, sticky=E)
-contracheque.pack(fill='both', expand=1)
-
-
-def enviarmsg():
-    pass
-
-
-mensagem = Frame(my_notebook, width=660, height=550)
-ttk.Label(mensagem, width=20, text="Escolher planilha de autônomos").grid(column=1, row=3, padx=25, pady=1, sticky=W)
-ttk.Button(mensagem, text="Planilha Autônomos", command=selecionaraut).grid(column=1, row=3, padx=20, pady=1, sticky=E)
-ttk.Button(mensagem, text="Carregar planilha", command=lambda: [enviarmsg]).grid(column=1, row=9, padx=20, pady=25, sticky=E)
-mensagem.pack(fill='both', expand=1)
-
-
-def enviarmsgferias():
-    pass
-
-
-ferias = Frame(my_notebook, width=660, height=550)
-ttk.Label(ferias, width=20, text="Escolher planilha de autônomos").grid(column=1, row=3, padx=25, pady=1, sticky=W)
-ttk.Button(ferias, text="Planilha Autônomos", command=selecionaraut).grid(column=1, row=3, padx=20, pady=1, sticky=E)
-ttk.Button(ferias, text="Carregar planilha", command=lambda: [enviarmsgferias]).grid(column=1, row=9, padx=20, pady=25, sticky=E)
-ferias.pack(fill='both', expand=1)
-
-desl = session.query(Colaborador).filter_by(desligamento=None).all()
-ativos = []
-for p in desl:
-    ativos.append(str(p.nome).title())
-adesligar = sorted(ativos)
-desligado = StringVar()
-desligamento = Frame(my_notebook, width=660, height=550)
-labelnomdeslig = ttk.Label(desligamento, width=20, text="Nome:")
-labelnomdeslig.grid(column=1, row=10, padx=25, pady=1, sticky=W)
-combonomdeslig = ttk.Combobox(desligamento, values=adesligar, textvariable=desligado, width=50)
-combonomdeslig.grid(column=1, row=10, padx=125, pady=1, sticky=W)
-solicitardeslig = IntVar()
-solictdeslig = ttk.Checkbutton(desligamento, text='Apenas solicitar contrato.', variable=solicitardeslig)
-solictdeslig.grid(column=1, row=25, padx=26, pady=1, sticky=W)
-edicaodeslig = IntVar()
-editardeslig = ttk.Checkbutton(desligamento, text='Editar cadastro feito manualmente.', variable=edicaodeslig)
-editardeslig.grid(column=1, row=26, padx=26, pady=1, sticky=W)
-feitondedeslig = IntVar()
-ondedeslig = ttk.Checkbutton(desligamento, text='Cadastro realizado fora da Cia.', variable=feitondedeslig)
-ondedeslig.grid(column=1, row=27, padx=26, pady=1, sticky=W)
-cargodeslig = StringVar()
-
-ttk.Button(desligamento, width=20, text="Realizar desligamento",
-           command=lambda: []).grid(column=1, row=28, padx=520, pady=1, sticky=W)
-desligamento.pack(fill='both', expand=1)
-
-my_notebook.add(funcionario, text='Cadastrar Funcionário')
-my_notebook.add(estagiario, text='Cadastrar Estagiário')
-my_notebook.add(autonomo, text='Cadastrar Autônomo')
-my_notebook.add(contracheque, text='Enviar contracheque')
-my_notebook.add(mensagem, text='Mensagem')
-my_notebook.add(ferias, text='Férias')
-my_notebook.add(desligamento, text='Desligamento')
-
-root.config(menu=menubar)
-root.mainloop()
+if __name__ == '__main__':
+    app = MainApplication()
+    app.mainloop()
