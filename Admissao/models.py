@@ -59,6 +59,9 @@ class Colaborador(Base):
     est_endfacul = Column(String, nullable=True)
     est_numendfacul = Column(String, nullable=True)
     est_bairroendfacul = Column(String, nullable=True)
+    ag = Column(String, nullable=True)
+    conta = Column(String, nullable=True)
+    cdigito = Column(String, nullable=True)
 
 
 Base.metadata.create_all(engine)
