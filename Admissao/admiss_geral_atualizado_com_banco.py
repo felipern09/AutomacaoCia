@@ -122,6 +122,24 @@ class Frame1(ttk.Frame):
         self.labelhrmen.grid(column=1, row=25, padx=25, pady=1, sticky=W)
         self.entryhrmen = ttk.Entry(self, width=20, textvariable=self.hrm)
         self.entryhrmen.grid(column=1, row=25, padx=125, pady=1, sticky=W)
+        self.agencia = StringVar()
+        self.conta = StringVar()
+        self.digito = StringVar()
+        # aparecer entry para agencia
+        self.labelag = ttk.Label(self, width=20, text="Agência:")
+        self.labelag.grid(column=1, row=24, padx=260, pady=1, sticky=W)
+        self.entryag = ttk.Entry(self, width=20, textvariable=self.agencia)
+        self.entryag.grid(column=1, row=24, padx=320, pady=1, sticky=W)
+        # aparecer entry para conta
+        self.labelcc = ttk.Label(self, width=20, text="Conta:")
+        self.labelcc.grid(column=1, row=25, padx=260, pady=1, sticky=W)
+        self.entrycc = ttk.Entry(self, width=20, textvariable=self.conta)
+        self.entrycc.grid(column=1, row=25, padx=320, pady=1, sticky=W)
+        # aparecer entry para ditigo
+        self.labeldig = ttk.Label(self, width=20, text="Dígito.:")
+        self.labeldig.grid(column=1, row=26, padx=260, pady=1, sticky=W)
+        self.entrydig = ttk.Entry(self, width=20, textvariable=self.digito)
+        self.entrydig.grid(column=1, row=26, padx=320, pady=1, sticky=W)
         self.edicao = IntVar()
         self.editar = ttk.Checkbutton(self, text='Editar cadastro feito manualmente.', variable=self.edicao)
         self.editar.grid(column=1, row=26, padx=26, pady=1, sticky=W)
@@ -162,7 +180,10 @@ class Frame1(ttk.Frame):
                                                                                self.combodepto.get(),
                                                                                self.combocontr.get(),
                                                                                self.hrs.get(),
-                                                                               self.hrm.get())])
+                                                                               self.hrm.get(),
+                                                                               self.agencia.get(),
+                                                                               self.conta.get(),
+                                                                               self.digito.get())])
         self.botaocadastrar.grid(column=1, row=28, padx=520, pady=1, sticky=W)
         self.botaosalvar = ttk.Button(self, width=20, text="Salvar Docs",
                                       command=lambda: [salvadocsfunc(self.entrymatr.get())])
@@ -181,7 +202,7 @@ class Frame1(ttk.Frame):
 
 def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
                          horario='', salario='', cargo='', depto='', tipo_contr='',
-                         hrsem='', hrmens=''):
+                         hrsem='', hrmens='', agencia='', conta='', digito=''):
     sessions = sessionmaker(bind=engine)
     session = sessions()
     if caminho == '' or nome == '' or matricula == '' or admissao == '' or horario == '' or salario == '' or \
@@ -259,7 +280,9 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                                        emiss_ctps=str(sh[f'AF{linha}'].value), depto=depto,
                                        cargo=cargo,
                                        horario=horario, salario=salario, tipo_contr=tipo_contr, hr_sem=hrsem,
-                                       hr_mens=hrmens)
+                                       hr_mens=hrmens,
+                                       ag=agencia, conta=conta, cdigito=digito
+                                       )
                     session.add(pess)
                     session.commit()
                     pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
@@ -291,7 +314,10 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         pessoa.sec_eleit), pa.press('tab'), pa.write(pessoa.ctps)
                     pa.press('tab'), pa.write(pessoa.serie_ctps), pa.press('tab'), pa.write(pessoa.uf_ctps), pa.press(
                         'tab'), pa.write(datetime.strftime(datetime.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
-                                                           '%d%m%Y')), pa.press('tab')
+                                                           '%d%m%Y'))
+                    pa.press('tab', 5), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
+                    pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press('tab')
+
                     # #clique em endereço
                     pa.click(pa.center(pa.locateOnScreen('./static/Endereco.png')))
                     pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
@@ -432,7 +458,9 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                                        emiss_ctps=str(sh[f'AF{linha}'].value), depto=depto,
                                        cargo=cargo,
                                        horario=horario, salario=salario, tipo_contr=tipo_contr, hr_sem=hrsem,
-                                       hr_mens=hrmens)
+                                       hr_mens=hrmens,
+                                       ag=agencia, conta=conta, cdigito=digito
+                                       )
                     session.add(pess)
                     session.commit()
                     pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
@@ -464,7 +492,9 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         pessoa.sec_eleit), pa.press('tab'), pa.write(pessoa.ctps)
                     pa.press('tab'), pa.write(pessoa.serie_ctps), pa.press('tab'), pa.write(pessoa.uf_ctps), pa.press(
                         'tab'), pa.write(datetime.strftime(datetime.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
-                                                           '%d%m%Y')), pa.press('tab')
+                                                           '%d%m%Y'))
+                    pa.press('tab', 5), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
+                    pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press('tab')
                     # #clique em endereço
                     pa.click(pa.center(pa.locateOnScreen('./static/Endereco.png')))
                     pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
@@ -606,7 +636,10 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         pessoa.sec_eleit), pa.press('tab'), pa.write(pessoa.ctps)
                     pa.press('tab'), pa.write(pessoa.serie_ctps), pa.press('tab'), pa.write(pessoa.uf_ctps), pa.press(
                         'tab'), pa.write(datetime.strftime(datetime.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
-                                                           '%d%m%Y')), pa.press('tab')
+                                                           '%d%m%Y'))
+                    pa.press('tab', 5), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
+                    pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press('tab')
+
                     # #clique em endereço
                     pa.click(pa.center(pa.locateOnScreen('./static/Endereco.png')))
                     pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
@@ -727,7 +760,10 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                             pessoa.uf_ctps), pa.press(
                             'tab'), pa.write(
                             datetime.strftime(datetime.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
-                                              '%d%m%Y')), pa.press('tab')
+                                              '%d%m%Y'))
+                        pa.press('tab', 5), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
+                        pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press(
+                            'tab')
                         # #clique em endereço
                         pa.click(pa.center(pa.locateOnScreen('./static/Endereco.png')))
                         pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
@@ -1141,10 +1177,29 @@ class Frame2(ttk.Frame):
         self.entryadmissest = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month,
                                         day=self.hoje.day, locale='pt_BR')
         self.entryadmissest.grid(column=1, row=12, padx=125, pady=1, sticky=W)
+        #aparecer combo departamento
         self.labeldeptoest = ttk.Label(self, width=20, text="Departamento:")
         self.labeldeptoest.grid(column=1, row=19, padx=25, pady=1, sticky=W)
         self.combodeptoest = ttk.Combobox(self, values=departamentos, textvariable=self.departamentoest, width=50)
         self.combodeptoest.grid(column=1, row=19, padx=125, pady=1, sticky=W)
+        self.agenciaest = StringVar()
+        self.contaest = StringVar()
+        self.digitoest = StringVar()
+        # aparecer entry para agencia
+        self.labelagest = ttk.Label(self, width=20, text="Agência:")
+        self.labelagest.grid(column=1, row=24, padx=260, pady=1, sticky=W)
+        self.entryagest = ttk.Entry(self, width=20, textvariable=self.agenciaest)
+        self.entryagest.grid(column=1, row=24, padx=320, pady=1, sticky=W)
+        # aparecer entry para conta
+        self.labelccest = ttk.Label(self, width=20, text="Conta:")
+        self.labelccest.grid(column=1, row=25, padx=260, pady=1, sticky=W)
+        self.entryccest = ttk.Entry(self, width=20, textvariable=self.contaest)
+        self.entryccest.grid(column=1, row=25, padx=320, pady=1, sticky=W)
+        # aparecer entry para ditigo
+        self.labeldigest = ttk.Label(self, width=20, text="Dígito.:")
+        self.labeldigest.grid(column=1, row=26, padx=260, pady=1, sticky=W)
+        self.entrydigest = ttk.Entry(self, width=20, textvariable=self.digitoest)
+        self.entrydigest.grid(column=1, row=26, padx=320, pady=1, sticky=W)
         self.solicitarest = IntVar()
         self.solictest = ttk.Checkbutton(self, text='Apenas solicitar contrato.', variable=self.solicitarest)
         self.solictest.grid(column=1, row=25, padx=26, pady=1, sticky=W)
@@ -1162,9 +1217,12 @@ class Frame2(ttk.Frame):
                                                     self.edicaoest.get(), self.feitondeest.get(),
                                                     self.combonomest.get(),
                                                     self.entrymatrest.get(), self.entryadmissest.get(),
-                                                    '',
-                                                    self.combodeptoest.get(),
-                                                    '', '', '')
+                                                    '', self.combodeptoest.get(),
+                                                    '', '', '',
+                                                    self.agenciaest.get(),
+                                                    self.contaest.get(),
+                                                    self.digitoest.get()
+                                                )
                                             ]
                                             )
         self.botaocadastrarest.grid(column=1, row=28, padx=520, pady=1, sticky=W)
@@ -1191,7 +1249,7 @@ class Frame2(ttk.Frame):
 
 def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
                         cargo='', depto='', tipo_contr='Horista',
-                        hrsem='25', hrmens='100'):
+                        hrsem='25', hrmens='100', agencia='', conta='', digito=''):
     sessions = sessionmaker(bind=engine)
     session = sessions()
     pa.FAILSAFE = False
@@ -1491,7 +1549,9 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                         est_faculdade=str(sh[f'AV{linha}'].value),
                         est_endfacul='End',
                         est_numendfacul='1',
-                        est_bairroendfacul='Bairro'
+                        est_bairroendfacul='Bairro',
+                        ag=agencia, conta=conta, cdigito=digito
+
                     )
                     session.add(estag_cadastrado)
                     session.commit()
@@ -1541,6 +1601,8 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pa.click(pa.center(pa.locateOnScreen('./static/Documentos.png')))
                 pa.press('tab'), pa.write(str(pessoa.rg)), pa.press('tab'), pa.write(
                     pessoa.emissor), pa.press('tab', 3), pa.write(pessoa.cod_municipioend)
+                pa.press('tab', 9), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
+                pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press('tab')
                 # #clique em endereço
                 pa.click(pa.center(pa.locateOnScreen('./static/Endereco.png')))
                 pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
@@ -1663,7 +1725,8 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                         est_faculdade=str(sh[f'AV{linha}'].value),
                         est_endfacul='End',
                         est_numendfacul='1',
-                        est_bairroendfacul='Bairro'
+                        est_bairroendfacul='Bairro',
+                        ag=agencia, conta=conta, cdigito=digito
                     )
                     session.add(estag_cadastrado)
                     session.commit()
@@ -1713,6 +1776,8 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pa.click(pa.center(pa.locateOnScreen('./static/Documentos.png')))
                 pa.press('tab'), pa.write(str(pessoa.rg)), pa.press('tab'), pa.write(
                     pessoa.emissor), pa.press('tab', 3), pa.write(pessoa.cod_municipioend)
+                pa.press('tab', 9), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
+                pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press('tab')
                 # #clique em endereço
                 pa.click(pa.center(pa.locateOnScreen('./static/Endereco.png')))
                 pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
@@ -1885,7 +1950,8 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                         est_faculdade=str(sh[f'AV{linha}'].value),
                         est_endfacul='End',
                         est_numendfacul='1',
-                        est_bairroendfacul='Bairro'
+                        est_bairroendfacul='Bairro',
+                        ag=agencia, conta=conta, cdigito=digito
                     )
                     session.add(estag_cadastrado)
                     session.commit()
@@ -1934,6 +2000,8 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pa.click(pa.center(pa.locateOnScreen('./static/Documentos.png')))
                 pa.press('tab'), pa.write(str(pessoa.rg)), pa.press('tab'), pa.write(
                     pessoa.emissor), pa.press('tab', 3), pa.write(pessoa.cod_municipioend)
+                pa.press('tab', 9), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
+                pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press('tab')
                 # #clique em endereço
                 pa.click(pa.center(pa.locateOnScreen('./static/Endereco.png')))
                 pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
