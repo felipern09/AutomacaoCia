@@ -8,7 +8,7 @@ from sqlalchemy.orm import sessionmaker
 import docx
 import os
 
-enviar_email = int(str(input('Enviar e-mail? s/n ')).replace('s', '1').replace('n', '0'))
+enviar_email = int(str(input('Enviar e-mail? s/n ')).replace('s', '1').replace('S', '1').replace('n', '0').replace('N', '0'))
 
 # Subistituir nome nos modellos de certificados e salvar como em uma pasta da área de trabalho
 outlook = win32.Dispatch('outlook.application')
@@ -47,7 +47,7 @@ for p in pesq:
 # Certificado Terrestre
 x = 2
 sh = wb['Terrestre']
-while x <= len(sh['B']):
+while sh[f'B{x}'].value is not None:
     t1 = docx.Document(cert_terrestre)
     nomeplan = str(sh[f'B{x}'].value)
     for pessoa in nomes:
@@ -63,8 +63,23 @@ while x <= len(sh['B']):
         # Loop added to work with runs (strings with same style)
             for i in range(len(inline)):
                 if '#nome' in inline[i].text:
-                    text = inline[i].text.replace('#nome', nome.title()).replace('#data', dia).replace('#dataextens', diaext)
+                    text = inline[i].text.replace('#nome', nome.title())
                     inline[i].text = text
+        if '#data' in p.text:
+            inline = p.runs
+        # Loop added to work with runs (strings with same style)
+            for i in range(len(inline)):
+                if '#data' in inline[i].text:
+                    text = inline[i].text.replace('#data', dia).replace('#dataextens', diaext)
+                    inline[i].text = text
+        if '#extens' in p.text:
+            inline = p.runs
+        # Loop added to work with runs (strings with same style)
+            for i in range(len(inline)):
+                if '#extens' in inline[i].text:
+                    text = inline[i].text.replace('#extens', diaext)
+                    inline[i].text = text
+
     doc.save(pasta+f'\\{nome} PST1.docx')
     convert(pasta+f'\\{nome} PST1.docx', pasta+f'\\{nome} PST1.pdf')
     os.remove(pasta+f'\\{nome} PST1.docx')
@@ -88,7 +103,7 @@ while x <= len(sh['B']):
 # Certificado Aquático
 x = 2
 sh = wb['Aquatico']
-while x <= len(sh['B']):
+while sh[f'B{x}'].value is not None:
     a1 = docx.Document(cert_aquatico)
     nomeplan = str(sh[f'B{x}'].value)
     for pessoa in nomes:
@@ -104,7 +119,21 @@ while x <= len(sh['B']):
         # Loop added to work with runs (strings with same style)
             for i in range(len(inline)):
                 if '#nome' in inline[i].text:
-                    text = inline[i].text.replace('#nome', nome.title()).replace('#data', dia).replace('#dataextens', diaext)
+                    text = inline[i].text.replace('#nome', nome.title())
+                    inline[i].text = text
+        if '#data' in p.text:
+            inline = p.runs
+        # Loop added to work with runs (strings with same style)
+            for i in range(len(inline)):
+                if '#data' in inline[i].text:
+                    text = inline[i].text.replace('#data', dia).replace('#dataextens', diaext)
+                    inline[i].text = text
+        if '#extens' in p.text:
+            inline = p.runs
+        # Loop added to work with runs (strings with same style)
+            for i in range(len(inline)):
+                if '#extens' in inline[i].text:
+                    text = inline[i].text.replace('#extens', diaext)
                     inline[i].text = text
     doc.save(pasta+f'\\{nome} PSA1.docx')
     convert(pasta+f'\\{nome} PSA1.docx', pasta+f'\\{nome} PSA1.pdf')
