@@ -2,6 +2,7 @@ import win32com.client as win32
 from datetime import datetime as dt
 from docx2pdf import convert
 from openpyxl import load_workbook
+from difflib import SequenceMatcher
 import docx
 import os
 
@@ -39,7 +40,17 @@ x = 2
 sh = wb['Terrestre']
 while x <= len(sh['B']):
     t1 = docx.Document(cert_terrestre)
-    nome = str(sh[f'B{x}'].value)
+    nomeplan = str(sh[f'B{x}'].value)
+    Sessions = sessionmaker(bind=engine)
+    session = Sessions()
+    pesq = session.query(Colaborador).all()
+    nomes = []
+    dicion = {}
+    for p in pesq:
+        nomes.append(str(p.nome).upper())
+    for pessoa in nomes:
+        dicion[pessoa] = SequenceMatcher(None, nomeplan, pessoa).ratio()
+    nome = max(dicion)
     endeletr = str(sh[f'C{x}'].value)
     dia = dt.strftime(dt.strptime(str(sh[f'D{x}'].value), '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y')
     diaext = extenso(dia)
@@ -77,7 +88,17 @@ x = 2
 sh = wb['Aquatico']
 while x <= len(sh['B']):
     a1 = docx.Document(cert_aquatico)
-    nome = str(sh[f'B{x}'].value)
+    nomeplan = str(sh[f'B{x}'].value)
+    Sessions = sessionmaker(bind=engine)
+    session = Sessions()
+    pesq = session.query(Colaborador).all()
+    nomes = []
+    dicion = {}
+    for p in pesq:
+        nomes.append(str(p.nome).upper())
+    for pessoa in nomes:
+        dicion[pessoa] = SequenceMatcher(None, nomeplan, pessoa).ratio()
+    nome = max(dicion)
     endeletr = str(sh[f'C{x}'].value)
     dia = dt.strftime(dt.strptime(str(sh[f'D{x}'].value), '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y')
     diaext = extenso(dia)
