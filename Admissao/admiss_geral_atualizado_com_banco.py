@@ -31,7 +31,7 @@ class MainApplication(tk.Tk):
 
         self.title("Atividades DP - Cia BSB")
         self.geometry('661x550')
-        self.img = PhotoImage(file='../Solicitacao de pagamento/static/Icone.png')
+        self.img = PhotoImage(file='./static/Icone.png')
         self.iconphoto(False, self.img)
         self.columnconfigure(0, weight=5)
         self.rowconfigure(0, weight=5)

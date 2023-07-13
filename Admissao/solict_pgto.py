@@ -39,6 +39,10 @@ class Pgto(ttk.Frame):
         for pessoa in pessoas:
             self.grupo.append(pessoa.nome)
             self.grupo.sort()
+        pessoas2 = session.query(Colaborador).filter_by(desligamento=None).all()
+        for pess in pessoas2:
+            self.grupo.append(pess.nome)
+            self.grupo.sort()
         self.nomes = self.grupo
         print(self.nomes)
         self.hoje = datetime.today()
