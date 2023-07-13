@@ -14,11 +14,12 @@ cert_aquatico = 'Treinamento Aquático.docx'
 
 # Certificado Terrestre
 x = 2
-sh = wb['TreinamentoTerrestre1']
+sh = wb['Terrestre']
 while x <= len(sh['B']):
     t1 = docx.Document(cert_terrestre)
     nome = str(sh[f'B{x}'].value)
     endeletr = str(sh[f'C{x}'].value)
+    dia = str(sh[f'D{x}'].value)
     doc = t1
     for p in doc.paragraphs:
         if '#nome' in p.text:
@@ -26,7 +27,7 @@ while x <= len(sh['B']):
         # Loop added to work with runs (strings with same style)
             for i in range(len(inline)):
                 if '#nome' in inline[i].text:
-                    text = inline[i].text.replace('#nome', nome)
+                    text = inline[i].text.replace('#nome', nome).replace('#data', dia).replace('#dataextens', dia)
                     inline[i].text = text
     doc.save(pasta+f'\\{nome} PST1.docx')
     convert(pasta+f'\\{nome} PST1.docx', pasta+f'\\{nome} PST1.pdf')
@@ -50,11 +51,12 @@ while x <= len(sh['B']):
 
 # Certificado Aquático
 x = 2
-sh = wb['TreinamentoAquat1']
+sh = wb['Aquatico']
 while x <= len(sh['B']):
     a1 = docx.Document(cert_aquatico)
     nome = str(sh[f'B{x}'].value)
     endeletr = str(sh[f'C{x}'].value)
+    dia = str(sh[f'D{x}'].value)
     doc = a1
     for p in doc.paragraphs:
         if '#nome' in p.text:
@@ -62,7 +64,7 @@ while x <= len(sh['B']):
         # Loop added to work with runs (strings with same style)
             for i in range(len(inline)):
                 if '#nome' in inline[i].text:
-                    text = inline[i].text.replace('#nome', nome)
+                    text = inline[i].text.replace('#nome', nome).replace('#data', dia).replace('#dataextens', dia)
                     inline[i].text = text
     doc.save(pasta+f'\\{nome} PSA1.docx')
     convert(pasta+f'\\{nome} PSA1.docx', pasta+f'\\{nome} PSA1.pdf')
