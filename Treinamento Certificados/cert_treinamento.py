@@ -3,6 +3,8 @@ from datetime import datetime as dt
 from docx2pdf import convert
 from openpyxl import load_workbook
 from difflib import SequenceMatcher
+from Admissao.models import Colaborador, engine
+from sqlalchemy.orm import sessionmaker
 import docx
 import os
 
@@ -10,7 +12,7 @@ enviar_email = int(str(input('Enviar e-mail? s/n ')).replace('s', '1').replace('
 
 # Subistituir nome nos modellos de certificados e salvar como em uma pasta da área de trabalho
 outlook = win32.Dispatch('outlook.application')
-wb = load_workbook("Treinamento.xlsx")
+wb = load_workbook('Treinamento.xlsx')
 pasta = '.\\Certificados'
 cert_terrestre = 'Treinamento Terrestre.docx'
 cert_aquatico = 'Treinamento Aquático.docx'
@@ -35,22 +37,22 @@ def extenso(datacompleta):
     return f'{dia} de {mesext[mes]} de {ano}.'
 
 
+Sessions = sessionmaker(bind=engine)
+session = Sessions()
+pesq = session.query(Colaborador).all()
+nomes = []
+dicion = {}
+for p in pesq:
+    nomes.append(str(p.nome).upper())
 # Certificado Terrestre
 x = 2
 sh = wb['Terrestre']
 while x <= len(sh['B']):
     t1 = docx.Document(cert_terrestre)
     nomeplan = str(sh[f'B{x}'].value)
-    Sessions = sessionmaker(bind=engine)
-    session = Sessions()
-    pesq = session.query(Colaborador).all()
-    nomes = []
-    dicion = {}
-    for p in pesq:
-        nomes.append(str(p.nome).upper())
     for pessoa in nomes:
         dicion[pessoa] = SequenceMatcher(None, nomeplan, pessoa).ratio()
-    nome = max(dicion)
+    nome = [i for i in dicion if dicion[i]==max(dicion.values())][0]
     endeletr = str(sh[f'C{x}'].value)
     dia = dt.strftime(dt.strptime(str(sh[f'D{x}'].value), '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y')
     diaext = extenso(dia)
@@ -61,7 +63,7 @@ while x <= len(sh['B']):
         # Loop added to work with runs (strings with same style)
             for i in range(len(inline)):
                 if '#nome' in inline[i].text:
-                    text = inline[i].text.replace('#nome', nome).replace('#data', dia).replace('#dataextens', diaext)
+                    text = inline[i].text.replace('#nome', nome.title()).replace('#data', dia).replace('#dataextens', diaext)
                     inline[i].text = text
     doc.save(pasta+f'\\{nome} PST1.docx')
     convert(pasta+f'\\{nome} PST1.docx', pasta+f'\\{nome} PST1.pdf')
@@ -89,16 +91,9 @@ sh = wb['Aquatico']
 while x <= len(sh['B']):
     a1 = docx.Document(cert_aquatico)
     nomeplan = str(sh[f'B{x}'].value)
-    Sessions = sessionmaker(bind=engine)
-    session = Sessions()
-    pesq = session.query(Colaborador).all()
-    nomes = []
-    dicion = {}
-    for p in pesq:
-        nomes.append(str(p.nome).upper())
     for pessoa in nomes:
         dicion[pessoa] = SequenceMatcher(None, nomeplan, pessoa).ratio()
-    nome = max(dicion)
+    nome = [i for i in dicion if dicion[i]==max(dicion.values())][0]
     endeletr = str(sh[f'C{x}'].value)
     dia = dt.strftime(dt.strptime(str(sh[f'D{x}'].value), '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y')
     diaext = extenso(dia)
@@ -109,7 +104,7 @@ while x <= len(sh['B']):
         # Loop added to work with runs (strings with same style)
             for i in range(len(inline)):
                 if '#nome' in inline[i].text:
-                    text = inline[i].text.replace('#nome', nome).replace('#data', dia).replace('#dataextens', diaext)
+                    text = inline[i].text.replace('#nome', nome.title()).replace('#data', dia).replace('#dataextens', diaext)
                     inline[i].text = text
     doc.save(pasta+f'\\{nome} PSA1.docx')
     convert(pasta+f'\\{nome} PSA1.docx', pasta+f'\\{nome} PSA1.pdf')
