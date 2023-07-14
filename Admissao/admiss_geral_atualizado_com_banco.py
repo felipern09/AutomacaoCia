@@ -460,7 +460,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
                     pa.click(pa.center(pa.locateOnScreen('./static/Dexion.png')))
                     pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
-                        'i'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(20)
+                        'i'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(60)
                     pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.cpf)
                     t.sleep(1), pa.press('tab', 3), pa.write(pessoa.genero), pa.press('tab'), pa.write(pessoa.cor)
                     t.sleep(1), pa.press('tab', 2), pa.write(pessoa.instru)
