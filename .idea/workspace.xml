@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Admissao/admiss_geral_atualizado_com_banco.py" beforeDir="false" afterPath="$PROJECT_DIR$/Admissao/admiss_geral_atualizado_com_banco.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,7 +46,7 @@
       <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.admiss_geral_atualizado_com_banco">
+  <component name="RunManager" selected="Python.cert_treinamento">
     <configuration name="admiss_geral_atualizado_com_banco" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -155,9 +154,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.cert_treinamento" />
         <item itemvalue="Python.admiss_geral_atualizado_com_banco" />
         <item itemvalue="Python.cadastrar_banco" />
-        <item itemvalue="Python.cert_treinamento" />
         <item itemvalue="Python.cert_treinamento (1)" />
         <item itemvalue="Python.cancelamentos" />
       </list>
