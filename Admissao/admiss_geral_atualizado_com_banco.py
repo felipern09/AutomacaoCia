@@ -136,7 +136,7 @@ class Frame1(ttk.Frame):
         self.entrycc = ttk.Entry(self, width=20, textvariable=self.conta)
         self.entrycc.grid(column=1, row=25, padx=320, pady=1, sticky=W)
         # aparecer entry para ditigo
-        self.labeldig = ttk.Label(self, width=20, text="Dígito.:")
+        self.labeldig = ttk.Label(self, width=20, text="Dígito:")
         self.labeldig.grid(column=1, row=26, padx=260, pady=1, sticky=W)
         self.entrydig = ttk.Entry(self, width=20, textvariable=self.digito)
         self.entrydig.grid(column=1, row=26, padx=320, pady=1, sticky=W)
@@ -1190,7 +1190,7 @@ class Frame2(ttk.Frame):
         self.entryccest = ttk.Entry(self, width=20, textvariable=self.contaest)
         self.entryccest.grid(column=1, row=25, padx=320, pady=1, sticky=W)
         # aparecer entry para ditigo
-        self.labeldigest = ttk.Label(self, width=20, text="Dígito.:")
+        self.labeldigest = ttk.Label(self, width=20, text="Dígito:")
         self.labeldigest.grid(column=1, row=26, padx=260, pady=1, sticky=W)
         self.entrydigest = ttk.Entry(self, width=20, textvariable=self.digitoest)
         self.entrydigest.grid(column=1, row=26, padx=320, pady=1, sticky=W)
