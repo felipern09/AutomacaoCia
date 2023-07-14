@@ -153,7 +153,7 @@ class Frame1(ttk.Frame):
             linha = int(num)
             planwb = l_w(self.caminho.get())
             plansh = planwb['Respostas ao formulário 1']
-            self.labelhor.config(text='Horário preenchido: ' + plansh[f'AI{linha + 1}'].value)
+            self.labelhor.config(text='Horário preenchido: ' + str(plansh[f'AI{linha}'].value))
 
         self.combonome.bind("<<ComboboxSelected>>", mostrarhorario)
 
@@ -219,31 +219,25 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
 
         # search for the highest compatibility between the city filled in the form and the cities in the lists to
         # define codmunnas value
-        pn = l_w('Cadastro de Funcionário (respostas).xlsx', read_only=False)
-        sn = pn['Respostas ao formulário 1']
-        x = 2
-        while x <= len(sn['L']):
-            est = str(sn[f'AJ{x}'].value)
-            cidade = str(sn[f'L{x}'].value).title()
-            lista = []
-            dicion = {}
-            for cid in municipios[est]:
-                dicion[SequenceMatcher(None, cidade, cid).ratio()] = cid
-                lista.append(SequenceMatcher(None, cidade, cid).ratio())
-            codmunnas = municipios[str(sh[f'AJ{linha}'].value).upper().strip()][dicion[max(lista)]]
+        est = str(sh[f'AJ{linha}'].value)
+        cidade = str(sh[f'L{linha}'].value).title()
+        lista = []
+        dicion = {}
+        for cid in municipios[est]:
+            dicion[SequenceMatcher(None, cidade, cid).ratio()] = cid
+            lista.append(SequenceMatcher(None, cidade, cid).ratio())
+        codmunnas = municipios[str(sh[f'AJ{linha}'].value).upper().strip()][dicion[max(lista)]]
 
         # search for the highest compatibility between the city filled in the form and the cities in the lists to
         # define codmunend value
-        x = 2
-        while x <= len(sn['L']):
-            est = str(sn[f'AJ{x}'].value)
-            cidade = str(sn[f'L{x}'].value).title()
-            listaend = []
-            dicionend = {}
-            for cid in municipios[est]:
-                dicionend[SequenceMatcher(None, cidade, cid).ratio()] = cid
-                listaend.append(SequenceMatcher(None, cidade, cid).ratio())
-            codmunend = municipios[str(sh[f'T{linha}'].value).upper().strip()][dicionend[max(listaend)]]
+        est = str(sh[f'AJ{linha}'].value)
+        cidade = str(sh[f'L{linha}'].value).title()
+        listaend = []
+        dicionend = {}
+        for cid in municipios[est]:
+            dicionend[SequenceMatcher(None, cidade, cid).ratio()] = cid
+            listaend.append(SequenceMatcher(None, cidade, cid).ratio())
+        codmunend = municipios[str(sh[f'T{linha}'].value).upper().strip()][dicionend[max(listaend)]]
 
         lotacao = {'UNIDADE PARK SUL - QUALQUER DEPARTAMENTO': '0013', 'KIDS': '0010', 'MUSCULAÇÃO': '0007',
                    'ESPORTES E LUTAS': '0008', 'CROSSFIT': '0012', 'GINÁSTICA': '0006', 'GESTANTES': '0008',
