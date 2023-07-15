@@ -8,6 +8,11 @@ from tkinter import *
 from models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
 from openpyxl import load_workbook as l_w
+import config
+
+a = 0.0
+b = ''
+c = ''
 
 
 class MainApplication(tk.Tk):
@@ -278,6 +283,81 @@ def excrevervelor(total):
 def fazplanilha(nome1, nome2, nome3, nome4, nome5, nome6, nome7, nome8, nome9, nome10, nome11, nome12, nome13, nome14, nome15,
                 tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9, tipo10, tipo11, tipo12, tipo13, tipo14, tipo15,
                 val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, val14, val15, data):
+    if val1 != '':
+        valor1 = float(val1.replace(',','.'))
+    else:
+        valor1 = ''
+
+    if val2 != '':
+        valor2 = float(val2.replace(',','.'))
+    else:
+        valor2 = ''
+
+    if val3 != '':
+        valor3 = float(val3.replace(',','.'))
+    else:
+        valor3 = ''
+
+    if val4 != '':
+        valor4 = float(val4.replace(',','.'))
+    else:
+        valor4 = ''
+
+    if val5 != '':
+        valor5 = float(val5.replace(',','.'))
+    else:
+        valor5 = ''
+
+    if val6 != '':
+        valor6 = float(val6.replace(',','.'))
+    else:
+        valor6 = ''
+
+    if val7 != '':
+        valor7 = float(val7.replace(',','.'))
+    else:
+        valor7 = ''
+
+    if val8 != '':
+        valor8 = float(val8.replace(',','.'))
+    else:
+        valor8 = ''
+
+    if val9 != '':
+        valor9 = float(val9.replace(',','.'))
+    else:
+        valor9 = ''
+
+    if val10 != '':
+        valor10 = float(val10.replace(',','.'))
+    else:
+        valor10 = ''
+
+    if val11 != '':
+        valor11 = float(val11.replace(',','.'))
+    else:
+        valor11 = ''
+
+    if val12 != '':
+        valor12 = float(val12.replace(',','.'))
+    else:
+        valor12 = ''
+
+    if val13 != '':
+        valor13 = float(val13.replace(',','.'))
+    else:
+        valor13 = ''
+
+    if val14 != '':
+        valor14 = float(val14.replace(',','.'))
+    else:
+        valor14 = ''
+
+    if val15 != '':
+        valor15 = float(val15.replace(',','.'))
+    else:
+        valor15 = ''
+
     sessions = sessionmaker(bind=engine)
     session = sessions()
     dia = data.replace('/','.')
@@ -399,21 +479,21 @@ def fazplanilha(nome1, nome2, nome3, nome4, nome5, nome6, nome7, nome8, nome9, n
     sh['F14'].value = tipos[tipo14]
     sh['F15'].value = tipos[tipo15]
 
-    sh['G1'].value = val1
-    sh['G2'].value = val2
-    sh['G3'].value = val3
-    sh['G4'].value = val4
-    sh['G5'].value = val5
-    sh['G6'].value = val6
-    sh['G7'].value = val7
-    sh['G8'].value = val8
-    sh['G9'].value = val9
-    sh['G10'].value = val10
-    sh['G11'].value = val11
-    sh['G12'].value = val12
-    sh['G13'].value = val13
-    sh['G14'].value = val14
-    sh['G15'].value = val15
+    sh['G1'].value = valor1
+    sh['G2'].value = valor2
+    sh['G3'].value = valor3
+    sh['G4'].value = valor4
+    sh['G5'].value = valor5
+    sh['G6'].value = valor6
+    sh['G7'].value = valor7
+    sh['G8'].value = valor8
+    sh['G9'].value = valor9
+    sh['G10'].value = valor10
+    sh['G11'].value = valor11
+    sh['G12'].value = valor12
+    sh['G13'].value = valor13
+    sh['G14'].value = valor14
+    sh['G15'].value = valor15
 
     sh.column_dimensions['A'].width = 6
     sh.column_dimensions['B'].width = 8
@@ -422,8 +502,8 @@ def fazplanilha(nome1, nome2, nome3, nome4, nome5, nome6, nome7, nome8, nome9, n
     sh.column_dimensions['E'].width = 20
     sh.column_dimensions['F'].width = 4
     sh.column_dimensions['G'].width = 16
-
     wb.save(f'Pagamento Itau {dia}.xlsx')
+    config.x = 20
 
 
 if __name__ == '__main__':

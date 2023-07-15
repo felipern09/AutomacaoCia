@@ -1,12 +1,6 @@
 import pandas as pd
-from openpyxl import load_workbook as l_w
-
-wb = l_w('Cancelados 2021-2023.xlsx')
-sh = wb['Exportado do CiaSoft']
 
 base = pd.read_excel('Cancelados 2021-2023.xlsx')
-total = base['Tipo'].count()
-# adicionar fim previsto de acordo com plano
 """
  tipos de planos: ANUAL,ANUAL JR.,BI-ANUAL JR.,SEMESTRAL JR.,BI-ANUAL,ANUAL COLLEGE,ANUAL DIRETO,ANUAL DÉBITO PROGRAMADO
  ANUAL DÉBITO PROGRAMADO COLLEGE,ANUAL DÉBITO PROGRAMADO KIDS,ANUAL DÉBITO PROGRAMADO TEENS,ANUAL PLATINUM
@@ -15,6 +9,15 @@ total = base['Tipo'].count()
  Anual Jiu Jitsu,BI-ANUAL COLLEGE,ELO ANUAL DÉBITO PROGRAMADO COLLEGE,MENSAL CIA OUTDOOR 1X,MENSAL CIA OUTDOOR 2X
  MENSAL CIA OUTDOOR SÁBADO 1X, MENSAL JR,MENSAL PLATINUM, PLANO MENSAL COLLEGE
 """
+# excluir planos que tiveram renovação
+base = base.loc[base['Tem renovação'] == 'N']
+# excluir planos gympass
+base = base.loc[base['GymPass'] == 'N']
+# confrontar com base de ativos e ver se algum desses fez novo plano (que não se classifica como renovação) -- excluir
+# cruzar base de dados com turma/aula frequentada
+# cruzar base de dados com baixa frequentcia
+# cruzar com base de dados de ROs/Reclamações
+total = base['Nome'].count()
 # extrair da base de cancelados planos kids
 basekids = base[base['Idade'] <= 10]
 kids = basekids['Idade'].count()
@@ -36,7 +39,6 @@ cancelados = basecancelados['Tipo'].count()
 # extrair numero de encerrados
 baseencerrados = base[base['Tipo'] == 'Ecerrados']
 encerrados = baseencerrados['Tipo'].count()
-# cruzar base de dados com turma/aula frequentada
 
 print(
     f'Kids: {kids}\n'

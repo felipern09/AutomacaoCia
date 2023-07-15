@@ -11,7 +11,7 @@ import os
 enviar_email = int(str(input('Enviar e-mail? s/n ')).replace('s', '1').replace('S', '1').replace('n', '0').replace('N', '0'))
 
 # Subistituir nome nos modellos de certificados e salvar como em uma pasta da área de trabalho
-outlook = win32.Dispatch('outlook.application')
+# outlook = win32.Dispatch('outlook.application')
 wb = load_workbook('Treinamento.xlsx')
 pasta = '.\\Certificados'
 cert_terrestre = 'Treinamento Terrestre.docx'
@@ -39,7 +39,7 @@ def extenso(datacompleta):
 
 Sessions = sessionmaker(bind=engine)
 session = Sessions()
-pesq = session.query(Colaborador).all()
+pesq = session.query(Colaborador).filter_by(desligamento=None).all()
 nomes = []
 dicion = {}
 for p in pesq:
@@ -154,4 +154,4 @@ while sh[f'B{x}'].value is not None:
         email.Attachments.Add(anexo)
         email.Send()
     x += 1
-outlook.quit()
+# outlook.quit()

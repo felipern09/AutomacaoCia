@@ -5,7 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/solict_pgto.py" beforeDir="false" afterPath="$PROJECT_DIR$/Admissao/solict_pgto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Treinamento Certificados/cert_treinamento.py" beforeDir="false" afterPath="$PROJECT_DIR$/Treinamento Certificados/cert_treinamento.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Vendas e Cancelamentos/cancelamentos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Vendas e Cancelamentos/cancelamentos.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +39,7 @@
     &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Felipe/PycharmProjects/AutomacaoCia/Admissao&quot;
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Felipe/PycharmProjects/neo&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -46,7 +50,7 @@
       <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.cert_treinamento">
+  <component name="RunManager" selected="Python.cancelamentos">
     <configuration name="admiss_geral_atualizado_com_banco" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -154,11 +158,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.cancelamentos" />
+        <item itemvalue="Python.cadastrar_banco" />
         <item itemvalue="Python.cert_treinamento" />
         <item itemvalue="Python.admiss_geral_atualizado_com_banco" />
-        <item itemvalue="Python.cadastrar_banco" />
         <item itemvalue="Python.cert_treinamento (1)" />
-        <item itemvalue="Python.cancelamentos" />
       </list>
     </recent_temporary>
   </component>
