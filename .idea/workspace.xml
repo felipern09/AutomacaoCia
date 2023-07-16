@@ -5,11 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Admissao/solict_pgto.py" beforeDir="false" afterPath="$PROJECT_DIR$/Admissao/solict_pgto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/admiss_geral_atualizado_com_banco.py" beforeDir="false" afterPath="$PROJECT_DIR$/Admissao/admiss_geral_atualizado_com_banco.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Contatos diversos/enviar_email.py" beforeDir="false" afterPath="$PROJECT_DIR$/Contatos diversos/enviar_email.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Treinamento Certificados/cert_treinamento.py" beforeDir="false" afterPath="$PROJECT_DIR$/Treinamento Certificados/cert_treinamento.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Vendas e Cancelamentos/cancelamentos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Vendas e Cancelamentos/cancelamentos.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +49,7 @@
       <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.cancelamentos">
+  <component name="RunManager" selected="Python.cadastrar_banco">
     <configuration name="admiss_geral_atualizado_com_banco" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -114,27 +113,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="cert_treinamento (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AutomacaoCia" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Admissao" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Admissao/cert_treinamento.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="cert_treinamento" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -156,13 +134,34 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="enviar_email" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="AutomacaoCia" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Contatos diversos" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Contatos diversos/enviar_email.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.cancelamentos" />
         <item itemvalue="Python.cadastrar_banco" />
+        <item itemvalue="Python.enviar_email" />
         <item itemvalue="Python.cert_treinamento" />
+        <item itemvalue="Python.cancelamentos" />
         <item itemvalue="Python.admiss_geral_atualizado_com_banco" />
-        <item itemvalue="Python.cert_treinamento (1)" />
       </list>
     </recent_temporary>
   </component>

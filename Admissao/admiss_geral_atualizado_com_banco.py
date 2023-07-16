@@ -230,8 +230,8 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
 
         # search for the highest compatibility between the city filled in the form and the cities in the lists to
         # define codmunend value
-        est = str(sh[f'AJ{linha}'].value)
-        cidade = str(sh[f'L{linha}'].value).title()
+        est = str(sh[f'T{linha}'].value)
+        cidade = str(sh[f'S{linha}'].value).title()
         listaend = []
         dicionend = {}
         for cid in municipios[est]:
