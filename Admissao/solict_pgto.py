@@ -8,7 +8,6 @@ from tkinter import *
 from models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
 from openpyxl import load_workbook as l_w
-import config
 
 a = 0.0
 b = ''
@@ -183,17 +182,22 @@ class Pgto(ttk.Frame):
         self.entryvalor14.grid(column=1, row=15, padx=525, pady=1, sticky=W)
         self.entryvalor15 = ttk.Entry(self, width=20)
         self.entryvalor15.grid(column=1, row=16, padx=525, pady=1, sticky=W)
-        self.data = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month, day=self.hoje.day, locale='pt_BR')
+        self.data = DateEntry(self, selectmode='day', year=self.hoje.year,
+                              month=self.hoje.month, day=self.hoje.day, locale='pt_BR')
         self.data.grid(column=1, row=28, padx=225, pady=1, sticky=W)
-        self.botao = ttk.Button(self, width=35, text="Criar Planilha",command=lambda: [fazplanilha(
-            self.nome1.get(), self.nome2.get(), self.nome3.get(), self.nome4.get(), self.nome5.get(), self.nome6.get(), self.nome7.get(), self.nome8.get(),
-            self.nome9.get(),self.nome10.get(), self.nome11.get(), self.nome12.get(), self.nome13.get(), self.nome14.get(), self.nome15.get(), self.tipo1.get(),
-            self.tipo2.get(), self.tipo3.get(), self.tipo4.get(), self.tipo5.get(), self.tipo6.get(), self.tipo7.get(), self.tipo8.get(), self.tipo9.get(),
-            self.tipo10.get(),self.tipo11.get(), self.tipo12.get(), self.tipo13.get(), self.tipo14.get(), self.tipo15.get(), self.entryvalor1.get(),
-            self.entryvalor2.get(),self.entryvalor3.get(), self.entryvalor4.get(), self.entryvalor5.get(),
-            self.entryvalor6.get(),self.entryvalor7.get(), self.entryvalor8.get(), self.entryvalor9.get(),
-            self.entryvalor10.get(),self.entryvalor11.get(), self.entryvalor12.get(), self.entryvalor13.get(),
-            self.entryvalor14.get(),self.entryvalor15.get(), self.data.get()
+        self.botao = ttk.Button(self, width=35, text="Criar Planilha", command=lambda: [fazplanilha(
+            self.nome1.get(), self.nome2.get(), self.nome3.get(), self.nome4.get(),
+            self.nome5.get(), self.nome6.get(), self.nome7.get(), self.nome8.get(),
+            self.nome9.get(), self.nome10.get(), self.nome11.get(), self.nome12.get(),
+            self.nome13.get(), self.nome14.get(), self.nome15.get(), self.tipo1.get(),
+            self.tipo2.get(), self.tipo3.get(), self.tipo4.get(), self.tipo5.get(),
+            self.tipo6.get(), self.tipo7.get(), self.tipo8.get(), self.tipo9.get(),
+            self.tipo10.get(), self.tipo11.get(), self.tipo12.get(), self.tipo13.get(),
+            self.tipo14.get(), self.tipo15.get(), self.entryvalor1.get(),
+            self.entryvalor2.get(), self.entryvalor3.get(), self.entryvalor4.get(), self.entryvalor5.get(),
+            self.entryvalor6.get(), self.entryvalor7.get(), self.entryvalor8.get(), self.entryvalor9.get(),
+            self.entryvalor10.get(), self.entryvalor11.get(), self.entryvalor12.get(), self.entryvalor13.get(),
+            self.entryvalor14.get(), self.entryvalor15.get(), self.data.get()
         )])
         self.botao.grid(column=1, row=28, padx=380, pady=1, sticky=W)
 
@@ -216,7 +220,8 @@ class PgtoFin(ttk.Frame):
         # aparecer horario preenchido e dropdown para escolher horario
         self.labelquantos = ttk.Label(self, width=55, text="Quantos tipos de pgto: ")
         self.labelquantos.grid(column=1, row=14, padx=25, pady=1, sticky=W)
-        self.comboquantos = ttk.Combobox(self, values=['1', '2', '3', '4', '5', '6'], textvariable=self.horario, width=50)
+        self.comboquantos = ttk.Combobox(self, values=['1', '2', '3', '4', '5', '6'],
+                                         textvariable=self.horario, width=50)
         self.comboquantos.grid(column=1, row=15, padx=225, pady=1, sticky=W)
         # aparecer entry para preencher salario
         self.labelsal = ttk.Label(self, width=20, text="Tipos: (colocar checkbox)")
@@ -226,12 +231,14 @@ class PgtoFin(ttk.Frame):
         # aparecer dropdown para escolher depto
         self.labelcalendario = ttk.Label(self, width=20, text="Data:")
         self.labelcalendario.grid(column=1, row=19, padx=25, pady=1, sticky=W)
-        self.calendario = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month, day=self.hoje.day, locale='pt_BR')
+        self.calendario = DateEntry(self, selectmode='day', year=self.hoje.year,
+                                    month=self.hoje.month, day=self.hoje.day, locale='pt_BR')
         self.calendario.grid(column=1, row=19, padx=225, pady=1, sticky=W)
         # aparecer dropdown para escolher tipo_contr
         self.labelcompetencia = ttk.Label(self, width=20, text="Competencia:")
         self.labelcompetencia.grid(column=1, row=21, padx=25, pady=1, sticky=W)
-        self.combocompetencia = ttk.Combobox(self, values=['mespassado', 'mesatual', 'mesquevem'], textvariable=self.tipocontr, width=50)
+        self.combocompetencia = ttk.Combobox(self, values=['mespassado', 'mesatual', 'mesquevem'],
+                                             textvariable=self.tipocontr, width=50)
         self.combocompetencia.grid(column=1, row=21, padx=225, pady=1, sticky=W)
         self.edicao = IntVar()
         self.editar = ttk.Checkbutton(self, text='Editar cadastro feito manualmente.', variable=self.edicao)
@@ -240,7 +247,7 @@ class PgtoFin(ttk.Frame):
         self.onde = ttk.Checkbutton(self, text='Cadastro realizado fora da Cia.', variable=self.feitonde)
         self.onde.grid(column=1, row=27, padx=26, pady=1, sticky=W)
         self.botao = ttk.Button(self, width=35, text="Cria capa e envia e-mail",
-                   command=lambda: [confirmapgto()])
+                                command=lambda: [confirmapgto()])
         self.botao.grid(column=1, row=28, padx=380, pady=1, sticky=W)
 
 
@@ -263,105 +270,109 @@ def excrevervelor(total):
     # transformar algarismos do total em número por extenso e com reais e centavos
     reais, centavos = str(format(total, '.2f')).split('.')
     if int(reais) == 1:
-        strReal = 'real'
+        str_real = 'real'
     else:
-        strReal = 'reais'
+        str_real = 'reais'
     if int(centavos) == 1:
-        strCentavo = 'centavo'
+        str_centavo = 'centavo'
     else:
-        strCentavo = 'centavos'
+        str_centavo = 'centavos'
     if int(reais) == 0:
-        extenso = f'{nw.num2words(centavos, lang="pt_BR").capitalize()} {strCentavo}.'
+        extenso = f'{nw.num2words(centavos, lang="pt_BR").capitalize()} {str_centavo}.'
     else:
         if int(centavos) == 0:
-            extenso = f'{nw.num2words(reais, lang="pt_BR").capitalize()} {strReal}.'
+            extenso = f'{nw.num2words(reais, lang="pt_BR").capitalize()} {str_real}.'
         else:
-            extenso = f'{nw.num2words(reais, lang="pt_BR").capitalize()} {strReal} e {nw.num2words(centavos, lang="pt_BR")} {strCentavo}.'
+            extenso = f'{nw.num2words(reais, lang="pt_BR").capitalize()} {str_real} e ' \
+                      f'{nw.num2words(centavos, lang="pt_BR")} {str_centavo}.'
     return extenso
 
 
-def fazplanilha(nome1, nome2, nome3, nome4, nome5, nome6, nome7, nome8, nome9, nome10, nome11, nome12, nome13, nome14, nome15,
-                tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9, tipo10, tipo11, tipo12, tipo13, tipo14, tipo15,
-                val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, val14, val15, data):
+def fazplanilha(nome1, nome2, nome3, nome4, nome5, nome6, nome7, nome8,
+                nome9, nome10, nome11, nome12, nome13, nome14, nome15,
+                tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8,
+                tipo9, tipo10, tipo11, tipo12, tipo13, tipo14, tipo15,
+                val1, val2, val3, val4, val5, val6, val7, val8, val9,
+                val10, val11, val12, val13, val14, val15, data):
     if val1 != '':
-        valor1 = float(val1.replace(',','.'))
+        valor1 = float(val1.replace(',', '.'))
     else:
         valor1 = ''
 
     if val2 != '':
-        valor2 = float(val2.replace(',','.'))
+        valor2 = float(val2.replace(',', '.'))
     else:
         valor2 = ''
 
     if val3 != '':
-        valor3 = float(val3.replace(',','.'))
+        valor3 = float(val3.replace(',', '.'))
     else:
         valor3 = ''
 
     if val4 != '':
-        valor4 = float(val4.replace(',','.'))
+        valor4 = float(val4.replace(',', '.'))
     else:
         valor4 = ''
 
     if val5 != '':
-        valor5 = float(val5.replace(',','.'))
+        valor5 = float(val5.replace(',', '.'))
     else:
         valor5 = ''
 
     if val6 != '':
-        valor6 = float(val6.replace(',','.'))
+        valor6 = float(val6.replace(',', '.'))
     else:
         valor6 = ''
 
     if val7 != '':
-        valor7 = float(val7.replace(',','.'))
+        valor7 = float(val7.replace(',', '.'))
     else:
         valor7 = ''
 
     if val8 != '':
-        valor8 = float(val8.replace(',','.'))
+        valor8 = float(val8.replace(',', '.'))
     else:
         valor8 = ''
 
     if val9 != '':
-        valor9 = float(val9.replace(',','.'))
+        valor9 = float(val9.replace(',', '.'))
     else:
         valor9 = ''
 
     if val10 != '':
-        valor10 = float(val10.replace(',','.'))
+        valor10 = float(val10.replace(',', '.'))
     else:
         valor10 = ''
 
     if val11 != '':
-        valor11 = float(val11.replace(',','.'))
+        valor11 = float(val11.replace(',', '.'))
     else:
         valor11 = ''
 
     if val12 != '':
-        valor12 = float(val12.replace(',','.'))
+        valor12 = float(val12.replace(',', '.'))
     else:
         valor12 = ''
 
     if val13 != '':
-        valor13 = float(val13.replace(',','.'))
+        valor13 = float(val13.replace(',', '.'))
     else:
         valor13 = ''
 
     if val14 != '':
-        valor14 = float(val14.replace(',','.'))
+        valor14 = float(val14.replace(',', '.'))
     else:
         valor14 = ''
 
     if val15 != '':
-        valor15 = float(val15.replace(',','.'))
+        valor15 = float(val15.replace(',', '.'))
     else:
         valor15 = ''
 
     sessions = sessionmaker(bind=engine)
     session = sessions()
-    dia = data.replace('/','.')
-    tipos = {'':'','Salário': '1', 'Férias': '2', 'Vale Transporte': '3', 'Vale Alimentação': '4', 'Comissão': '5',
+    dia = data.replace('/', '.')
+    tipos = {'': '', 'Salário': '1', 'Férias': '2', 'Vale Transporte': '3', 'Vale Alimentação': '4', 'Comissão': '5',
              '13º salário': '6', 'Bolsa Estágio': '7', 'Bônus': '8', 'Adiantamento Salarial': '9',
              'Rescisão': '10', 'Bolsa Auxílio': '11', 'Pensão Alimentícia': '12', 'Pgto em C/C': '13',
              'Remuneração': '14'}
@@ -503,7 +514,6 @@ def fazplanilha(nome1, nome2, nome3, nome4, nome5, nome6, nome7, nome8, nome9, n
     sh.column_dimensions['F'].width = 4
     sh.column_dimensions['G'].width = 16
     wb.save(f'Pagamento Itau {dia}.xlsx')
-    config.x = 20
 
 
 if __name__ == '__main__':
@@ -513,5 +523,6 @@ if __name__ == '__main__':
 
 # alterar o modelo de pagamento inserindo dados armazenados
 # salvar como o modelo na pasta do mês e do tipo de pagamento solicitaçao de pgto-> Mes ->arquivos
-# transformar modelo salvo na pasta "arquivos" mes para pdf e salvar na pasta definitiva solicitaçao de pgto-> Mes ->Tipo pgto-> pgto x dia y
+# transformar modelo salvo na pasta "arquivos" mes para pdf e salvar na pasta definitiva
+# solicitaçao de pgto-> Mes ->Tipo pgto-> pgto x dia y
 # enviar o arquivo definitivo para o financeiro com corpo do e-mail definindo tipo pgto, valor total e data

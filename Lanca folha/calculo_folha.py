@@ -9,6 +9,7 @@ Sessions = sessionmaker(bind=engine)
 session = Sessions()
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
 
+
 class Folha:
     def __init__(self, competencia, aulas, deptos):
         if competencia.day >= 21:
@@ -22,7 +23,7 @@ class Folha:
 
 
 class Aula:
-    def __init__(self, nome, prof, depart, diasem,inicio, fim, valorhr, iniciograde, fimgrade=''):
+    def __init__(self, nome, prof, depart, diasem, inicio, fim, valorhr, iniciograde, fimgrade=''):
         self.nome = nome
         self.professor = prof
         self.departamento = depart
@@ -49,20 +50,20 @@ def somaaula(diasem, inic, fim, hoje, iniciograd, fimgrad):
     if hoje.day >= 21:
         inicio = dt(day=21, month=hoje.month, year=hoje.year)
         fechamento = dt(day=20, month=(hoje + relativedelta(months=1)).month,
-                              year=(hoje + relativedelta(months=1)).year)
+                        year=(hoje + relativedelta(months=1)).year)
     if hoje.day < 21:
         inicio = dt(day=21, month=(hoje - relativedelta(months=1)).month,
-                          year=(hoje - relativedelta(months=1)).year)
+                    year=(hoje - relativedelta(months=1)).year)
         fechamento = dt(day=20, month=hoje.month, year=hoje.year)
 
     def intervalo(inicio, fechamento):
         if hoje.day >= 21:
             inicio = dt(day=21, month=hoje.month, year=hoje.year)
             fechamento = dt(day=20, month=(hoje + relativedelta(months=1)).month,
-                                  year=(hoje + relativedelta(months=1)).year)
+                            year=(hoje + relativedelta(months=1)).year)
         if hoje.day < 21:
             inicio = dt(day=21, month=(hoje - relativedelta(months=1)).month,
-                              year=(hoje - relativedelta(months=1)).year)
+                        year=(hoje - relativedelta(months=1)).year)
             fechamento = dt(day=20, month=hoje.month, year=hoje.year)
 
         for n in range(int((fechamento - inicio).days) + 1):
@@ -142,7 +143,8 @@ def aulasativas():
     aula = []
     for i, a in enumerate(aulasativasdb):
         aula.append(i)
-        aula[i] = Aula(a.nome, a.professor, a.departamento, a.diadasemana, a.inicio, a.fim, a.valor, a.iniciograde, a.fimgrade)
+        aula[i] = Aula(a.nome, a.professor, a.departamento, a.diadasemana, a.inicio, a.fim, a.valor, a.iniciograde,
+                       a.fimgrade)
         yield aula[i]
 
 
@@ -170,7 +172,8 @@ folhadehoje = Folha(data, list(aulasativas()), deptosativos())
 def totaldafolha(folha):
     somatorio = 0
     for al in list(aulasativas()):
-        somatorio += somaaula(al.dia, al.inicio, al.fim, data, al.iniciograde, al.fimgrade) * float(str(al.valor).replace(',', '.')) * al.dsr
+        somatorio += somaaula(al.dia, al.inicio, al.fim, data, al.iniciograde, al.fimgrade) * \
+                     float(str(al.valor).replace(',', '.')) * al.dsr
     return round(somatorio, 2)
 
 
@@ -188,7 +191,7 @@ for i in profsativos():
     for d in deptosativos():
         somaaulas[i][d] = {}
 for aulas in aulasativas():
-    somaaulas[aulas.professor][aulas.departamento][aulas.nome] = somaprof(folhadehoje, aulas.professor, aulas.departamento, aulas.nome)
+    somaaulas[aulas.professor][aulas.departamento][aulas.nome+f'({aulas.valor})'] = \
+        somaprof(folhadehoje, aulas.professor, aulas.departamento, aulas.nome)
 print(somaaulas)
 print(locale.currency(totaldafolha(folhadehoje), grouping=True))
-

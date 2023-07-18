@@ -318,7 +318,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         'tab'), pa.write(pessoa.num), pa.press('tab', 2)
                     pp.copy(pessoa.bairro), pa.hotkey('ctrl', 'v'), pa.press('tab'), pp.copy(pessoa.cidade), pa.hotkey(
                         'ctrl', 'v'), pa.press('tab'), pa.write(pessoa.uf)
-                    pa.press('tab'), pa.write(pessoa.cep), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press(
+                    pa.press('tab'), pa.write(pessoa.cep), pa.press('tab'), pa.write(pessoa.cod_municipioend),pa.press(
                         'tab'), pa.write(str(pessoa.tel)), pa.press('tab', 2), pa.write(pessoa.email)
                     # #clique em dados contratuais
                     pa.click(pa.center(pa.locateOnScreen('./static/Contratuais.png')))
@@ -819,28 +819,36 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         pa.click(pa.center(pa.locateOnScreen('./static/Fechartrab1.png'))), t.sleep(0.5)
 
                         os.makedirs(
-                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
                             r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome))
                         os.makedirs(
-                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
                             r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestados'.format(pessoa.nome))
                         os.makedirs(
-                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
                             r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome))
                         os.makedirs(
-                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
                             r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome))
                         os.makedirs(
-                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
                             r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome))
                         os.makedirs(
-                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
                             r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome))
                         os.makedirs(
-                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
                             r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome))
                         os.makedirs(
-                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
                             r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome))
                         tkinter.messagebox.showinfo(
                             title='Cadastro ok!',
@@ -1008,11 +1016,10 @@ def salvadocsfunc(matricula):
     os.remove(p_contr + '\\AC.docx')
 
     # # Alterar Abertura de Conta e salvar na pasta
-    abert_c.paragraphs[14].text = str(abert_c.paragraphs[14].text).replace('#nome_completo', pessoa.nome).replace(
-        '#rg', pessoa.rg).replace(
-        '#cpf', pessoa.cpf).replace('#endereco', pessoa.endereco).replace('#cep', pessoa.cep).replace('#bairro',
-                                                                                                      pessoa.bairro).replace(
-        '#cargo', pessoa.cargo).replace('#data', pessoa.admiss)
+    abert_c.paragraphs[14].text = str(abert_c.paragraphs[14].text).replace('#nome_completo', pessoa.nome)\
+        .replace('#rg', pessoa.rg).replace('#cpf', pessoa.cpf).replace('#endereco', pessoa.endereco)\
+        .replace('#cep', pessoa.cep).replace('#bairro', pessoa.bairro).replace('#cargo', pessoa.cargo)\
+        .replace('#data', pessoa.admiss)
     abert_c.save(p_contr + '\\Abertura Conta.docx')
     docx2pdf.convert(p_contr + '\\Abertura Conta.docx', p_contr + '\\Abertura Conta.pdf')
     os.remove(p_contr + '\\Abertura Conta.docx')
@@ -1021,25 +1028,23 @@ def salvadocsfunc(matricula):
     fch_c.paragraphs[34].text = str(fch_c.paragraphs[34].text).replace('#gerente#',
                                                                        lotacao[str(pessoa.depto).title()][1])
     fch_c.paragraphs[9].text = str(fch_c.paragraphs[9].text).replace('#nome_completo', pessoa.nome)
-    fch_c.paragraphs[21].text = str(fch_c.paragraphs[21].text).replace('#cargo', pessoa.cargo).replace('#depart',
-                                                                                                       str(pessoa.depto).title())
+    fch_c.paragraphs[21].text = str(fch_c.paragraphs[21].text).replace('#cargo', pessoa.cargo)\
+        .replace('#depart', str(pessoa.depto).title())
     fch_c.paragraphs[19].text = str(fch_c.paragraphs[19].text).replace('#end_eletr', pessoa.email)
     fch_c.paragraphs[17].text = str(fch_c.paragraphs[17].text).replace('#mae#', pessoa.mae)
     fch_c.paragraphs[16].text = str(fch_c.paragraphs[16].text).replace('#pai#', pessoa.pai)
-    fch_c.paragraphs[15].text = str(fch_c.paragraphs[15].text).replace('#ident', pessoa.rg).replace('#cpf#',
-                                                                                                    pessoa.cpf)
+    fch_c.paragraphs[15].text = str(fch_c.paragraphs[15].text).replace('#ident', pessoa.rg)\
+        .replace('#cpf#', pessoa.cpf)
     fch_c.paragraphs[13].text = str(fch_c.paragraphs[13].text).replace('#telefone', pessoa.tel)
-    fch_c.paragraphs[12].text = str(fch_c.paragraphs[12].text).replace('#codigo', pessoa.cep).replace('#cid',
-                                                                                                      pessoa.cidade).replace(
-        '#uf',
-        pessoa.uf)
-    fch_c.paragraphs[11].text = str(fch_c.paragraphs[11].text).replace('#local', pessoa.endereco).replace('#qd',
-                                                                                                          pessoa.bairro)
-    fch_c.paragraphs[10].text = str(fch_c.paragraphs[10].text).replace('#nasc', datetime.strftime(
-        datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y')).replace('#gen',
-                                                                                        pessoa.genero).replace(
-        '#est_civ',
-        str(pessoa.estado_civil).replace('1 - ', '').replace('2 - ', '').replace('3 - ', '').replace('4 - ', ''))
+    fch_c.paragraphs[12].text = str(fch_c.paragraphs[12].text).replace('#codigo', pessoa.cep)\
+        .replace('#cid', pessoa.cidade).replace('#uf', pessoa.uf)
+    fch_c.paragraphs[11].text = str(fch_c.paragraphs[11].text).replace('#local', pessoa.endereco)\
+        .replace('#qd', pessoa.bairro)
+    fch_c.paragraphs[10].text = str(fch_c.paragraphs[10].text)\
+        .replace('#nasc', datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y'))\
+        .replace('#gen', pessoa.genero)\
+        .replace('#est_civ', str(pessoa.estado_civil).replace('1 - ', '').replace('2 - ', '').replace('3 - ', '')
+                 .replace('4 - ', ''))
     fch_c.save(p_contr + '\\Ficha Cadastral.docx')
     docx2pdf.convert(p_contr + '\\Ficha Cadastral.docx', p_contr + '\\Ficha Cadastral.pdf')
     os.remove(p_contr + '\\Ficha Cadastral.docx')
@@ -1293,24 +1298,44 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         senha = k1
         lot = lotacao[f'{sh[f"AG{linha}"].value}']
         pasta = r'\192.168.0.250'
-        modelo = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\Modelo'
+        modelo = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\' \
+                 f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\Modelo'
         os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}')
+            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}')
         os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Atestados')
+            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Atestados')
         os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Diversos')
+            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Diversos')
         os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Contratuais')
+            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Contratuais')
         os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Ferias')
+            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Ferias')
         os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Ponto')
+            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Ponto')
         os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Recibo')
+            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Recibo')
         os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Rescisao')
-        pasta_contratuais = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Contratuais'
+            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Rescisao')
+        pasta_contratuais = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\' \
+                            f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\' \
+                            f'00 - ATIVOS\\0 - Estagiários\\' \
+                            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Contratuais'
 
         # change tree docx model files with intern data and save pdfs files
         solicitacao = docx.Document(modelo + r'\Solicitacao MODELO - Copia.docx')
@@ -1466,7 +1491,8 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         msg = MIMEMultipart('alternative')
         arquivo = pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf'
         text = MIMEText(
-            f'''Olá!\n\nSegue pedido de TCE do(a) estagiário(a) {cadastro["nome"]}.\n\nAtenciosamente,<br><img src="cid:image1">''',
+            f'''Olá!\n\nSegue pedido de TCE do(a) estagiário(a) {cadastro["nome"]}.\n\n
+            Atenciosamente,<br><img src="cid:image1">''',
             'html')
         msg.attach(text)
         image = MIMEImage(
@@ -1552,26 +1578,44 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pasta = r'\192.168.0.250'
                 try:
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Atestados')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Atestados')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Diversos')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Diversos')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Contratuais')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Contratuais')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ferias')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ferias')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ponto')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ponto')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Recibo')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Recibo')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Rescisao')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Rescisao')
                 except:
                     pass
                 # abrir cadastro no dexion e atualizar informações campo a campo
                 pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
-                pastapessoa = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{pessoa.nome}'
+                pastapessoa = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\' \
+                              f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\' \
+                              f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{pessoa.nome}'
                 pa.click(pa.center(pa.locateOnScreen('./static/Dexion.png')))
                 pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
                     'i'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(20)
@@ -1666,7 +1710,9 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 # #clique em fechar trabalhadores
                 pa.click(pa.center(pa.locateOnScreen('./static/Fechartrab1.png'))), t.sleep(0.5)
                 os.rename(pastapessoa,
-                          f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\{pessoa.nome}')
+                          f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                          f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                          f'00 - ATIVOS\\0 - Estagiários\\{pessoa.nome}')
                 tkinter.messagebox.showinfo(
                     title='Cadastro ok!',
                     message='Cadastro realizado com sucesso!'
@@ -1727,26 +1773,44 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pasta = r'\192.168.0.250'
                 try:
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Atestados')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Atestados')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Diversos')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Diversos')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Contratuais')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Contratuais')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ferias')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ferias')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ponto')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ponto')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Recibo')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Recibo')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Rescisao')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Rescisao')
                 except:
                     pass
                 # abrir cadastro no dexion e atualizar informações campo a campo
                 pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
-                pastapessoa = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{pessoa.nome}'
+                pastapessoa = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\' \
+                              f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\' \
+                              f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{pessoa.nome}'
                 pa.click(pa.center(pa.locateOnScreen('./static/Dexion.png')))
                 pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
                     'i'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(20)
@@ -1841,7 +1905,9 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 # #clique em fechar trabalhadores
                 pa.click(pa.center(pa.locateOnScreen('./static/Fechartrab1.png'))), t.sleep(0.5)
                 os.rename(pastapessoa,
-                          f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\{pessoa.nome}')
+                          f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                          f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                          f'00 - ATIVOS\\0 - Estagiários\\{pessoa.nome}')
                 tkinter.messagebox.showinfo(
                     title='Cadastro ok!',
                     message='Cadastro realizado com sucesso!'
@@ -1879,13 +1945,11 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                             'num': str(sh[f"P{linha}"].value), 'bairro': str(sh[f"Q{linha}"].value),
                             'cep': str(sh[f"R{linha}"].value).replace('.', '').replace('-', ''),
                             'cid_end': str(sh[f"S{linha}"].value), 'uf_end': str(sh[f"T{linha}"].value),
-                            'tel': str(sh[f"U{linha}"].value).replace('(', '').replace(')', '').replace('-',
-                                                                                                        '').replace(' ',
-                                                                                                                    ''),
+                            'tel': str(sh[f"U{linha}"].value).replace('(', '')
+                            .replace(')', '').replace('-','').replace(' ',''),
                             'mun_end': str(sh[f"AP{linha}"].value),
-                            'cpf': str(sh[f"V{linha}"].value).strip().replace('.', '').replace('-', '').replace(' ',
-                                                                                                                '').zfill(
-                                11),
+                            'cpf': str(sh[f"V{linha}"].value).strip().replace('.', '')
+                            .replace('-', '').replace(' ','').zfill(11),
                             'rg': str(sh[f"W{linha}"].value).strip().replace('.', '').replace('-', '').replace(' ', ''),
                             'emissor': str(sh[f"X{linha}"].value),
                             'lotacao': str(lotacao[f'{sh[f"AG{linha}"].value}'][0]).zfill(4),
@@ -1952,21 +2016,37 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pasta = r'\192.168.0.250'
                 try:
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Atestados')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Atestados')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Diversos')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Diversos')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Contratuais')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'2 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Contratuais')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ferias')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ferias')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ponto')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ponto')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Recibo')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Recibo')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Rescisao')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Rescisao')
                 except:
                     pass
                 # abrir cadastro no dexion e atualizar informações campo a campo
