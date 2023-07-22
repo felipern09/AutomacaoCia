@@ -12,7 +12,10 @@ while x < len(sh['A']):
     email = str(sh[f"D{x}"].value)
     numero = str(sh[f"H{x}"].value)
     url = str(sh[f"F{x}"].value)
-    mensagem = f'Oi {pessoa}, te enviei por e-mail(no {email}) o resultado da primeira etapa da sua avaliação de desempenho e o link da pesquisa sobre a avaliação. Antes da segunda etapa, precisamos que responda a pesquisa. Ok? Se puder responder agora, é bem rápido, dura no máximo 5 minutos. Segue o link: {url}'
+    mensagem = f'Oi {pessoa}, te enviei por e-mail(no {email}) o resultado da primeira etapa da sua avaliação de ' \
+               f'desempenho e o link da pesquisa sobre a avaliação. Antes da segunda etapa, precisamos que ' \
+               f'responda a pesquisa. Ok? Se puder responder agora, é bem rápido, dura no máximo 5 minutos. ' \
+               f'Segue o link: {url}'
     texto = urllib.parse.quote(mensagem)
     cel = urllib.parse.quote(numero)
     link = f'https://web.whatsapp.com/send?phone={cel}&text={texto}'
