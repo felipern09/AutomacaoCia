@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Contatos diversos/mensagem_wpp.py" beforeDir="false" afterPath="$PROJECT_DIR$/Contatos diversos/mensagem_wpp.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Lanca folha/calculo_folha.py" beforeDir="false" afterPath="$PROJECT_DIR$/Lanca folha/calculo_folha.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lanca folha/modelsfolha.py" beforeDir="false" afterPath="$PROJECT_DIR$/Lanca folha/modelsfolha.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,7 +48,7 @@
       <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.alterar_banco">
+  <component name="RunManager" selected="Python.calculo_folha">
     <configuration name="alterar_banco" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -159,9 +156,9 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.calculo_folha" />
         <item itemvalue="Python.alterar_banco" />
         <item itemvalue="Python.modelsfolha" />
-        <item itemvalue="Python.calculo_folha" />
         <item itemvalue="Python.modelsfaltas" />
         <item itemvalue="Python.teste" />
       </list>

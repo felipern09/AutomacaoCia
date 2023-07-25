@@ -184,7 +184,7 @@ def faltas(comp):
     return dic
 
 
-def ferias(comp):
+def feriasf(comp):
     sessions = sessionmaker(bind=engine)
     session = sessions()
     fer = session.query(Ferias).all()
@@ -208,7 +208,7 @@ def ferias(comp):
     return dic
 
 
-def atestado(comp):
+def atestadof(comp):
     sessions = sessionmaker(bind=engine)
     session = sessions()
     ates = session.query(Atestado).all()
@@ -229,7 +229,7 @@ def atestado(comp):
     return dic
 
 
-def feriado(comp):
+def feriadof(comp):
     inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
                 year=dt.today().year)
     fim = dt(day=20, month=comp, year=dt.today().year)
@@ -345,10 +345,10 @@ def plandegrade(dic, comp):
     flt = faltas(comp)
     subs = substit(comp)
     dslg = desligamentos(comp)
-    fer = ferias(comp)
+    fer = feriasf(comp)
     complem = horascomplementares(comp)
-    atest = atestado(comp)
-    feriad = feriado(comp)
+    atest = atestadof(comp)
+    feriad = feriadof(comp)
     escal = escala(comp)
     atestado = PatternFill(start_color='A9D08E',
                           end_color='A9D08E',
