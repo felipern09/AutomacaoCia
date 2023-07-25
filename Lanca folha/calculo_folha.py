@@ -1,10 +1,12 @@
 from datetime import datetime as dt, timedelta as td
 from dateutil.relativedelta import relativedelta
-from modelsfolha import Aulas, engine
+from modelsfolha import Aulas, Faltas, Ferias, Hrcomplement, Atestado, Desligados, Escala, Substituicao, engine
 from sqlalchemy.orm import sessionmaker
 from openpyxl import load_workbook as l_w
 from openpyxl.styles import Color, PatternFill, Font, Border
+import pandas as pd
 import openpyxl.utils.cell
+import holidays
 import locale
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -158,28 +160,196 @@ def somaprof(folha, prof, depto, nome):
     return somahoras
 
 
-def alteracoesfolha(dicionario):
-    folha = dicionario
-    hoje = dt.today()
-    alt = l_w('AlteracoesGrade.xlsx', read_only=False)
-    substituicoes = alt['Subs']
-    faltas = alt['Falta']
-    atestados = alt['Atestado']
-    if hoje.day >= 21:
-        inicio = dt(day=21, month=hoje.month, year=hoje.year)
-        fechamento = dt(day=20, month=(hoje + relativedelta(months=1)).month,
-                        year=(hoje + relativedelta(months=1)).year)
-    if hoje.day < 21:
-        inicio = dt(day=21, month=(hoje - relativedelta(months=1)).month,
-                    year=(hoje - relativedelta(months=1)).year)
-        fechamento = dt(day=20, month=hoje.month, year=hoje.year)
-    
-    return folha
+def faltas(comp):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
+    falt = session.query(Faltas).all()
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
+                year=dt.today().year)
+    fim = dt(day=20, month=comp, year=dt.today().year)
+    dic = {}
+    for f in falt:
+        if inicio <= dt.strptime(f.data, '%d/%m/%Y') <= fim:
+            if f.professor in dic:
+                if f.data in dic[f.professor]:
+                    if f.departamento in dic[f.professor][f.data]:
+                        pass
+                    else:
+                        dic[f.professor][f.data][f.departamento] = f.horas
+                else:
+                    dic[f.professor][f.data] = {f.departamento: f.horas}
+            else:
+                d2 = {f.professor: {f.data: {f.departamento: f.horas}}}
+                dic = {**dic, **d2}
+    return dic
+
+
+def ferias(comp):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
+    fer = session.query(Ferias).all()
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
+                year=dt.today().year)
+    fim = dt(day=20, month=comp, year=dt.today().year)
+    dic = {}
+    for f in fer:
+        if inicio <= dt.strptime(f.inicio, '%d/%m/%Y') <= fim:
+            if f.professor in dic:
+                if f.departamento in dic[f.professor]:
+                    if f.inicio in dic[f.professor][f.departamento]:
+                        pass
+                    else:
+                        dic[f.professor][f.departamento][f.inicio] = f.fim
+                else:
+                    dic[f.professor][f.departamento] = {f.inicio: f.fim}
+            else:
+                d2 = {f.professor: {f.departamento: {f.inicio: f.fim}}}
+                dic = {**dic, **d2}
+    return dic
+
+
+def atestado(comp):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
+    ates = session.query(Atestado).all()
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
+                year=dt.today().year)
+    fim = dt(day=20, month=comp, year=dt.today().year)
+    dic = {}
+    for a in ates:
+        if inicio <= dt.strptime(a.data, '%d/%m/%Y') <= fim:
+            if a.professor in dic:
+                if a.departamento in dic[a.professor]:
+                    pass
+                else:
+                    dic[a.professor][a.departamento] = a.data
+            else:
+                d2 = {a.professor: {a.departamento: a.data}}
+                dic = {**dic, **d2}
+    return dic
+
+
+def feriado(comp):
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
+                year=dt.today().year)
+    fim = dt(day=20, month=comp, year=dt.today().year)
+    # Get the Bank Holidays for the given country
+    feriados = holidays.country_holidays('BR')
+    # Create a list of dates between the start and end date
+    intervalo_datas = pd.date_range(inicio, fim)
+    # Filter the dates to only include Bank Holidays
+    feriados_nacionais = [date for date in intervalo_datas if date in feriados]
+    return feriados_nacionais
+
+
+def substit(comp):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
+    subst = session.query(Substituicao).all()
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
+                year=dt.today().year)
+    fim = dt(day=20, month=comp, year=dt.today().year)
+    dic = {}
+    for s in subst:
+        if inicio <= dt.strptime(s.data, '%d/%m/%Y') <= fim:
+            if s.professorsubst in dic:
+                if s.substituto in dic[s.professorsubst]:
+                    if s.departamento in dic[s.professorsubst][s.substituto]:
+                        if s.data in dic[s.professorsubst][s.substituto][s.departamento]:
+                            pass
+                        else:
+                            dic[s.professorsubst][s.substituto][s.departamento][s.data] = s.horas
+                else:
+                    dic[s.professorsubst][s.substituto][s.departamento] = {s.data: s.horas}
+            else:
+                d2 = {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
+                dic = {**dic, **d2}
+    return dic
+
+
+def desligamentos(comp):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
+    desl = session.query(Desligados).all()
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
+                year=dt.today().year)
+    fim = dt(day=20, month=comp, year=dt.today().year)
+    dic = {}
+    for d in desl:
+        if inicio <= dt.strptime(d.datadesligamento, '%d/%m/%Y') <= fim:
+            if d.professor in dic:
+                if d.departamento in dic[d.professor]:
+                    if d.datadesligamento in dic[d.professor][d.departamento]:
+                        pass
+                    else:
+                        dic[d.professor][d.departamento] = d.datadesligamento
+                else:
+                    dic[d.professor] = {d.departamento: d.datadesligamento}
+            else:
+                d2 = {d.professor: {d.departamento: d.datadesligamento}}
+                dic = {**dic, **d2}
+    return dic
+
+
+def escala(comp):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
+    esc = session.query(Escala).all()
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
+                year=dt.today().year)
+    fim = dt(day=20, month=comp, year=dt.today().year)
+    dic = {}
+    for e in esc:
+        if inicio <= dt.strptime(e.data, '%d/%m/%Y') <= fim:
+            if e.professor in dic:
+                if e.data in dic[e.professor]:
+                    if e.departamento in dic[e.professor][e.data]:
+                        pass
+                    else:
+                        dic[e.professor][e.data][e.departamento] = e.horas
+                else:
+                    dic[e.professor][e.data] = {e.departamento: e.horas}
+            else:
+                d2 = {e.professor: {e.data: {e.departamento: e.horas}}}
+                dic = {**dic, **d2}
+    return dic
+
+
+def horascomplementares(comp):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
+    hrsc = session.query(Faltas).all()
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
+                year=dt.today().year)
+    fim = dt(day=20, month=comp, year=dt.today().year)
+    dic = {}
+    for h in hrsc:
+        if inicio <= dt.strptime(h.data, '%d/%m/%Y') <= fim:
+            if h.professor in dic:
+                if h.data in dic[h.professor]:
+                    if h.departamento in dic[h.professor][h.data]:
+                        pass
+                    else:
+                        dic[h.professor][h.data][h.departamento] = h.horas
+                else:
+                    dic[h.professor][h.data] = {h.departamento: h.horas}
+            else:
+                d2 = {h.professor: {h.data: {h.departamento: h.horas}}}
+                dic = {**dic, **d2}
+    return dic
 
 
 def plandegrade(dic, comp):
     grade = l_w('Grade.xlsx', read_only=False)
     plan1 = grade['Planilha1']
+    flt = faltas(comp)
+    subs = substit(comp)
+    dslg = desligamentos(comp)
+    fer = ferias(comp)
+    complem = horascomplementares(comp)
+    atest = atestado(comp)
+    feriad = feriado(comp)
+    escal = escala(comp)
     atestado = PatternFill(start_color='A9D08E',
                           end_color='A9D08E',
                           fill_type='solid')
@@ -264,6 +434,13 @@ def plandegrade(dic, comp):
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
+                for nome in flt:
+                    for dia in flt[nome]:
+                        for depart in flt[nome][dia]:
+                            if depart == 'Musculação' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
+
         plan1.cell(column=2, row=novalinha, value=i)
         novalinha = plan1.max_row + 1
 
@@ -290,6 +467,13 @@ def plandegrade(dic, comp):
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
+                for nome in flt:
+                    for dia in flt[nome]:
+                        for depart in flt[nome][dia]:
+                            if depart == 'Ginástica' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
+
         plan1.cell(column=2, row=novalinha, value=i)
         novalinha = plan1.max_row + 1
 
@@ -316,6 +500,12 @@ def plandegrade(dic, comp):
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
+                for nome in flt:
+                    for dia in flt[nome]:
+                        for depart in flt[nome][dia]:
+                            if depart == 'Kids' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
         plan1.cell(column=2, row=novalinha, value=i)
         novalinha = plan1.max_row + 1
 
@@ -342,6 +532,12 @@ def plandegrade(dic, comp):
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
+                for nome in flt:
+                    for dia in flt[nome]:
+                        for depart in flt[nome][dia]:
+                            if depart == 'Esportes' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
         plan1.cell(column=2, row=novalinha, value=i)
         novalinha = plan1.max_row + 1
 
@@ -368,6 +564,83 @@ def plandegrade(dic, comp):
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
+                # aplica cor de falta
+                for nome in flt:
+                    for dia in flt[nome]:
+                        for depart in flt[nome][dia]:
+                            if depart == 'Cross Cia' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
+                # aplica alterações de substituição
+                # {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
+                for nome in subs:
+                    for substituto in subs[nome]:
+                        for depart in subs[nome][substituto]:
+                            for dia in subs[nome][substituto][depart]:
+                                if depart == 'Cross Cia' and nome == i:
+                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                        plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                if depart == 'Cross Cia' and substituto == i:
+                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                        plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + subs[nome][substituto][depart][dia]
+
+                # aplica alterações de desligamento
+                # {d.professor: {d.departamento: d.datadesligamento}}
+                # conferir se tem outras aulas ativas ou foi desligado de tudo
+                # se desligado de tudo, alterar status das aulas para inativas
+                for nome in dslg:
+                    for depart in dslg[nome]:
+                        for dia in dslg[nome][depart]:
+                            if depart == 'Cross Cia' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
+                                if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= fechamento:
+                                    plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica talterações de férias
+                # # {f.professor: {f.departamento: {f.inicio: f.fim}}}
+                for nome in fer:
+                    for depart in fer[nome]:
+                        for inicio in fer[nome][depart]:
+                            if depart == 'Cross Cia' and nome == i and dt.strptime(inicio, '%d/%m/%Y') <= fechamento:
+                                if dt.strptime(inicio, '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= dt.strptime(fer[nome][depart][inicio], '%d/%m/%Y'):
+                                    plan1.cell(column=cell.column, row=novalinha).fill = ferias
+                                    plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica alterações de horas complementares
+                # {h.professor: {h.data: {h.departamento: h.horas}}}
+                for nome in complem:
+                    for dia in complem[nome]:
+                        for depart in complem[nome][dia]:
+                            if depart == 'Cross Cia' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
+
+                # aplica alterações de atestados
+                # {a.professor: {a.departamento: a.data}}
+                for nome in atest:
+                    for dia in atest[nome]:
+                        for depart in atest[nome][dia]:
+                            if depart == 'Cross Cia' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
+
+                # aplica alterações de feriado
+                # [datas de feriado formato dt]
+                for nome in feriad:
+                    for dia in flt[nome]:
+                        for depart in flt[nome][dia]:
+                            if depart == 'Cross Cia' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
+
+                # aplica alterações de escala
+                # {e.professor: {e.data: {e.departamento: e.horas}}}
+                for nome in escal:
+                    for dia in escal[nome]:
+                        for depart in escal[nome][dia]:
+                            if depart == 'Cross Cia' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
+
         plan1.cell(column=2, row=novalinha, value=i)
         novalinha = plan1.max_row + 1
 
@@ -399,39 +672,6 @@ def plandegrade(dic, comp):
     plan1['F2'].fill = feriado
     plan1['G2'].value = 'Feriado'
     grade.save(f'Grade {fechamento.month}-{fechamento.year}.xlsx')
-
-
-def ferias():
-    pass
-
-
-def atestado():
-    pass
-
-
-def falta(dias, aula):
-    horas = aula.fim - aula.inicio
-    hr, minut, seg = str(horas).split(':')
-    somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
-    somadia = round(somadia, 2)
-    faltas = somadia * dias
-    return round(faltas, 2)
-
-
-def feriado():
-    pass
-
-
-def substituicaoacres(pessoa, inicio, fim):
-    pass
-
-
-def substituicaodesc():
-    pass
-
-
-def escala():
-    pass
 
 
 def somaseg(nome, depto):

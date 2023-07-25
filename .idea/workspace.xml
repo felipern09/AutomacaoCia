@@ -9,6 +9,7 @@
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Contatos diversos/mensagem_wpp.py" beforeDir="false" afterPath="$PROJECT_DIR$/Contatos diversos/mensagem_wpp.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Lanca folha/calculo_folha.py" beforeDir="false" afterPath="$PROJECT_DIR$/Lanca folha/calculo_folha.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lanca folha/modelsfolha.py" beforeDir="false" afterPath="$PROJECT_DIR$/Lanca folha/modelsfolha.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,18 +39,19 @@
     &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Felipe/PycharmProjects/appCia&quot;
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Felipe/PycharmProjects/AutomacaoCia/Lanca folha&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Lanca folha" />
       <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.calculo_folha">
+  <component name="RunManager" selected="Python.alterar_banco">
     <configuration name="alterar_banco" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -92,7 +94,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="cht" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="modelsfaltas" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -100,11 +102,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Contatos diversos" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Lanca folha" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Contatos diversos/cht.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Lanca folha/modelsfaltas.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -157,11 +159,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.calculo_folha" />
         <item itemvalue="Python.alterar_banco" />
         <item itemvalue="Python.modelsfolha" />
+        <item itemvalue="Python.calculo_folha" />
+        <item itemvalue="Python.modelsfaltas" />
         <item itemvalue="Python.teste" />
-        <item itemvalue="Python.cht" />
       </list>
     </recent_temporary>
   </component>

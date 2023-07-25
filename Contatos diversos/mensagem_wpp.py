@@ -6,8 +6,8 @@ from openpyxl import load_workbook as l_w
 # simple code to send whatsapp messages through browser
 wb = l_w("AV.xlsm")
 sh = wb['Planilha1']
-x = 1
-while x < len(sh['A']):
+
+for x in range(2, len(sh['A'])):
     pessoa = str(sh[f"B{x}"].value).split(' ')[0]
     email = str(sh[f"D{x}"].value)
     numero = str(sh[f"H{x}"].value)
