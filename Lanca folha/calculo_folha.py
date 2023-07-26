@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 from modelsfolha import Aulas, Faltas, Ferias, Hrcomplement, Atestado, Desligados, Escala, Substituicao, engine
 from sqlalchemy.orm import sessionmaker
 from openpyxl import load_workbook as l_w
-from openpyxl.styles import Color, PatternFill, Font, Border
+from openpyxl.styles import Color, PatternFill, Font
 import pandas as pd
 import openpyxl.utils.cell
 import holidays
@@ -260,7 +260,7 @@ def substit(comp):
                         else:
                             dic[s.professorsubst][s.substituto][s.departamento][s.data] = s.horas
                 else:
-                    dic[s.professorsubst][s.substituto][s.departamento] = {s.data: s.horas}
+                    dic = {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
             else:
                 d2 = {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
                 dic = {**dic, **d2}
@@ -318,7 +318,7 @@ def escala(comp):
 def horascomplementares(comp):
     sessions = sessionmaker(bind=engine)
     session = sessions()
-    hrsc = session.query(Faltas).all()
+    hrsc = session.query(Hrcomplement).all()
     inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
                 year=dt.today().year)
     fim = dt(day=20, month=comp, year=dt.today().year)
@@ -350,6 +350,7 @@ def plandegrade(dic, comp):
     atest = atestadof(comp)
     feriad = feriadof(comp)
     escal = escala(comp)
+
     atestado = PatternFill(start_color='A9D08E',
                           end_color='A9D08E',
                           fill_type='solid')
@@ -365,26 +366,40 @@ def plandegrade(dic, comp):
     fds = PatternFill(start_color='BFBFBF',
                           end_color='BFBFBF',
                           fill_type='solid')
-    competencia = dt(day=1, month=comp, year=dt.today().year)
+    deslig = PatternFill(start_color='454545',
+                          end_color='454545',
+                          fill_type='solid')
+    subst = PatternFill(start_color='FFFF00',
+                          end_color='FFFF00',
+                          fill_type='solid')
+    comple = PatternFill(start_color='FFC000',
+                          end_color='FFC000',
+                          fill_type='solid')
+
+    competencia = dt(day=10, month=comp, year=dt.today().year)
     inicio = dt(day=21, month=(competencia - relativedelta(months=1)).month, year=(competencia - relativedelta(months=1)).year)
     fechamento = dt(day=20, month=competencia.month, year=competencia.year)
     # primeira linha deve aparecer 'Folha' na coluna A1 e 'Julho' de '2023' na B1
     plan1['A1'].value = 'Folha'
     plan1['B1'].value = f'{fechamento.month} de {fechamento.year}'
-    # na linha 3 a partir da célula C deve se iniciar os dias do intervalo de folha escritos como a inicial do dia da
-    # semana
 
     def intervalo(inicio, fechamento):
         for n in range(int((fechamento - inicio).days) + 1):
-            yield dt.strftime(inicio + td(n), '%d/%m')
+            yield dt.strftime(inicio + td(n), '%d/%m/%Y')
 
     col = 3
     for item in list(intervalo(inicio, fechamento)):
-        plan1.cell(column=col, row=3, value=dt.strftime(dt.strptime(item, '%d/%m'), '%a'))
-        plan1.cell(column=col, row=4, value=item)
+        plan1.cell(column=col, row=3, value=dt.strftime(dt.strptime(item, '%d/%m/%Y'), '%a'))
+        plan1.cell(column=col, row=4, value=dt.strftime(dt.strptime(item, '%d/%m/%Y'), '%d/%m'))
         col += 1
     plan1.cell(column=col, row=3, value='Total')
-
+    for itens in plan1.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
+        for cell in itens:
+            if cell.value != 'Total':
+                if cell.value == 'sáb' or cell.value == 'dom':
+                    letras = openpyxl.utils.cell.get_column_letter(cell.column)
+                    for numero in range(3,150):
+                        plan1[f'{letras}{numero}'].fill = fds
     musculacao = []
     ginastica = []
     esportes = []
@@ -434,18 +449,90 @@ def plandegrade(dic, comp):
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
+                # aplica cor de falta
                 for nome in flt:
                     for dia in flt[nome]:
                         for depart in flt[nome][dia]:
                             if depart == 'Musculação' and nome == i:
                                 if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
                                     plan1.cell(column=cell.column, row=novalinha).fill = falta
+                # aplica alterações de substituição
+                # {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
+                for nome in subs:
+                    for substituto in subs[nome]:
+                        for depart in subs[nome][substituto]:
+                            for dia in subs[nome][substituto][depart]:
+                                if depart == 'Musculação' and nome == i:
+                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                        plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                if depart == 'Musculação' and substituto == i:
+                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                        plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(subs[nome][substituto][depart][dia]).replace(',','.'))
+                                        plan1.cell(column=cell.column, row=novalinha).fill = subst
 
+                # aplica alterações de desligamento
+                # {d.professor: {d.departamento: d.datadesligamento}}
+                # conferir se tem outras aulas ativas ou foi desligado de tudo
+                # se desligado de tudo, alterar status das aulas para inativas
+                for nome in dslg:
+                    for depart in dslg[nome]:
+                        for dia in dslg[nome][depart]:
+                            if depart == 'Musculação' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                    if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= fechamento:
+                                        plan1.cell(column=cell.column, row=novalinha).value = 0
+                                        plan1.cell(column=cell.column, row=novalinha).fill = deslig
+                                        plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
+
+                # aplica talterações de férias
+                # # {f.professor: {f.departamento: {f.inicio: f.fim}}}
+                for nome in fer:
+                    for depart in fer[nome]:
+                        for inic in fer[nome][depart]:
+                            if depart == 'Musculação' and nome == i and dt.strptime(inic, '%d/%m/%Y') <= fechamento:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                    if dt.strptime(inic, '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= dt.strptime(fer[nome][depart][inic], '%d/%m/%Y'):
+                                        plan1.cell(column=cell.column, row=novalinha).fill = ferias
+                                        plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica alterações de horas complementares
+                # {h.professor: {h.data: {h.departamento: h.horas}}}
+                for nome in complem:
+                    for dia in complem[nome]:
+                        for depart in complem[nome][dia]:
+                            if depart == 'Musculação' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(complem[nome][dia][depart]).replace(',','.'))
+                                    plan1.cell(column=cell.column, row=novalinha).fill = comple
+
+                # aplica alterações de atestados
+                # {a.professor: {a.departamento: a.data}}
+                for nome in atest:
+                    for depart in atest[nome]:
+                        if depart == 'Musculação' and nome == i:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(atest[nome][depart], '%d/%m/%Y'), '%d/%m'):
+                                plan1.cell(column=cell.column, row=novalinha).fill = atestado
+
+                # aplica alterações de feriado
+                # [datas de feriado formato dt]
+                for dia in feriad:
+                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dia, '%d/%m'):
+                        plan1.cell(column=cell.column, row=novalinha).fill = feriado
+                        plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica alterações de escala
+                # {e.professor: {e.data: {e.departamento: e.horas}}}
+                for nome in escal:
+                    for dia in escal[nome]:
+                        for depart in escal[nome][dia]:
+                            if depart == 'Musculação' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(escal[nome][dia][depart]).replace(',','.'))
         plan1.cell(column=2, row=novalinha, value=i)
-        novalinha = plan1.max_row + 1
+        novalinha += 1
 
     plan1[f'A{novalinha}'].value = 'Ginástica'
-    novalinha = plan1.max_row + 1
+    novalinha += 1
     for i in ginastica:
         for row in plan1.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
             for cell in row:
@@ -467,18 +554,91 @@ def plandegrade(dic, comp):
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
+                # aplica cor de falta
                 for nome in flt:
                     for dia in flt[nome]:
                         for depart in flt[nome][dia]:
                             if depart == 'Ginástica' and nome == i:
                                 if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
                                     plan1.cell(column=cell.column, row=novalinha).fill = falta
+                # aplica alterações de substituição
+                # {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
+                for nome in subs:
+                    for substituto in subs[nome]:
+                        for depart in subs[nome][substituto]:
+                            for dia in subs[nome][substituto][depart]:
+                                if depart == 'Ginástica' and nome == i:
+                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                        plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                if depart == 'Ginástica' and substituto == i:
+                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                        plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(subs[nome][substituto][depart][dia]).replace(',','.'))
+                                        plan1.cell(column=cell.column, row=novalinha).fill = subst
+
+                # aplica alterações de desligamento
+                # {d.professor: {d.departamento: d.datadesligamento}}
+                # conferir se tem outras aulas ativas ou foi desligado de tudo
+                # se desligado de tudo, alterar status das aulas para inativas
+                for nome in dslg:
+                    for depart in dslg[nome]:
+                        for dia in dslg[nome][depart]:
+                            if depart == 'Ginástica' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                    if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= fechamento:
+                                        plan1.cell(column=cell.column, row=novalinha).value = 0
+                                        plan1.cell(column=cell.column, row=novalinha).fill = deslig
+                                        plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
+
+                # aplica talterações de férias
+                # # {f.professor: {f.departamento: {f.inicio: f.fim}}}
+                for nome in fer:
+                    for depart in fer[nome]:
+                        for inic in fer[nome][depart]:
+                            if depart == 'Ginástica' and nome == i and dt.strptime(inic, '%d/%m/%Y') <= fechamento:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                    if dt.strptime(inic, '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= dt.strptime(fer[nome][depart][inic], '%d/%m/%Y'):
+                                        plan1.cell(column=cell.column, row=novalinha).fill = ferias
+                                        plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica alterações de horas complementares
+                # {h.professor: {h.data: {h.departamento: h.horas}}}
+                for nome in complem:
+                    for dia in complem[nome]:
+                        for depart in complem[nome][dia]:
+                            if depart == 'Ginástica' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(complem[nome][dia][depart]).replace(',','.'))
+                                    plan1.cell(column=cell.column, row=novalinha).fill = comple
+
+                # aplica alterações de atestados
+                # {a.professor: {a.departamento: a.data}}
+                for nome in atest:
+                    for depart in atest[nome]:
+                        if depart == 'Ginástica' and nome == i:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(atest[nome][depart], '%d/%m/%Y'), '%d/%m'):
+                                plan1.cell(column=cell.column, row=novalinha).fill = atestado
+
+                # aplica alterações de feriado
+                # [datas de feriado formato dt]
+                for dia in feriad:
+                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dia, '%d/%m'):
+                        plan1.cell(column=cell.column, row=novalinha).fill = feriado
+                        plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica alterações de escala
+                # {e.professor: {e.data: {e.departamento: e.horas}}}
+                for nome in escal:
+                    for dia in escal[nome]:
+                        for depart in escal[nome][dia]:
+                            if depart == 'Ginástica' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(escal[nome][dia][depart]).replace(',','.'))
 
         plan1.cell(column=2, row=novalinha, value=i)
-        novalinha = plan1.max_row + 1
+        novalinha += 1
 
     plan1[f'A{novalinha}'].value = 'Kids'
-    novalinha = plan1.max_row + 1
+    novalinha += 1
     for i in kids:
         for row in plan1.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
             for cell in row:
@@ -500,17 +660,89 @@ def plandegrade(dic, comp):
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
+                # aplica cor de falta
                 for nome in flt:
                     for dia in flt[nome]:
                         for depart in flt[nome][dia]:
                             if depart == 'Kids' and nome == i:
                                 if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
                                     plan1.cell(column=cell.column, row=novalinha).fill = falta
+                # aplica alterações de substituição
+                # {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
+                for nome in subs:
+                    for substituto in subs[nome]:
+                        for depart in subs[nome][substituto]:
+                            for dia in subs[nome][substituto][depart]:
+                                if depart == 'Kids' and nome == i:
+                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                        plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                if depart == 'Kids' and substituto == i:
+                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                        plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(subs[nome][substituto][depart][dia]).replace(',','.'))
+                                        plan1.cell(column=cell.column, row=novalinha).fill = subst
+
+                # aplica alterações de desligamento
+                # {d.professor: {d.departamento: d.datadesligamento}}
+                # conferir se tem outras aulas ativas ou foi desligado de tudo
+                # se desligado de tudo, alterar status das aulas para inativas
+                for nome in dslg:
+                    for depart in dslg[nome]:
+                        if depart == 'Kids' and nome == i and dt.strptime(dslg[nome][depart], '%d/%m/%Y') <= fechamento:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                if dt.strptime(dslg[nome][depart], '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= fechamento:
+                                    plan1.cell(column=cell.column, row=novalinha).value = 0
+                                    plan1.cell(column=cell.column, row=novalinha).fill = deslig
+                                    plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
+
+                # aplica talterações de férias
+                # # {f.professor: {f.departamento: {f.inicio: f.fim}}}
+                for nome in fer:
+                    for depart in fer[nome]:
+                        for inic in fer[nome][depart]:
+                            if depart == 'Kids' and nome == i and dt.strptime(inic, '%d/%m/%Y') <= fechamento:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                    if dt.strptime(inic, '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= dt.strptime(fer[nome][depart][inic], '%d/%m/%Y'):
+                                        plan1.cell(column=cell.column, row=novalinha).fill = ferias
+                                        plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica alterações de horas complementares
+                # {h.professor: {h.data: {h.departamento: h.horas}}}
+                for nome in complem:
+                    for dia in complem[nome]:
+                        for depart in complem[nome][dia]:
+                            if depart == 'Kids' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(complem[nome][dia][depart]).replace(',','.'))
+                                    plan1.cell(column=cell.column, row=novalinha).fill = comple
+
+                # aplica alterações de atestados
+                # {a.professor: {a.departamento: a.data}}
+                for nome in atest:
+                    for depart in atest[nome]:
+                        if depart == 'Kids' and nome == i:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(atest[nome][depart], '%d/%m/%Y'), '%d/%m'):
+                                plan1.cell(column=cell.column, row=novalinha).fill = atestado
+
+                # aplica alterações de feriado
+                # [datas de feriado formato dt]
+                for dia in feriad:
+                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dia, '%d/%m'):
+                        plan1.cell(column=cell.column, row=novalinha).fill = feriado
+                        plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica alterações de escala
+                # {e.professor: {e.data: {e.departamento: e.horas}}}
+                for nome in escal:
+                    for dia in escal[nome]:
+                        for depart in escal[nome][dia]:
+                            if depart == 'Kids' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(escal[nome][dia][depart]).replace(',','.'))
         plan1.cell(column=2, row=novalinha, value=i)
-        novalinha = plan1.max_row + 1
+        novalinha += 1
 
     plan1[f'A{novalinha}'].value = 'Esportes'
-    novalinha = plan1.max_row + 1
+    novalinha += 1
     for i in esportes:
         for row in plan1.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
             for cell in row:
@@ -532,17 +764,91 @@ def plandegrade(dic, comp):
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
+                # aplica cor de falta
                 for nome in flt:
                     for dia in flt[nome]:
                         for depart in flt[nome][dia]:
                             if depart == 'Esportes' and nome == i:
                                 if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
                                     plan1.cell(column=cell.column, row=novalinha).fill = falta
+                # aplica alterações de substituição
+                # {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
+                for nome in subs:
+                    for substituto in subs[nome]:
+                        for depart in subs[nome][substituto]:
+                            for dia in subs[nome][substituto][depart]:
+                                if depart == 'Esportes' and nome == i:
+                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                        plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                if depart == 'Esportes' and substituto == i:
+                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                        plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(subs[nome][substituto][depart][dia]).replace(',','.'))
+                                        plan1.cell(column=cell.column, row=novalinha).fill = subst
+
+                # aplica alterações de desligamento
+                # {d.professor: {d.departamento: d.datadesligamento}}
+                # conferir se tem outras aulas ativas ou foi desligado de tudo
+                # se desligado de tudo, alterar status das aulas para inativas
+                for nome in dslg:
+                    for depart in dslg[nome]:
+                        for dia in dslg[nome][depart]:
+                            if depart == 'Esportes' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                    if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= fechamento:
+                                        plan1.cell(column=cell.column, row=novalinha).value = 0
+                                        plan1.cell(column=cell.column, row=novalinha).fill = deslig
+                                        plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
+
+                # aplica talterações de férias
+                # {f.professor: {f.departamento: {f.inicio: f.fim}}}
+                for nome in fer:
+                    for depart in fer[nome]:
+                        for inic in fer[nome][depart]:
+                            if depart == 'Esportes' and nome == i and dt.strptime(inic, '%d/%m/%Y') <= fechamento:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                    if dt.strptime(inic, '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= dt.strptime(fer[nome][depart][inic], '%d/%m/%Y'):
+                                        plan1.cell(column=cell.column, row=novalinha).fill = ferias
+                                        plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica alterações de horas complementares
+                # {h.professor: {h.data: {h.departamento: h.horas}}}
+                for nome in complem:
+                    for dia in complem[nome]:
+                        for depart in complem[nome][dia]:
+                            if depart == 'Esportes' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(complem[nome][dia][depart]).replace(',','.'))
+                                    plan1.cell(column=cell.column, row=novalinha).fill = comple
+
+                # aplica alterações de atestados
+                # {a.professor: {a.departamento: a.data}}
+                for nome in atest:
+                    for depart in atest[nome]:
+                        if depart == 'Esportes' and nome == i:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(atest[nome][depart], '%d/%m/%Y'), '%d/%m'):
+                                plan1.cell(column=cell.column, row=novalinha).fill = atestado
+
+                # aplica alterações de feriado
+                # [datas de feriado formato dt]
+                for dia in feriad:
+                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dia, '%d/%m'):
+                        plan1.cell(column=cell.column, row=novalinha).fill = feriado
+                        plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica alterações de escala
+                # {e.professor: {e.data: {e.departamento: e.horas}}}
+                for nome in escal:
+                    for dia in escal[nome]:
+                        for depart in escal[nome][dia]:
+                            if depart == 'Esportes' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(escal[nome][dia][depart]).replace(',','.'))
+        
         plan1.cell(column=2, row=novalinha, value=i)
-        novalinha = plan1.max_row + 1
+        novalinha += 1
 
     plan1[f'A{novalinha}'].value = 'Cross Cia'
-    novalinha = plan1.max_row + 1
+    novalinha += 1
     for i in cross:
         for row in plan1.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
             for cell in row:
@@ -582,7 +888,8 @@ def plandegrade(dic, comp):
                                         plan1.cell(column=cell.column, row=novalinha).fill = falta
                                 if depart == 'Cross Cia' and substituto == i:
                                     if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                        plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + subs[nome][substituto][depart][dia]
+                                        plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(subs[nome][substituto][depart][dia]).replace(',','.'))
+                                        plan1.cell(column=cell.column, row=novalinha).fill = subst
 
                 # aplica alterações de desligamento
                 # {d.professor: {d.departamento: d.datadesligamento}}
@@ -592,18 +899,22 @@ def plandegrade(dic, comp):
                     for depart in dslg[nome]:
                         for dia in dslg[nome][depart]:
                             if depart == 'Cross Cia' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
-                                if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= fechamento:
-                                    plan1.cell(column=cell.column, row=novalinha).value = 0
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                    if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= fechamento:
+                                        plan1.cell(column=cell.column, row=novalinha).value = 0
+                                        plan1.cell(column=cell.column, row=novalinha).fill = deslig
+                                        plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
 
                 # aplica talterações de férias
                 # # {f.professor: {f.departamento: {f.inicio: f.fim}}}
                 for nome in fer:
                     for depart in fer[nome]:
-                        for inicio in fer[nome][depart]:
-                            if depart == 'Cross Cia' and nome == i and dt.strptime(inicio, '%d/%m/%Y') <= fechamento:
-                                if dt.strptime(inicio, '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= dt.strptime(fer[nome][depart][inicio], '%d/%m/%Y'):
-                                    plan1.cell(column=cell.column, row=novalinha).fill = ferias
-                                    plan1.cell(column=cell.column, row=novalinha).value = 0
+                        for inic in fer[nome][depart]:
+                            if depart == 'Cross Cia' and nome == i and dt.strptime(inic, '%d/%m/%Y') <= fechamento:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                    if dt.strptime(inic, '%d/%m/%Y') <= dt(day=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]), month=int(str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[1]), year=dt.today().year) <= dt.strptime(fer[nome][depart][inic], '%d/%m/%Y'):
+                                        plan1.cell(column=cell.column, row=novalinha).fill = ferias
+                                        plan1.cell(column=cell.column, row=novalinha).value = 0
 
                 # aplica alterações de horas complementares
                 # {h.professor: {h.data: {h.departamento: h.horas}}}
@@ -612,25 +923,23 @@ def plandegrade(dic, comp):
                         for depart in complem[nome][dia]:
                             if depart == 'Cross Cia' and nome == i:
                                 if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(complem[nome][dia][depart]).replace(',','.'))
+                                    plan1.cell(column=cell.column, row=novalinha).fill = comple
 
                 # aplica alterações de atestados
                 # {a.professor: {a.departamento: a.data}}
                 for nome in atest:
-                    for dia in atest[nome]:
-                        for depart in atest[nome][dia]:
-                            if depart == 'Cross Cia' and nome == i:
-                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
+                    for depart in atest[nome]:
+                        if depart == 'Cross Cia' and nome == i:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(atest[nome][depart], '%d/%m/%Y'), '%d/%m'):
+                                plan1.cell(column=cell.column, row=novalinha).fill = atestado
 
                 # aplica alterações de feriado
                 # [datas de feriado formato dt]
-                for nome in feriad:
-                    for dia in flt[nome]:
-                        for depart in flt[nome][dia]:
-                            if depart == 'Cross Cia' and nome == i:
-                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
+                for dia in feriad:
+                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dia, '%d/%m'):
+                        plan1.cell(column=cell.column, row=novalinha).fill = feriado
+                        plan1.cell(column=cell.column, row=novalinha).value = 0
 
                 # aplica alterações de escala
                 # {e.professor: {e.data: {e.departamento: e.horas}}}
@@ -639,10 +948,10 @@ def plandegrade(dic, comp):
                         for depart in escal[nome][dia]:
                             if depart == 'Cross Cia' and nome == i:
                                 if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column, row=novalinha).value + float(str(escal[nome][dia][depart]).replace(',','.'))
 
         plan1.cell(column=2, row=novalinha, value=i)
-        novalinha = plan1.max_row + 1
+        novalinha += 1
 
     for i, coluna in enumerate(plan1.columns):
         max_length = 0
@@ -655,13 +964,11 @@ def plandegrade(dic, comp):
                 pass
         adjusted_width = max_length + 1
         plan1.column_dimensions[column].width = adjusted_width
-    for itens in plan1.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
-        for cell in itens:
-            if cell.value != 'Total':
-                if cell.value == 'sáb' or cell.value == 'dom':
-                    letras = openpyxl.utils.cell.get_column_letter(cell.column)
-                    for i in range(3,150):
-                        plan1[f'{letras}{i}'].fill = fds
+
+    for row in plan1.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
+        for cell in row:
+            if plan1.cell(column=cell.column, row=cell.row).value == 'Total':
+                plan1.column_dimensions[openpyxl.utils.cell.get_column_letter(cell.column)].width = 8
 
     plan1['C1'].fill = atestado
     plan1['D1'].value = 'Atestado'
@@ -671,6 +978,13 @@ def plandegrade(dic, comp):
     plan1['G1'].value = 'Férias'
     plan1['F2'].fill = feriado
     plan1['G2'].value = 'Feriado'
+    plan1['I1'].fill = deslig
+    plan1['J1'].value = 'Desligamento'
+    plan1['I2'].fill = subst
+    plan1['J2'].value = 'Substituiu'
+    plan1['M1'].fill = comple
+    plan1['N1'].value = 'Horas Complementares'
+    # plan1[]
     grade.save(f'Grade {fechamento.month}-{fechamento.year}.xlsx')
 
 

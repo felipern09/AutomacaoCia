@@ -253,7 +253,6 @@ cython_debug/
 /Admissao/Cadastro de Autônomos (respostas).xlsx
 /Admissao/datadecalendario.py
 /Admissao/adminssao_tkcorreto.py
-/Admissao/datadecalendario.py
 /Admissao/colaboradorescia.db
 /Admissao/models2.py
 /Admissao/Planilha Itau.xlsx
@@ -299,3 +298,4 @@ cython_debug/
 /Contatos diversos/emailsteste.xlsx
 /Contatos diversos/cht.py
 /Lanca folha/faltas.db
+/Lanca folha/CadastroAlteracoes.xlsx

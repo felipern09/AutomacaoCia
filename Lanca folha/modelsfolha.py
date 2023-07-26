@@ -63,7 +63,7 @@ class Substituicao(Base):
     departamento = Column(String, nullable=False)
     aula = Column(String, nullable=False)
     data = Column(String, nullable=False)
-
+    horas = Column(String, nullable=False)
 
 class Desligados(Base):
     __tablename__ = 'desligados'
