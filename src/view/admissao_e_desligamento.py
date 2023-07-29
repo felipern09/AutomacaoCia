@@ -2,10 +2,10 @@ import tkinter as tk
 from tkcalendar import DateEntry
 from datetime import datetime
 import tkinter.filedialog
-from src.controler.funcoes import cadastro_funcionario, salvar_docs_funcionarios, enviar_emails_funcionario, \
-    cadastro_estagiario, cadastrar_autonomo, validar_pis
+from ..controler.funcoes import cadastro_funcionario, salvar_docs_funcionarios, enviar_emails_funcionario, \
+    cadastro_estagiario, cadastrar_autonomo, validar_pis, desligar_pessoa
 from openpyxl import load_workbook as l_w
-from src.models.listas import horarios, cargos, departamentos, tipodecontrato
+from ..models.listas import horarios, cargos, departamentos, tipodecontrato
 import tkinter.filedialog
 from tkinter import ttk
 from tkinter import *
@@ -17,7 +17,7 @@ class MainApplication(tk.Tk):
 
         self.title("Atividades DP - Cia BSB")
         self.geometry('661x550')
-        self.img = PhotoImage(file='../models/static/Icone.png')
+        self.img = PhotoImage(file='../models/static/imgs/Icone.png')
         self.iconphoto(False, self.img)
         self.columnconfigure(0, weight=5)
         self.rowconfigure(0, weight=5)

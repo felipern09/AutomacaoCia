@@ -6,7 +6,7 @@ from openpyxl import load_workbook as l_w
 
 
 # code to save images of performance evaluation of employee
-wb = l_w("Resultados Individuais AV.xlsm", read_only=False)
+wb = l_w("../models/static/files/Resultados Individuais AV.xlsm", read_only=False)
 sh = wb['Nota Geral']
 pa.hotkey('alt', 'tab')
 t.sleep(0.5)

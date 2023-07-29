@@ -156,8 +156,8 @@ cython_debug/
 /Admissao/Banco.xlsx
 /Admissao/Banco - Total.xlsx
 /test/cadastrar_banco.py
-/src/models/Cadastro de Funcionário (respostas).xlsx
-/src/models/Cadastro Est Cia (respostas).xlsx
+/src/models/static/files/Cadastro de Funcionário (respostas).xlsx
+/src/models/static/files/Cadastro Est Cia (respostas).xlsx
 /Admissao/Cadastro Funcionários.xlsm
 /Admissao/Classes.py
 /src/models/colaboradores.db
@@ -167,11 +167,11 @@ cython_debug/
 /Admissao/teste.py
 /Admissao/testexy.py
 /Contatos diversos/Envia_email_peloExcel.py
-/Desempenho/AV.xlsm
-/Desempenho/AV.xlsx
-/Desempenho/Resultados Individuais AV.xlsm
+/src/models/static/files/AV.xlsm
+/src/models/static/files/AV.xlsx
+/src/models/static/files/Resultados Individuais AV.xlsm
 /Emissao de contracheques/Contracheque.xlsx
-/Lanca folha/Lancamentos.xlsx
+/src/models/static/files/Lancamentos.xlsx
 /Personal/Relatorios/2024/
 /Personal/Relatorios/2025/
 /Personal/Relatorios/2023/
@@ -250,7 +250,7 @@ cython_debug/
 /Admissao/colaboradores_antigo.db
 /Admissao/colaboradores_maisantigo.db
 /Admissao/~$Cadastro de Autônomos (respostas).xlsx
-/src/models/Cadastro de Autônomos (respostas).xlsx
+/src/models/static/files/Cadastro de Autônomos (respostas).xlsx
 /Admissao/datadecalendario.py
 /Admissao/adminssao_tkcorreto.py
 /Admissao/colaboradorescia.db
@@ -265,16 +265,16 @@ cython_debug/
 /Treinamento Certificados/Treinamento Aquático - 2022.docx
 /Treinamento Certificados/Treinamento Terrestre - 2022.docx
 /Vendas e Cancelamentos/Duplicados.xlsx
-/Lanca folha/aulas.db
-/Lanca folha/alterar_banco.py
+/src/models/aulas.db
+/test/alterar_banco.py
 /Lanca folha/Aulas.xlsx
 /Lanca folha/~$Aulas.xlsx
-/Lanca folha/CadastroAulas.xlsx
+/src/models/static/files/CadastroAulas.xlsx
 /Lanca folha/~$CadastroAulas.xlsx
-/Lanca folha/Somafinal.xlsx
+/src/models/static/files/Somafinal.xlsx
 /Lanca folha/AlteracoesGrade.xlsx
 /Lanca folha/Folhas de substituição001.pdf
-/Lanca folha/Grade.xlsx
+/src/models/static/files/Grade.xlsx
 /Lanca folha/Grade 7-2023.xlsx
 /Lanca folha/Grade 8-2023.xlsx
 /Lanca folha/Grade 9-2023.xlsx
@@ -298,4 +298,5 @@ cython_debug/
 /Contatos diversos/emailsteste.xlsx
 /Contatos diversos/cht.py
 /Lanca folha/faltas.db
-/Lanca folha/CadastroAlteracoes.xlsx
+/src/models/static/files/CadastroAlteracoes.xlsx
+/src/models/aulas.db

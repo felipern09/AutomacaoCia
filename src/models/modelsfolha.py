@@ -2,8 +2,9 @@ from sqlalchemy import create_engine
 from sqlalchemy import MetaData
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String
+from datetime import datetime as dt
 
-engine = create_engine("sqlite+pysqlite:///..\\Lanca folha\\aulas.db", echo=True, future=True)
+engine = create_engine("sqlite+pysqlite:///..\\src\\models\\aulas.db", echo=True, future=True)
 metadata_obj = MetaData()
 Base = declarative_base()
 
@@ -97,3 +98,26 @@ class Hrcomplement(Base):
 
 
 Base.metadata.create_all(engine)
+
+
+class Folha:
+    def __init__(self, competencia, aulas, deptos):
+        self.fechamento = dt(day=20, month=competencia, year=dt.today().year)
+        self.compet = self.fechamento.month
+        self.aulas = aulas
+        self.dept = deptos
+
+
+class Aula:
+    def __init__(self, nome, prof, depart, diasem,inicio, fim, valorhr, iniciograde, fimgrade=''):
+        self.nome = nome
+        self.professor = prof
+        self.departamento = depart
+        self.dia = diasem
+        self.inicio = dt.strptime(inicio, '%H:%M:%S')
+        self.fim = dt.strptime(fim, '%H:%M:%S')
+        self.valor = valorhr
+        self.iniciograde = iniciograde
+        self.fimgrade = fimgrade
+        self.dsr = 1.1666
+

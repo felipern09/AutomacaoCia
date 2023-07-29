@@ -9,7 +9,7 @@ import tkinter.filedialog
 
 root = Tk()
 root.title("Recibos uniformes - Cia BSB")
-img = PhotoImage(file='../src/models/static/icone.png')
+img = PhotoImage(file='../src/models/static/imgs/Icone.png')
 root.iconphoto(False, img)
 root.geometry('480x350')
 root.columnconfigure(0, weight=5)
