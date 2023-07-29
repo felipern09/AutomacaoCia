@@ -1,10 +1,10 @@
-from Admissao.models import Colaborador, engine
+from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
-from Admissao.dados_servd import em_rem, k1, host, port
+from src.models.dados_servd import em_rem, k1, host, port
 
 
 # # code to send e-mails through win32com.client libary

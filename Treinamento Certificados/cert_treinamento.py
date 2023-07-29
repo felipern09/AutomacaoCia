@@ -3,7 +3,7 @@ from datetime import datetime as dt
 from docx2pdf import convert
 from openpyxl import load_workbook
 from difflib import SequenceMatcher
-from Admissao.models import Colaborador, engine
+from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
 import docx
 import os

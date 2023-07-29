@@ -4,11 +4,9 @@ from datetime import datetime
 import tkinter.filedialog
 import pyautogui as pa
 import pyperclip as pp
-import time as t
-from Admissao.models import Colaborador, engine
+from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
 from openpyxl import load_workbook as l_w
-from listas import horarios, cargos, departamentos, tipodecontrato, municipios
 import os
 import tkinter.filedialog
 from tkinter import ttk, messagebox
@@ -20,8 +18,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.base import MIMEBase
-from email import encoders
-from dados_servd import em_rem, em_ti, em_if, k1
 from difflib import SequenceMatcher
 
 matricula = int(input('Digite a matrícula desligada: '))

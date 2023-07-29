@@ -155,12 +155,12 @@ cython_debug/
 /Admissao/alteracoes.txt
 /Admissao/Banco.xlsx
 /Admissao/Banco - Total.xlsx
-/Admissao/cadastrar_banco.py
-/Admissao/Cadastro de Funcionário (respostas).xlsx
-/Admissao/Cadastro Est Cia (respostas).xlsx
+/test/cadastrar_banco.py
+/src/models/Cadastro de Funcionário (respostas).xlsx
+/src/models/Cadastro Est Cia (respostas).xlsx
 /Admissao/Cadastro Funcionários.xlsm
 /Admissao/Classes.py
-/Admissao/colaboradores.db
+/src/models/colaboradores.db
 /Admissao/function.py
 /Admissao/Matriculas para atualizar banco.txt
 /Admissao/Salva_docs_peloExcel.py
@@ -239,7 +239,7 @@ cython_debug/
 /testes grade.py
 /Contatos diversos/dados.py
 /Contatos diversos/Nomes e e-mails.xlsx
-/Admissao/dados_servd.py
+/src/models/dados_servd.py
 /Personal/sk.py
 /Ponto/Novo codigo/
 /Ponto/AFD.txt
@@ -250,7 +250,7 @@ cython_debug/
 /Admissao/colaboradores_antigo.db
 /Admissao/colaboradores_maisantigo.db
 /Admissao/~$Cadastro de Autônomos (respostas).xlsx
-/Admissao/Cadastro de Autônomos (respostas).xlsx
+/src/models/Cadastro de Autônomos (respostas).xlsx
 /Admissao/datadecalendario.py
 /Admissao/adminssao_tkcorreto.py
 /Admissao/colaboradorescia.db

@@ -5,14 +5,51 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/controler/funcoes.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/view/admissao.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Admissao/admiss_geral_atualizado_com_banco.py" beforeDir="false" afterPath="$PROJECT_DIR$/Admissao/admiss_geral_atualizado_com_banco.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Admissao/salvar_docs.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Admissao/solicitar_contrato_est.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Admissao/solict_pgto.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lanca folha/calculo_folha.py" beforeDir="false" afterPath="$PROJECT_DIR$/Lanca folha/calculo_folha.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lanca folha/dsr.png" beforeDir="false" afterPath="$PROJECT_DIR$/Admissao/static/dsr.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lanca folha/dsr2.png" beforeDir="false" afterPath="$PROJECT_DIR$/Admissao/static/dsr2.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/admiss_geral_atualizado_com_banco.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/listas.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/listas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/CAGED.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/CAGED.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Cancelarhor.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Cancelarhor.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Compatibilidade.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Compatibilidade.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Compatibilidade1.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Compatibilidade1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Compatibilidade2.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Compatibilidade2.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Compatibilidade3.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Compatibilidade3.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Contratuais.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Contratuais.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Dexion.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Dexion.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Documentos.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Documentos.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/EVTrab.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/EVTrab.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Endereco.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Endereco.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Experiencia.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Experiencia.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Fecharlot.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Fecharlot.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Fecharnovo.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Fecharnovo.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Fecharnovo1.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Fecharnovo1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Fechartrab.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Fechartrab.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Fechartrab1.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Fechartrab1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Icone.ico" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Icone.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Icone.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Icone.jpg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Icone.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Icone.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Lotacoes.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Lotacoes.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Lupa.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Lupa.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Outros.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Outros.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/RAIS.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/RAIS.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Salvarbtn.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Salvarbtn.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Salvarcadastro.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Salvarcadastro.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/Salvarlot.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/Salvarlot.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/assinatura.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/assinatura.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/dsr.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/dsr.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/dsr2.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/dsr2.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/faculdade.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/faculdade.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/fechar_janela.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/fechar_janela.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/salvar.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/salvar.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admissao/static/tela.png" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/static/tela.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Contatos diversos/enviar_email.py" beforeDir="false" afterPath="$PROJECT_DIR$/Contatos diversos/enviar_email.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Desligamento/desligamento.py" beforeDir="false" afterPath="$PROJECT_DIR$/Desligamento/desligamento.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Treinamento Certificados/cert_treinamento.py" beforeDir="false" afterPath="$PROJECT_DIR$/Treinamento Certificados/cert_treinamento.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Uniformes/gerar_recibo.py" beforeDir="false" afterPath="$PROJECT_DIR$/Uniformes/gerar_recibo.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,26 +74,50 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Felipe/PycharmProjects/AutomacaoCia/Admissao/static&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_ADD_EXTERNAL_FILES": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "last_opened_file_path": "C:/Users/Felipe/PycharmProjects/AutomacaoCia/src/view"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Lanca folha" />
       <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\src\view" />
+      <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\src\models" />
+      <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\src\model" />
+      <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\test" />
       <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao\static" />
-      <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Admissao" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.admiss_geral_atualizado_com_banco">
-    <configuration name="admiss_geral_atualizado_com_banco" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.admissao (1)">
+    <configuration name="admissao (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="AutomacaoCia" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/view" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/view/admissao.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="admissao" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -68,7 +129,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Admissao/admiss_geral_atualizado_com_banco.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\Felipe\PycharmProjects\AutomacaoCia\src\view\admissao.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -119,27 +180,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="modelsfolha" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AutomacaoCia" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Lanca folha" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Lanca folha/modelsfolha.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="teste (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -163,11 +203,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.admiss_geral_atualizado_com_banco" />
+        <item itemvalue="Python.admissao (1)" />
+        <item itemvalue="Python.admissao" />
         <item itemvalue="Python.teste (1)" />
         <item itemvalue="Python.calculo_folha" />
         <item itemvalue="Python.alterar_banco" />
-        <item itemvalue="Python.modelsfolha" />
       </list>
     </recent_temporary>
   </component>
