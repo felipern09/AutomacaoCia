@@ -61,7 +61,7 @@ class Frame1(ttk.Frame):
         self.caminho = StringVar()
         self.labelescolh = ttk.Label(self, width=40, text="Escolher planilha de novos funcionários")
         self.labelescolh.grid(column=1, row=1, padx=25, pady=1, sticky=W)
-        self.botaoescolha = ttk.Button(self, text="Escolha a planilha", command=self.selecionarfunc)
+        self.botaoescolha = ttk.Button(self, text="Escolha a planilha", command=self.selecionar_funcionario)
         self.botaoescolha.grid(column=1, row=1, padx=350, pady=1, sticky=W)
         self.nome = StringVar()
         self.horario = StringVar()
@@ -147,7 +147,7 @@ class Frame1(ttk.Frame):
         self.onde = ttk.Checkbutton(self, text='Cadastro realizado fora da Cia.', variable=self.feitonde)
         self.onde.grid(column=1, row=27, padx=26, pady=1, sticky=W)
 
-        def mostrarhorario(event):
+        def mostrar_horario(event):
             nome = event.widget.get()
             num, name = nome.split(' - ')
             linha = int(num)
@@ -155,7 +155,7 @@ class Frame1(ttk.Frame):
             plansh = planwb['Respostas ao formulário 1']
             self.labelhor.config(text='Horário preenchido: ' + str(plansh[f'AI{linha}'].value))
 
-        self.combonome.bind("<<ComboboxSelected>>", mostrarhorario)
+        self.combonome.bind("<<ComboboxSelected>>", mostrar_horario)
 
         def carregarfunc(local):
             planwb = l_w(local)
@@ -192,7 +192,7 @@ class Frame1(ttk.Frame):
                                           command=lambda: [enviaemailsfunc(self.entrymatr.get())])
         self.botaoenviaemail.grid(column=1, row=30, padx=520, pady=1, sticky=W)
 
-    def selecionarfunc(self):
+    def selecionar_funcionario(self):
         try:
             caminhoplan = tkinter.filedialog.askopenfilename(title='Planilha Funcionários')
             self.caminho.set(str(caminhoplan))
@@ -230,8 +230,8 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
 
         # search for the highest compatibility between the city filled in the form and the cities in the lists to
         # define codmunend value
-        est = str(sh[f'T{linha}'].value)
-        cidade = str(sh[f'S{linha}'].value).title()
+        est = str(sh[f'AJ{linha}'].value)
+        cidade = str(sh[f'L{linha}'].value).title()
         listaend = []
         dicionend = {}
         for cid in municipios[est]:
@@ -318,7 +318,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         'tab'), pa.write(pessoa.num), pa.press('tab', 2)
                     pp.copy(pessoa.bairro), pa.hotkey('ctrl', 'v'), pa.press('tab'), pp.copy(pessoa.cidade), pa.hotkey(
                         'ctrl', 'v'), pa.press('tab'), pa.write(pessoa.uf)
-                    pa.press('tab'), pa.write(pessoa.cep), pa.press('tab'), pa.write(pessoa.cod_municipioend),pa.press(
+                    pa.press('tab'), pa.write(pessoa.cep), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press(
                         'tab'), pa.write(str(pessoa.tel)), pa.press('tab', 2), pa.write(pessoa.email)
                     # #clique em dados contratuais
                     pa.click(pa.center(pa.locateOnScreen('./static/Contratuais.png')))
@@ -327,7 +327,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     # #clique em Contrato de Experiência
                     try:
                         pa.click(pa.center(pa.locateOnScreen('./static/Experiencia.png')))
-                    except:
+                    except pa.ImageNotFoundException:
                         t.sleep(5)
                         pa.click(pa.center(pa.locateOnScreen('./static/Experiencia.png')))
                     pa.press('tab'), pa.write('45'), pa.press('tab'), pa.write('45'), pa.press(
@@ -337,7 +337,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     # #clique em Outros
                     try:
                         pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
-                    except:
+                    except pa.ImageNotFoundException:
                         t.sleep(5)
                         pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
                     t.sleep(2), pa.write('CARGO GERAL')
@@ -370,7 +370,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     # #clique em fechar lotação
                     try:
                         pa.click(pa.center(pa.locateOnScreen('./static/Fecharlot.png'))), t.sleep(1)
-                    except:
+                    except pa.ImageNotFoundException:
                         t.sleep(4)
                         pa.click(pa.center(pa.locateOnScreen('./static/Fecharlot.png')))
                     # #clique em Compatibilidade
@@ -390,30 +390,41 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pa.click(pa.center(pa.locateOnScreen('./static/Fecharnovo1.png'))), t.sleep(2)
                     # #clique em fechar trabalhadores
                     pa.click(pa.center(pa.locateOnScreen('./static/Fechartrab1.png'))), t.sleep(0.5)
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestados'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome))
+                    try:
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestados'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+                            02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome))
+                    except FileExistsError:
+                        pass
                     tkinter.messagebox.showinfo(
                         title='Cadastro ok!',
                         message='Cadastro realizado com sucesso!'
@@ -504,7 +515,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     # #clique em Contrato de Experiência
                     try:
                         pa.click(pa.center(pa.locateOnScreen('./static/Experiencia.png')))
-                    except:
+                    except pa.ImageNotFoundException:
                         t.sleep(5)
                         pa.click(pa.center(pa.locateOnScreen('./static/Experiencia.png')))
                     pa.press('tab'), pa.write('45'), pa.press('tab'), pa.write('45'), pa.press(
@@ -514,7 +525,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     # #clique em Outros
                     try:
                         pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
-                    except:
+                    except pa.ImageNotFoundException:
                         t.sleep(5)
                         pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
                     t.sleep(2), pa.write('CARGO GERAL')
@@ -547,7 +558,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     # #clique em fechar lotação
                     try:
                         pa.click(pa.center(pa.locateOnScreen('./static/Fecharlot.png'))), t.sleep(1)
-                    except:
+                    except pa.ImageNotFoundException:
                         t.sleep(4)
                         pa.click(pa.center(pa.locateOnScreen('./static/Fecharlot.png')))
                     # #clique em Compatibilidade
@@ -649,7 +660,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     # #clique em Contrato de Experiência
                     try:
                         pa.click(pa.center(pa.locateOnScreen('./static/Experiencia.png')))
-                    except:
+                    except pa.ImageNotFoundException:
                         t.sleep(5)
                         pa.click(pa.center(pa.locateOnScreen('./static/Experiencia.png')))
                     pa.press('tab'), pa.write('45'), pa.press('tab'), pa.write('45'), pa.press(
@@ -659,7 +670,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     # #clique em Outros
                     try:
                         pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
-                    except:
+                    except pa.ImageNotFoundException:
                         t.sleep(5)
                         pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
                     t.sleep(2), pa.write('CARGO GERAL')
@@ -775,7 +786,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         # #clique em Contrato de Experiência
                         try:
                             pa.click(pa.center(pa.locateOnScreen('./static/Experiencia.png')))
-                        except:
+                        except pa.ImageNotFoundException:
                             t.sleep(5)
                             pa.click(pa.center(pa.locateOnScreen('./static/Experiencia.png')))
                         pa.press('tab'), pa.write('45'), pa.press('tab'), pa.write('45'), pa.press(
@@ -785,7 +796,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         # #clique em Outros
                         try:
                             pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
-                        except:
+                        except pa.ImageNotFoundException:
                             t.sleep(5)
                             pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
                         t.sleep(2), pa.write('CARGO GERAL')
@@ -885,15 +896,13 @@ def salvadocsfunc(matricula):
                r'\000 - Pastas Funcionais\00 - ATIVOS\Modelo\Ficha Cadastral MODELO.docx'
     p_recibos = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
                 r'\000 - Pastas Funcionais\00 - ATIVOS\Modelo\Recibo Crachá e Uniformes MODELO.docx'
-    p_recibovt = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
-                 r'\000 - Pastas Funcionais\00 - ATIVOS\Modelo\Recibo VT MODELO.docx'
     p_codetic = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
                 r'\000 - Pastas Funcionais\00 - ATIVOS\Modelo\Cod Etica MODELO.docx'
     ps_acordo = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
                 r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Acordo Banco de Horas.pdf'.format(pessoa.nome)
     ps_recctps = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
                  r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Recibo de Entrega e Dev CTPS.pdf'.format(
-        pessoa.nome)
+                    pessoa.nome)
     ps_anotctps = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
                   r'\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais\Anotacoes CTPS.pdf'.format(pessoa.nome)
     ps_termovt = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
@@ -911,7 +920,7 @@ def salvadocsfunc(matricula):
         os.mkdir(p_ponto)
         os.mkdir(p_rec)
         os.mkdir(p_rescisao)
-    except:
+    except FileExistsError:
         pass
 
     lotacao = {
@@ -1016,10 +1025,11 @@ def salvadocsfunc(matricula):
     os.remove(p_contr + '\\AC.docx')
 
     # # Alterar Abertura de Conta e salvar na pasta
-    abert_c.paragraphs[14].text = str(abert_c.paragraphs[14].text).replace('#nome_completo', pessoa.nome)\
-        .replace('#rg', pessoa.rg).replace('#cpf', pessoa.cpf).replace('#endereco', pessoa.endereco)\
-        .replace('#cep', pessoa.cep).replace('#bairro', pessoa.bairro).replace('#cargo', pessoa.cargo)\
-        .replace('#data', pessoa.admiss)
+    abert_c.paragraphs[14].text = str(abert_c.paragraphs[14].text).replace('#nome_completo', pessoa.nome).replace(
+        '#rg', pessoa.rg).replace(
+        '#cpf', pessoa.cpf).replace('#endereco', pessoa.endereco)\
+        .replace('#cep', pessoa.cep)\
+        .replace('#bairro', pessoa.bairro).replace('#cargo', pessoa.cargo).replace('#data', pessoa.admiss)
     abert_c.save(p_contr + '\\Abertura Conta.docx')
     docx2pdf.convert(p_contr + '\\Abertura Conta.docx', p_contr + '\\Abertura Conta.pdf')
     os.remove(p_contr + '\\Abertura Conta.docx')
@@ -1033,8 +1043,8 @@ def salvadocsfunc(matricula):
     fch_c.paragraphs[19].text = str(fch_c.paragraphs[19].text).replace('#end_eletr', pessoa.email)
     fch_c.paragraphs[17].text = str(fch_c.paragraphs[17].text).replace('#mae#', pessoa.mae)
     fch_c.paragraphs[16].text = str(fch_c.paragraphs[16].text).replace('#pai#', pessoa.pai)
-    fch_c.paragraphs[15].text = str(fch_c.paragraphs[15].text).replace('#ident', pessoa.rg)\
-        .replace('#cpf#', pessoa.cpf)
+    fch_c.paragraphs[15].text = str(fch_c.paragraphs[15].text).replace('#ident', pessoa.rg).replace('#cpf#',
+                                                                                                    pessoa.cpf)
     fch_c.paragraphs[13].text = str(fch_c.paragraphs[13].text).replace('#telefone', pessoa.tel)
     fch_c.paragraphs[12].text = str(fch_c.paragraphs[12].text).replace('#codigo', pessoa.cep)\
         .replace('#cid', pessoa.cidade).replace('#uf', pessoa.uf)
@@ -1042,9 +1052,8 @@ def salvadocsfunc(matricula):
         .replace('#qd', pessoa.bairro)
     fch_c.paragraphs[10].text = str(fch_c.paragraphs[10].text)\
         .replace('#nasc', datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y'))\
-        .replace('#gen', pessoa.genero)\
-        .replace('#est_civ', str(pessoa.estado_civil).replace('1 - ', '').replace('2 - ', '').replace('3 - ', '')
-                 .replace('4 - ', ''))
+        .replace('#gen', pessoa.genero).replace('#est_civ', str(pessoa.estado_civil).replace('1 - ', '')
+                                                .replace('2 - ', '').replace('3 - ', '').replace('4 - ', ''))
     fch_c.save(p_contr + '\\Ficha Cadastral.docx')
     docx2pdf.convert(p_contr + '\\Ficha Cadastral.docx', p_contr + '\\Ficha Cadastral.pdf')
     os.remove(p_contr + '\\Ficha Cadastral.docx')
@@ -1102,7 +1111,7 @@ def enviaemailsfunc(matricula):
     # set up the parameters of the message
     msg.attach(text)
     image = MIMEImage(
-        open(r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
+        open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
     image.add_header('Content-ID', '<image1>')
     msg.attach(image)
     # attach pdf file
@@ -1123,7 +1132,7 @@ def enviaemailsfunc(matricula):
         'html')
     msg.attach(text)
     image = MIMEImage(
-        open(r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
+        open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
     image.add_header('Content-ID', '<image1>')
     msg.attach(image)
     # set up the parameters of the message
@@ -1176,7 +1185,7 @@ class Frame2(ttk.Frame):
         self.entryadmissest = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month,
                                         day=self.hoje.day, locale='pt_BR')
         self.entryadmissest.grid(column=1, row=12, padx=125, pady=1, sticky=W)
-        #aparecer combo departamento
+        # aparecer combo departamento
         self.labeldeptoest = ttk.Label(self, width=20, text="Departamento:")
         self.labeldeptoest.grid(column=1, row=19, padx=25, pady=1, sticky=W)
         self.combodeptoest = ttk.Combobox(self, values=departamentos, textvariable=self.departamentoest, width=50)
@@ -1300,42 +1309,45 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         pasta = r'\192.168.0.250'
         modelo = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\' \
                  f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\Modelo'
-        os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}')
-        os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Atestados')
-        os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Diversos')
-        os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Contratuais')
-        os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Ferias')
-        os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Ponto')
-        os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Recibo')
-        os.makedirs(
-            f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-            f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Rescisao')
+        try:
+            os.makedirs(
+                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}')
+            os.makedirs(
+                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Atestados')
+            os.makedirs(
+                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Diversos')
+            os.makedirs(
+                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Contratuais')
+            os.makedirs(
+                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Ferias')
+            os.makedirs(
+                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Ponto')
+            os.makedirs(
+                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Recibo')
+            os.makedirs(
+                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Rescisao')
+        except FileExistsError:
+            pass
         pasta_contratuais = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\' \
                             f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\' \
-                            f'00 - ATIVOS\\0 - Estagiários\\' \
-                            f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Contratuais'
+                            f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\' \
+                            f'{str(cadastro["nome"]).upper()}\\Contratuais'
 
         # change tree docx model files with intern data and save pdfs files
         solicitacao = docx.Document(modelo + r'\Solicitacao MODELO - Copia.docx')
@@ -1383,8 +1395,8 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         ficha_cadastral.tables[1].rows[0].cells[0].paragraphs[0].text = str(
             ficha_cadastral.tables[1].rows[0].cells[0].paragraphs[0].text).replace('#nome_completo', cadastro['nome'])
         ficha_cadastral.tables[1].rows[1].cells[0].paragraphs[0].text = str(
-            ficha_cadastral.tables[1].rows[1].cells[0].paragraphs[0].text).replace('#nasc', datetime.strftime(
-            cadastro['nasc_ed'], '%d/%m/%Y'))
+            ficha_cadastral.tables[1].rows[1].cells[0].paragraphs[0].text)\
+            .replace('#nasc', datetime.strftime(cadastro['nasc_ed'], '%d/%m/%Y'))
         ficha_cadastral.tables[1].rows[1].cells[2].paragraphs[0].text = str(
             ficha_cadastral.tables[1].rows[1].cells[2].paragraphs[0].text).replace('#gen', cadastro['genero'])
         ficha_cadastral.tables[1].rows[1].cells[4].paragraphs[0].text = str(
@@ -1443,7 +1455,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         <img src="cid:image1">''', 'html')
         msg.attach(text)
         image = MIMEImage(
-            open(r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
+            open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
         image.add_header('Content-ID', '<image1>')
         msg.attach(image)
         # set up the parameters of the message
@@ -1469,7 +1481,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         <img src="cid:image1">''', 'html')
         msg.attach(text)
         image = MIMEImage(
-            open(r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
+            open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
         # Define the image's ID as referenced in the HTML body above
         image.add_header('Content-ID', '<image1>')
         msg.attach(image)
@@ -1491,12 +1503,12 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         msg = MIMEMultipart('alternative')
         arquivo = pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf'
         text = MIMEText(
-            f'''Olá!\n\nSegue pedido de TCE do(a) estagiário(a) {cadastro["nome"]}.\n\n
-            Atenciosamente,<br><img src="cid:image1">''',
+            f'''Olá!<br><br>nSegue pedido de TCE do(a) estagiário(a) {cadastro["nome"]}.
+            <br><br>Atenciosamente,<br><img src="cid:image1">''',
             'html')
         msg.attach(text)
         image = MIMEImage(
-            open(r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
+            open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\Admissao\static\assinatura.png', 'rb').read())
         # Define the image's ID as referenced in the HTML body above
         image.add_header('Content-ID', '<image1>')
         msg.attach(image)
@@ -1609,7 +1621,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                         f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
                         f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
                         f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Rescisao')
-                except:
+                except FileExistsError:
                     pass
                 # abrir cadastro no dexion e atualizar informações campo a campo
                 pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
@@ -1659,7 +1671,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 # #clique em instituição de ensino
                 try:
                     pa.click(pa.center(pa.locateOnScreen('./static/faculdade.png')))
-                except:
+                except pa.ImageNotFoundException:
                     t.sleep(3)
                     pa.click(pa.center(pa.locateOnScreen('./static/faculdade.png')))
                 pa.press('tab'), pp.copy(pessoa.est_faculdade), pa.hotkey('ctrl', 'v')
@@ -1669,7 +1681,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 # #clique em Outros
                 try:
                     pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
-                except:
+                except pa.ImageNotFoundException:
                     t.sleep(5)
                     pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
                 t.sleep(2), pa.write('CARGO GERAL')
@@ -1695,7 +1707,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 # #clique em fechar lotação
                 try:
                     pa.click(pa.center(pa.locateOnScreen('./static/Fecharlot.png'))), t.sleep(1)
-                except:
+                except pa.ImageNotFoundException:
                     t.sleep(4)
                     pa.click(pa.center(pa.locateOnScreen('./static/Fecharlot.png')))
                 # #clique em Compatibilidade
@@ -1804,7 +1816,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                         f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
                         f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
                         f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Rescisao')
-                except:
+                except FileExistsError:
                     pass
                 # abrir cadastro no dexion e atualizar informações campo a campo
                 pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
@@ -1854,7 +1866,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 # #clique em instituição de ensino
                 try:
                     pa.click(pa.center(pa.locateOnScreen('./static/faculdade.png')))
-                except:
+                except pa.ImageNotFoundException:
                     t.sleep(3)
                     pa.click(pa.center(pa.locateOnScreen('./static/faculdade.png')))
                 pa.press('tab'), pp.copy(pessoa.est_faculdade), pa.hotkey('ctrl', 'v')
@@ -1864,7 +1876,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 # #clique em Outros
                 try:
                     pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
-                except:
+                except pa.ImageNotFoundException:
                     t.sleep(5)
                     pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
                 t.sleep(2), pa.write('CARGO GERAL')
@@ -1890,7 +1902,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 # #clique em fechar lotação
                 try:
                     pa.click(pa.center(pa.locateOnScreen('./static/Fecharlot.png'))), t.sleep(1)
-                except:
+                except pa.ImageNotFoundException:
                     t.sleep(4)
                     pa.click(pa.center(pa.locateOnScreen('./static/Fecharlot.png')))
                 # #clique em Compatibilidade
@@ -1915,7 +1927,6 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
         else:
             if ondestou == 0:
                 # Editando o cadastro na Cia
-                hoje = datetime.today()
                 wb = l_w(caminho)
                 sh = wb['Respostas ao formulário 1']
                 num, name = nome.strip().split(' - ')
@@ -1938,28 +1949,6 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                     'Manutenção': ['0004', 'José Aparecido', 'aparecido.grota@ciaathletica.com.br',
                                    'Gerente Manutenção'],
                 }
-                cadastro = {'nome': str(sh[f"C{linha}"].value).title().strip(), 'nasc_ed': sh[f"D{linha}"].value,
-                            'genero': str(sh[f"E{linha}"].value), 'est_civ': str(sh[f"F{linha}"].value),
-                            'pai': str(sh[f"M{linha}"].value), 'mae': str(sh[f"N{linha}"].value),
-                            'end': str(sh[f"O{linha}"].value),
-                            'num': str(sh[f"P{linha}"].value), 'bairro': str(sh[f"Q{linha}"].value),
-                            'cep': str(sh[f"R{linha}"].value).replace('.', '').replace('-', ''),
-                            'cid_end': str(sh[f"S{linha}"].value), 'uf_end': str(sh[f"T{linha}"].value),
-                            'tel': str(sh[f"U{linha}"].value).replace('(', '')
-                            .replace(')', '').replace('-','').replace(' ',''),
-                            'mun_end': str(sh[f"AP{linha}"].value),
-                            'cpf': str(sh[f"V{linha}"].value).strip().replace('.', '')
-                            .replace('-', '').replace(' ','').zfill(11),
-                            'rg': str(sh[f"W{linha}"].value).strip().replace('.', '').replace('-', '').replace(' ', ''),
-                            'emissor': str(sh[f"X{linha}"].value),
-                            'lotacao': str(lotacao[f'{sh[f"AG{linha}"].value}'][0]).zfill(4),
-                            'cargo': str(sh[f"AH{linha}"].value), 'horario': str(sh[f"AI{linha}"].value),
-                            'email': str(sh[f"B{linha}"].value).strip(),
-                            'admissao_ed': str(sh[f"AL{linha}"].value),
-                            'faculdade': str(sh[f"AV{linha}"].value), 'semestre': str(sh[f"AS{linha}"].value),
-                            'turno': str(sh[f"AT{linha}"].value), 'conclusao': str(sh[f"AU{linha}"].value),
-                            'salario': str(sh[f"AM{linha}"].value),
-                            'hrsemanais': str(sh[f"AQ{linha}"].value), 'hrmensais': str(sh[f"AR{linha}"].value)}
             else:
                 # Editando o cadastro em Casa
                 wb = l_w(caminho)
@@ -2029,7 +2018,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                         f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Diversos')
                     os.makedirs(
                         f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
-                        f'2 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
                         f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Contratuais')
                     os.makedirs(
                         f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
@@ -2047,7 +2036,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                         f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
                         f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
                         f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Rescisao')
-                except:
+                except FileExistsError:
                     pass
                 # abrir cadastro no dexion e atualizar informações campo a campo
                 pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
@@ -2100,7 +2089,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 # #clique em Outros
                 try:
                     pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
-                except:
+                except pa.ImageNotFoundException:
                     t.sleep(5)
                     pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
                 t.sleep(2), pa.write('CARGO GERAL')
@@ -2282,7 +2271,7 @@ def cadastrar_autonomo(caminhoaut, nomeaut, matriculaaut, admissaoaut, cargoaut,
     # #clique em Outros
     try:
         pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
-    except:
+    except pa.ImageNotFoundException:
         t.sleep(5)
         pa.click(pa.center(pa.locateOnScreen('./static/Outros.png')))
     t.sleep(2), pa.write('CARGO GERAL')
@@ -2300,7 +2289,7 @@ def cadastrar_autonomo(caminhoaut, nomeaut, matriculaaut, admissaoaut, cargoaut,
     # #clique em fechar lotação
     try:
         pa.click(pa.center(pa.locateOnScreen('./static/Fecharlot.png'))), t.sleep(1)
-    except:
+    except pa.ImageNotFoundException:
         t.sleep(4)
         pa.click(pa.center(pa.locateOnScreen('./static/Fecharlot.png')))
     # #clique em Compatibilidade

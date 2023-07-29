@@ -3,7 +3,7 @@ from dateutil.relativedelta import relativedelta
 from modelsfolha import Aulas, Faltas, Ferias, Hrcomplement, Atestado, Desligados, Escala, Substituicao, engine
 from sqlalchemy.orm import sessionmaker
 from openpyxl import load_workbook as l_w
-from openpyxl.styles import Color, PatternFill, Font
+from openpyxl.styles import PatternFill, Font
 import pandas as pd
 import openpyxl.utils.cell
 import holidays
@@ -171,13 +171,8 @@ def faltas(comp):
     for f in falt:
         if inicio <= dt.strptime(f.data, '%d/%m/%Y') <= fim:
             if f.professor in dic:
-                if f.data in dic[f.professor]:
-                    if f.departamento in dic[f.professor][f.data]:
-                        pass
-                    else:
-                        dic[f.professor][f.data][f.departamento] = f.horas
-                else:
-                    dic[f.professor][f.data] = {f.departamento: f.horas}
+                d2 = {f.professor: {f.data: {f.departamento: f.horas}}}
+                dic[f.professor] = {**dic[f.professor], **d2[f.professor]}
             else:
                 d2 = {f.professor: {f.data: {f.departamento: f.horas}}}
                 dic = {**dic, **d2}
@@ -195,13 +190,8 @@ def feriasf(comp):
     for f in fer:
         if inicio <= dt.strptime(f.inicio, '%d/%m/%Y') <= fim:
             if f.professor in dic:
-                if f.departamento in dic[f.professor]:
-                    if f.inicio in dic[f.professor][f.departamento]:
-                        pass
-                    else:
-                        dic[f.professor][f.departamento][f.inicio] = f.fim
-                else:
-                    dic[f.professor][f.departamento] = {f.inicio: f.fim}
+                d2 = {f.professor: {f.departamento: {f.inicio: f.fim}}}
+                dic[f.professor] = {**dic[f.professor], **d2[f.professor]}
             else:
                 d2 = {f.professor: {f.departamento: {f.inicio: f.fim}}}
                 dic = {**dic, **d2}
@@ -219,12 +209,10 @@ def atestadof(comp):
     for a in ates:
         if inicio <= dt.strptime(a.data, '%d/%m/%Y') <= fim:
             if a.professor in dic:
-                if a.departamento in dic[a.professor]:
-                    pass
-                else:
-                    dic[a.professor][a.departamento] = a.data
+                d2 = {a.professor: {a.data: a.departamento}}
+                dic[a.professor] = {**dic[a.professor], **d2[a.professor]}
             else:
-                d2 = {a.professor: {a.departamento: a.data}}
+                d2 = {a.professor: {a.data: a.departamento}}
                 dic = {**dic, **d2}
     return dic
 
@@ -253,14 +241,8 @@ def substit(comp):
     for s in subst:
         if inicio <= dt.strptime(s.data, '%d/%m/%Y') <= fim:
             if s.professorsubst in dic:
-                if s.substituto in dic[s.professorsubst]:
-                    if s.departamento in dic[s.professorsubst][s.substituto]:
-                        if s.data in dic[s.professorsubst][s.substituto][s.departamento]:
-                            pass
-                        else:
-                            dic[s.professorsubst][s.substituto][s.departamento][s.data] = s.horas
-                else:
-                    dic = {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
+                dic2 = {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
+                dic[s.professorsubst] = {**dic[s.professorsubst], **dic2[s.professorsubst]}
             else:
                 d2 = {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
                 dic = {**dic, **d2}
@@ -278,13 +260,8 @@ def desligamentos(comp):
     for d in desl:
         if inicio <= dt.strptime(d.datadesligamento, '%d/%m/%Y') <= fim:
             if d.professor in dic:
-                if d.departamento in dic[d.professor]:
-                    if d.datadesligamento in dic[d.professor][d.departamento]:
-                        pass
-                    else:
-                        dic[d.professor][d.departamento] = d.datadesligamento
-                else:
-                    dic[d.professor] = {d.departamento: d.datadesligamento}
+                d2 = {d.professor: {d.departamento: d.datadesligamento}}
+                dic[d.professor] = {**dic[d.professor], **d2[d.professor]}
             else:
                 d2 = {d.professor: {d.departamento: d.datadesligamento}}
                 dic = {**dic, **d2}
@@ -302,13 +279,8 @@ def escala(comp):
     for e in esc:
         if inicio <= dt.strptime(e.data, '%d/%m/%Y') <= fim:
             if e.professor in dic:
-                if e.data in dic[e.professor]:
-                    if e.departamento in dic[e.professor][e.data]:
-                        pass
-                    else:
-                        dic[e.professor][e.data][e.departamento] = e.horas
-                else:
-                    dic[e.professor][e.data] = {e.departamento: e.horas}
+                d2 = {e.professor: {e.data: {e.departamento: e.horas}}}
+                dic[e.professor] = {**dic[e.professor], **d2[e.professor]}
             else:
                 d2 = {e.professor: {e.data: {e.departamento: e.horas}}}
                 dic = {**dic, **d2}
@@ -326,18 +298,37 @@ def horascomplementares(comp):
     for h in hrsc:
         if inicio <= dt.strptime(h.data, '%d/%m/%Y') <= fim:
             if h.professor in dic:
-                if h.data in dic[h.professor]:
-                    if h.departamento in dic[h.professor][h.data]:
-                        pass
-                    else:
-                        dic[h.professor][h.data][h.departamento] = h.horas
-                else:
-                    dic[h.professor][h.data] = {h.departamento: h.horas}
+                d2 = {h.professor: {h.data: {h.departamento: h.horas}}}
+                dic[h.professor] = {**dic[h.professor], **d2[h.professor]}
             else:
                 d2 = {h.professor: {h.data: {h.departamento: h.horas}}}
                 dic = {**dic, **d2}
     return dic
 
+atestado = PatternFill(start_color='A9D08E',
+                      end_color='A9D08E',
+                      fill_type='solid')
+falta = PatternFill(start_color='FF0000',
+                      end_color='FF0000',
+                      fill_type='solid')
+ferias = PatternFill(start_color='9BC2E6',
+                      end_color='9BC2E6',
+                      fill_type='solid')
+feriado = PatternFill(start_color='F4B084',
+                      end_color='F4B084',
+                      fill_type='solid')
+fds = PatternFill(start_color='BFBFBF',
+                      end_color='BFBFBF',
+                      fill_type='solid')
+deslig = PatternFill(start_color='454545',
+                      end_color='454545',
+                      fill_type='solid')
+subst = PatternFill(start_color='FFFF00',
+                      end_color='FFFF00',
+                      fill_type='solid')
+comple = PatternFill(start_color='FFC000',
+                      end_color='FFC000',
+                      fill_type='solid')
 
 def plandegrade(dic, comp):
     grade = l_w('Grade.xlsx', read_only=False)
@@ -350,32 +341,6 @@ def plandegrade(dic, comp):
     atest = atestadof(comp)
     feriad = feriadof(comp)
     escal = escala(comp)
-
-    atestado = PatternFill(start_color='A9D08E',
-                          end_color='A9D08E',
-                          fill_type='solid')
-    falta = PatternFill(start_color='FF0000',
-                          end_color='FF0000',
-                          fill_type='solid')
-    ferias = PatternFill(start_color='9BC2E6',
-                          end_color='9BC2E6',
-                          fill_type='solid')
-    feriado = PatternFill(start_color='F4B084',
-                          end_color='F4B084',
-                          fill_type='solid')
-    fds = PatternFill(start_color='BFBFBF',
-                          end_color='BFBFBF',
-                          fill_type='solid')
-    deslig = PatternFill(start_color='454545',
-                          end_color='454545',
-                          fill_type='solid')
-    subst = PatternFill(start_color='FFFF00',
-                          end_color='FFFF00',
-                          fill_type='solid')
-    comple = PatternFill(start_color='FFC000',
-                          end_color='FFC000',
-                          fill_type='solid')
-
     competencia = dt(day=10, month=comp, year=dt.today().year)
     inicio = dt(day=21, month=(competencia - relativedelta(months=1)).month, year=(competencia - relativedelta(months=1)).year)
     fechamento = dt(day=20, month=competencia.month, year=competencia.year)
@@ -458,6 +423,7 @@ def plandegrade(dic, comp):
                                     plan1.cell(column=cell.column, row=novalinha).fill = falta
                 # aplica alterações de substituição
                 # {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
+                # {s.professorsubst: {s.data: {s.substituto: {s.departamento: s.horas}}}}
                 for nome in subs:
                     for substituto in subs[nome]:
                         for depart in subs[nome][substituto]:
@@ -506,11 +472,11 @@ def plandegrade(dic, comp):
                                     plan1.cell(column=cell.column, row=novalinha).fill = comple
 
                 # aplica alterações de atestados
-                # {a.professor: {a.departamento: a.data}}
+                # {a.professor: {a.data: a.departamento}}
                 for nome in atest:
-                    for depart in atest[nome]:
-                        if depart == 'Musculação' and nome == i:
-                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(atest[nome][depart], '%d/%m/%Y'), '%d/%m'):
+                    for d in atest[nome]:
+                        if atest[nome][d] == 'Musculação' and nome == i:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(d, '%d/%m/%Y'), '%d/%m'):
                                 plan1.cell(column=cell.column, row=novalinha).fill = atestado
 
                 # aplica alterações de feriado
@@ -611,11 +577,11 @@ def plandegrade(dic, comp):
                                     plan1.cell(column=cell.column, row=novalinha).fill = comple
 
                 # aplica alterações de atestados
-                # {a.professor: {a.departamento: a.data}}
+                # {a.professor: {a.data: a.departamento}}
                 for nome in atest:
-                    for depart in atest[nome]:
-                        if depart == 'Ginástica' and nome == i:
-                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(atest[nome][depart], '%d/%m/%Y'), '%d/%m'):
+                    for d in atest[nome]:
+                        if atest[nome][d] == 'Ginástica' and nome == i:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(d, '%d/%m/%Y'), '%d/%m'):
                                 plan1.cell(column=cell.column, row=novalinha).fill = atestado
 
                 # aplica alterações de feriado
@@ -716,11 +682,11 @@ def plandegrade(dic, comp):
                                     plan1.cell(column=cell.column, row=novalinha).fill = comple
 
                 # aplica alterações de atestados
-                # {a.professor: {a.departamento: a.data}}
+                # {a.professor: {a.data: a.departamento}}
                 for nome in atest:
-                    for depart in atest[nome]:
-                        if depart == 'Kids' and nome == i:
-                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(atest[nome][depart], '%d/%m/%Y'), '%d/%m'):
+                    for d in atest[nome]:
+                        if atest[nome][d] == 'Kids' and nome == i:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(d, '%d/%m/%Y'), '%d/%m'):
                                 plan1.cell(column=cell.column, row=novalinha).fill = atestado
 
                 # aplica alterações de feriado
@@ -821,11 +787,11 @@ def plandegrade(dic, comp):
                                     plan1.cell(column=cell.column, row=novalinha).fill = comple
 
                 # aplica alterações de atestados
-                # {a.professor: {a.departamento: a.data}}
+                # {a.professor: {a.data: a.departamento}}
                 for nome in atest:
-                    for depart in atest[nome]:
-                        if depart == 'Esportes' and nome == i:
-                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(atest[nome][depart], '%d/%m/%Y'), '%d/%m'):
+                    for d in atest[nome]:
+                        if atest[nome][d] == 'Esportes' and nome == i:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(d, '%d/%m/%Y'), '%d/%m'):
                                 plan1.cell(column=cell.column, row=novalinha).fill = atestado
 
                 # aplica alterações de feriado
@@ -927,11 +893,11 @@ def plandegrade(dic, comp):
                                     plan1.cell(column=cell.column, row=novalinha).fill = comple
 
                 # aplica alterações de atestados
-                # {a.professor: {a.departamento: a.data}}
+                # {a.professor: {a.data: a.departamento}}
                 for nome in atest:
-                    for depart in atest[nome]:
-                        if depart == 'Cross Cia' and nome == i:
-                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(atest[nome][depart], '%d/%m/%Y'), '%d/%m'):
+                    for d in atest[nome]:
+                        if atest[nome][d] == 'Cross Cia' and nome == i:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dt.strptime(d, '%d/%m/%Y'), '%d/%m'):
                                 plan1.cell(column=cell.column, row=novalinha).fill = atestado
 
                 # aplica alterações de feriado
@@ -1072,38 +1038,145 @@ def somadom(nome, depto):
     return somas
 
 
-folhadehoje = Folha(8, list(aulasativas()), deptosativos())
-somaaulas = {}
-for i in profsativos():
-    somaaulas[i] = {}
-    for d in deptosativos():
-        somaaulas[i][d] = {}
-for aulas in aulasativas():
-    somaaulas[aulas.professor][aulas.departamento][aulas.nome+f' ({aulas.valor})'] = round(somaprof(folhadehoje, aulas.professor, aulas.departamento, aulas.nome), 2)
-    dictchav = list(somaaulas.keys())
-    dictchav.sort()
-    somafinal = {i: somaaulas[i] for i in dictchav}
+def plansoma():
+    folhadehoje = Folha(data, list(aulasativas()), deptosativos())
+    somaaulas = {}
+    for i in profsativos():
+        somaaulas[i] = {}
+        for d in deptosativos():
+            somaaulas[i][d] = {}
+    for aulas in aulasativas():
+        somaaulas[aulas.professor][aulas.departamento][aulas.nome+f' ({aulas.valor})'] = round(somaprof(folhadehoje, aulas.professor, aulas.departamento, aulas.nome), 2)
+        dictchav = list(somaaulas.keys())
+        dictchav.sort()
+        somafinal = {i: somaaulas[i] for i in dictchav}
 
-plan = l_w('Somafinal.xlsx', read_only=False)
-folha = plan['Planilha1']
-folha['A1'].value = 'Matrícula'
-folha['B1'].value = 'Nome'
-folha['C1'].value = 'Aula e Valor'
-folha['D1'].value = 'Horas'
-x = 2
-for i in somafinal:
-    matr = session.query(Aulas).filter_by(professor=str(i)).first()
-    folha[f'A{x}'].value = int(matr.matrprof)
-    folha[f'B{x}'].value = str(i)
-    for sub in somafinal[i]:
-        if somafinal[i][sub] == {}:
-            pass
-        else:
-            for sub2 in somafinal[i][sub]:
-                folha[f'C{x}'].value = str(sub2)
-                folha[f'D{x}'].value = float(str(somafinal[i][sub][sub2]))
-                x += 1
-# folha['F1'].value = 'Total Bruto - Professores'
-# folha['G1'].value = locale.currency(totaldafolha(folhadehoje), grouping=True)
-plan.save(f'Somafinal mes {data}.xlsx')
-plandegrade(somafinal, data)
+    plan = l_w('Somafinal.xlsx', read_only=False)
+    folha = plan['Planilha1']
+    folha['A1'].value = 'Matrícula'
+    folha['B1'].value = 'Nome'
+    folha['C1'].value = 'Aula e Valor'
+    folha['D1'].value = 'Horas'
+    x = 2
+    for i in somafinal:
+        matr = session.query(Aulas).filter_by(professor=str(i)).first()
+        folha[f'A{x}'].value = int(matr.matrprof)
+        folha[f'B{x}'].value = str(i)
+        for sub in somafinal[i]:
+            if somafinal[i][sub] == {}:
+                pass
+            else:
+                for sub2 in somafinal[i][sub]:
+                    folha[f'C{x}'].value = str(sub2)
+                    folha[f'D{x}'].value = float(str(somafinal[i][sub][sub2]))
+                    x += 1
+    # folha['F1'].value = 'Total Bruto - Professores'
+    # folha['G1'].value = locale.currency(totaldafolha(folhadehoje), grouping=True)
+    plan.save(f'Somafinal mes {data}.xlsx')
+    plandegrade(somafinal, data)
+    substitutos = {}
+    complementares = {}
+    feriasl = {}
+    desligadosl = {}
+    planilha = l_w(f'Grade {data}-2023.xlsx')
+    aba = planilha['Planilha1']
+    for row in aba.iter_cols(min_row=3, min_col=3, max_row=115, max_col=35):
+        for cell in row:
+            if cell.fill == ferias:
+                for i in range(1,150):
+                    if aba.cell(column=1, row=cell.row - i).value is not None:
+                        depart = aba.cell(column=1, row=cell.row - i).value
+                        break
+                for r in aba.iter_cols(min_row=3, min_col=3, max_row=3, max_col=38):
+                    for c in r:
+                        if c.value == 'Total':
+                            tt = c.column
+                hrs = 0
+                for m in range(3, tt):
+                    hrs += aba.cell(column=m, row=cell.row).value
+                feriasl[aba.cell(column=2, row=cell.row).value] = {depart: round(hrs, 2)}
+            if cell.fill == deslig:
+                for i in range(1,150):
+                    if aba.cell(column=1, row=cell.row - i).value is not None:
+                        depart = aba.cell(column=1, row=cell.row - i).value
+                        break
+                for r in aba.iter_cols(min_row=3, min_col=3, max_row=3, max_col=38):
+                    for c in r:
+                        if c.value == 'Total':
+                            tt = c.column
+                hrs = 0
+                for m in range(3, tt):
+                    hrs += aba.cell(column=m, row=cell.row).value
+                desligadosl[aba.cell(column=2, row=cell.row).value] = {depart: round(hrs, 2)}
+            if cell.fill == subst:
+                for i in range(1,150):
+                    if aba.cell(column=1, row=cell.row - i).value is not None:
+                        depart = aba.cell(column=1, row=cell.row - i).value
+                        break
+                for r in aba.iter_cols(min_row=3, min_col=3, max_row=3, max_col=38):
+                    for c in r:
+                        if c.value == 'Total':
+                            tt = c.column
+                hrs = 0
+                for m in range(3, tt):
+                    hrs += aba.cell(column=m, row=cell.row).value
+                substitutos[aba.cell(column=2, row=cell.row).value] = {depart: round(hrs, 2)}
+            if cell.fill == comple:
+                for i in range(1, 150):
+                    if aba.cell(column=1, row=cell.row - i).value is not None:
+                        depart = aba.cell(column=1, row=cell.row - i).value
+                        break
+                for r in aba.iter_cols(min_row=3, min_col=3, max_row=3, max_col=38):
+                    for c in r:
+                        if c.value == 'Total':
+                            tt = c.column
+                hrs = 0
+                for m in range(3, tt):
+                    hrs += aba.cell(column=m, row=cell.row).value
+                complementares[aba.cell(column=2, row=cell.row).value] = {depart: round(hrs, 2)}
+
+    planilha2 = l_w(f'Somafinal mes {data}.xlsx', read_only=False)
+    aba2 = planilha2['Planilha1']
+    for pessoa in feriasl:
+        for depart in feriasl[pessoa]:
+            for cll in aba2['B']:
+                if cll.value is not None:
+                    if cll.value == pessoa:
+                        aba2.cell(column=4, row=cll.row, value=float(feriasl[pessoa][depart]))
+    for pessoa in desligadosl:
+        for depart in desligadosl[pessoa]:
+            for cell in aba2['B']:
+                if cell.value is not None:
+                    if cell.value == pessoa:
+                        aba2.cell(column=4, row=cell.row).value = float(desligadosl[pessoa][depart]) 
+    for pessoa in substitutos:
+        for depart in substitutos[pessoa]:
+            for cell in aba2['B']:
+                if cell.value is not None:
+                    if cell.value == pessoa:
+                        aba2.cell(column=4, row=cell.row).value = float(substitutos[pessoa][depart]) 
+    for pessoa in complementares:
+        for depart in complementares[pessoa]:
+            for cell in aba2['B']:
+                if cell.value is not None:
+                    if cell.value == pessoa:
+                        aba2.cell(column=4, row=cell.row).value = float(complementares[pessoa][depart]) 
+    for i, coluna in enumerate(aba2.columns):
+        max_length = 0
+        column = coluna[0].column_letter
+        for cell in coluna:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(str(cell.value))
+            except Exception:
+                pass
+        adjusted_width = max_length + 1
+        aba2.column_dimensions[column].width = adjusted_width
+    planilha2.save(f'Somafinal mes {data}.xlsx')
+    print('Férias \n', feriasl)
+    print('Desligados \n', desligadosl)
+    print('Substitutos \n', substitutos)
+    print('Hrs Complementares \n', complementares)
+
+
+plansoma()
