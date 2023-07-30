@@ -33,6 +33,7 @@ import tkinter.filedialog
 from tkinter import messagebox
 import tkinter.filedialog
 import time as t
+from typing import List, Dict, Tuple, Type
 import urllib
 from urllib import parse
 import win32com.client as client
@@ -40,39 +41,55 @@ import win32com.client as client
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
-data = 7
+# data = 7
 
 atestado = PatternFill(start_color='A9D08E',
-                      end_color='A9D08E',
-                      fill_type='solid')
+                       end_color='A9D08E',
+                       fill_type='solid')
 falta = PatternFill(start_color='FF0000',
-                      end_color='FF0000',
-                      fill_type='solid')
+                    end_color='FF0000',
+                    fill_type='solid')
 ferias = PatternFill(start_color='9BC2E6',
-                      end_color='9BC2E6',
-                      fill_type='solid')
+                     end_color='9BC2E6',
+                     fill_type='solid')
 feriado = PatternFill(start_color='F4B084',
                       end_color='F4B084',
                       fill_type='solid')
 fds = PatternFill(start_color='BFBFBF',
-                      end_color='BFBFBF',
-                      fill_type='solid')
+                  end_color='BFBFBF',
+                  fill_type='solid')
 deslig = PatternFill(start_color='454545',
-                      end_color='454545',
-                      fill_type='solid')
+                     end_color='454545',
+                     fill_type='solid')
 subst = PatternFill(start_color='FFFF00',
-                      end_color='FFFF00',
-                      fill_type='solid')
+                    end_color='FFFF00',
+                    fill_type='solid')
 comple = PatternFill(start_color='FFC000',
-                      end_color='FFC000',
-                      fill_type='solid')
+                     end_color='FFC000',
+                     fill_type='solid')
 
 
-def lancar_folha_no_dexion():
+def confirma_folha(comp: int):
+    resp = messagebox.askyesno(title='Tem certeza?',
+                               message=f'Tem certeza que deseja lançar a folha do mês {comp} no Dexion?')
+    if resp:
+        lancar_folha_no_dexion(comp)
+
+
+def confirma_grade(comp: int):
+    r = messagebox.askyesno(title='Tem certeza?',
+                            message=f'Tem certeza que deseja gerar a folha do mês {comp}?\n'
+                                    f'Essa ação irá sobrepor qualquer arquivo de folha já salvo na pasta.')
+    if r:
+        salvar_planilha_soma_final(comp)
+
+
+def lancar_folha_no_dexion(competencia):
     pa.hotkey('alt', 'tab'), pa.press('a'), t.sleep(2)
-    wb = l_w("../src/models/static/files/Lancamentos.xlsx")
+    folhagrd = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\view\Somafinal mes {competencia}.xlsx')
+    wb = l_w(folhagrd, read_only=False)
 
-    # # lançamento de faltas
+    # lançamento de faltas
     sh = wb['Faltas']
     x = 2
     while x <= len(sh['A']):
@@ -175,6 +192,11 @@ def lancar_folha_no_dexion():
         pa.press('enter'), t.sleep(0.5), pa.write(sq), t.sleep(0.5), pa.press('enter'), t.sleep(0.5), pa.write(hr)
         pa.press('enter', 3), t.sleep(0.5),
         x += 1
+    tkinter.messagebox.showinfo(
+        title='Folha ok!',
+        message=f'Folha do mês {competencia} lançada no Dexion com sucesso!'
+    )
+
 
 
 def somar_aulas_da_grade(diasem, inic, fim, competencia, iniciograd, fimgrad):
@@ -269,7 +291,7 @@ def listar_aulas_ativas():
         yield aula[i]
 
 
-def listar_departamentos_ativos():
+def listar_departamentos_ativos() -> list:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulasativasdb = session.query(Aulas).filter_by(status='Ativa').all()
@@ -280,7 +302,7 @@ def listar_departamentos_ativos():
     return departamentos
 
 
-def listar_professores_ativos():
+def listar_professores_ativos() -> list:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulasativasdb = session.query(Aulas).filter_by(status='Ativa').all()
@@ -291,23 +313,23 @@ def listar_professores_ativos():
     return professores
 
 
-def calcular_total_monetario_folha(folha):
+def calcular_total_monetario_folha(compet: int) -> float:
     somatorio = 0
     for al in list(listar_aulas_ativas()):
-        somatorio += somar_aulas_da_grade(al.dia, al.inicio, al.fim, data, al.iniciograde, al.fimgrade) * float(
+        somatorio += somar_aulas_da_grade(al.dia, al.inicio, al.fim, compet, al.iniciograde, al.fimgrade) * float(
             str(al.valor).replace(',', '.')) * al.dsr
     return round(somatorio, 2)
 
 
-def somar_horas_professor(folha, prof, depto, nome):
+def somar_horas_professor(folha, prof, depto, nome, compet: int) -> float:
     somahoras = 0
     for aula in folha.aulas:
         if aula.professor == prof and aula.departamento == depto and aula.nome == nome:
-            somahoras += somar_aulas_da_grade(aula.dia, aula.inicio, aula.fim, data, aula.iniciograde, aula.fimgrade)
+            somahoras += somar_aulas_da_grade(aula.dia, aula.inicio, aula.fim, compet, aula.iniciograde, aula.fimgrade)
     return somahoras
 
 
-def consultar_faltas(comp):
+def consultar_faltas(comp) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     falt = session.query(Faltas).all()
@@ -326,7 +348,7 @@ def consultar_faltas(comp):
     return dic
 
 
-def consultar_ferias(comp):
+def consultar_ferias(comp) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     fer = session.query(Ferias).all()
@@ -345,7 +367,7 @@ def consultar_ferias(comp):
     return dic
 
 
-def consultar_atestados(comp):
+def consultar_atestados(comp) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     ates = session.query(Atestado).all()
@@ -364,7 +386,7 @@ def consultar_atestados(comp):
     return dic
 
 
-def listar_feriados(comp):
+def listar_feriados(comp: int) -> list:
     inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
                 year=dt.today().year)
     fim = dt(day=20, month=comp, year=dt.today().year)
@@ -377,7 +399,7 @@ def listar_feriados(comp):
     return feriados_nacionais
 
 
-def consultar_substituicoes(comp):
+def consultar_substituicoes(comp: int) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     subst = session.query(Substituicao).all()
@@ -396,7 +418,7 @@ def consultar_substituicoes(comp):
     return dic
 
 
-def consultar_desligamentos(comp):
+def consultar_desligamentos(comp: int) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     desl = session.query(Desligados).all()
@@ -415,7 +437,7 @@ def consultar_desligamentos(comp):
     return dic
 
 
-def consultar_escalas(comp):
+def consultar_escalas(comp: int) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     esc = session.query(Escala).all()
@@ -434,7 +456,7 @@ def consultar_escalas(comp):
     return dic
 
 
-def consultar_horas_complementares(comp):
+def consultar_horas_complementares(comp: int) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     hrsc = session.query(Hrcomplement).all()
@@ -453,8 +475,9 @@ def consultar_horas_complementares(comp):
     return dic
 
 
-def salvar_planilha_grade_horaria(dic, comp):
-    grade = l_w('../src/models/static/files/Grade.xlsx', read_only=False)
+def salvar_planilha_grade_horaria(dic: dict, comp: int):
+    grd = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Grade.xlsx')
+    grade = l_w(grd, read_only=False)
     plan1 = grade['Planilha1']
     flt = consultar_faltas(comp)
     subs = consultar_substituicoes(comp)
@@ -1194,7 +1217,7 @@ def salvar_planilha_grade_horaria(dic, comp):
     grade.save(f'Grade {fechamento.month}-{fechamento.year}.xlsx')
 
 
-def somar_aulas_de_segunda(nome, depto):
+def somar_aulas_de_segunda(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulasseg = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Segunda') \
@@ -1208,7 +1231,7 @@ def somar_aulas_de_segunda(nome, depto):
     return somas
 
 
-def somar_aulas_de_terca(nome, depto):
+def somar_aulas_de_terca(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulaster = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Terça') \
@@ -1222,7 +1245,7 @@ def somar_aulas_de_terca(nome, depto):
     return somas
 
 
-def somar_aulas_de_quarta(nome, depto):
+def somar_aulas_de_quarta(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulasqua = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Quarta') \
@@ -1236,7 +1259,7 @@ def somar_aulas_de_quarta(nome, depto):
     return somas
 
 
-def somar_aulas_de_quinta(nome, depto):
+def somar_aulas_de_quinta(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulasqui = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Quinta') \
@@ -1250,7 +1273,7 @@ def somar_aulas_de_quinta(nome, depto):
     return somas
 
 
-def somar_aulas_de_sexta(nome, depto):
+def somar_aulas_de_sexta(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulassex = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Sexta') \
@@ -1264,7 +1287,7 @@ def somar_aulas_de_sexta(nome, depto):
     return somas
 
 
-def somar_aulas_de_sabado(nome, depto):
+def somar_aulas_de_sabado(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulassab = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Sábado') \
@@ -1278,7 +1301,7 @@ def somar_aulas_de_sabado(nome, depto):
     return somas
 
 
-def somar_aulas_de_domingo(nome, depto):
+def somar_aulas_de_domingo(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulasdom = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Domingo') \
@@ -1292,10 +1315,10 @@ def somar_aulas_de_domingo(nome, depto):
     return somas
 
 
-def salvar_planilha_soma_final():
+def salvar_planilha_soma_final(compet: int):
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
-    folhadehoje = Folha(data, list(listar_aulas_ativas()), listar_departamentos_ativos())
+    folhadehoje = Folha(compet, list(listar_aulas_ativas()), listar_departamentos_ativos())
     somaaulas = {}
     for i in listar_professores_ativos():
         somaaulas[i] = {}
@@ -1303,12 +1326,12 @@ def salvar_planilha_soma_final():
             somaaulas[i][d] = {}
     for aulas in listar_aulas_ativas():
         somaaulas[aulas.professor][aulas.departamento][aulas.nome + f' ({aulas.valor})'] = round(
-            somar_horas_professor(folhadehoje, aulas.professor, aulas.departamento, aulas.nome), 2)
+            somar_horas_professor(folhadehoje, aulas.professor, aulas.departamento, aulas.nome, compet), 2)
         dictchav = list(somaaulas.keys())
         dictchav.sort()
         somafinal = {i: somaaulas[i] for i in dictchav}
-
-    plan = l_w('../src/models/static/files/Somafinal.xlsx', read_only=False)
+    arquivo = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Somafinal.xlsx')
+    plan = l_w(arquivo, read_only=False)
     folha = plan['Planilha1']
     folha['A1'].value = 'Matrícula'
     folha['B1'].value = 'Nome'
@@ -1329,13 +1352,13 @@ def salvar_planilha_soma_final():
                     x += 1
     # folha['F1'].value = 'Total Bruto - Professores'
     # folha['G1'].value = locale.currency(totaldafolha(folhadehoje), grouping=True)
-    plan.save(f'Somafinal mes {data}.xlsx')
-    salvar_planilha_grade_horaria(somafinal, data)
+    plan.save(f'Somafinal mes {compet}.xlsx')
+    salvar_planilha_grade_horaria(somafinal, compet)
     substitutos = {}
     complementares = {}
     feriasl = {}
     desligadosl = {}
-    planilha = l_w(f'Grade {data}-2023.xlsx')
+    planilha = l_w(f'Grade {compet}-2023.xlsx')
     aba = planilha['Planilha1']
     for row in aba.iter_cols(min_row=3, min_col=3, max_row=115, max_col=35):
         for cell in row:
@@ -1392,7 +1415,7 @@ def salvar_planilha_soma_final():
                     hrs += aba.cell(column=m, row=cell.row).value
                 complementares[aba.cell(column=2, row=cell.row).value] = {depart: round(hrs, 2)}
 
-    planilha2 = l_w(f'Somafinal mes {data}.xlsx', read_only=False)
+    planilha2 = l_w(f'Somafinal mes {compet}.xlsx', read_only=False)
     aba2 = planilha2['Planilha1']
     for pessoa in feriasl:
         for depart in feriasl[pessoa]:
@@ -1429,7 +1452,11 @@ def salvar_planilha_soma_final():
                 pass
         adjusted_width = max_length + 1
         aba2.column_dimensions[column].width = adjusted_width
-    planilha2.save(f'Somafinal mes {data}.xlsx')
+    planilha2.save(f'Somafinal mes {compet}.xlsx')
+    tkinter.messagebox.showinfo(
+        title='Grade ok!',
+        message=f'Grade do mês {compet} salva com sucesso!'
+    )
     print('Férias \n', feriasl)
     print('Desligados \n', desligadosl)
     print('Substitutos \n', substitutos)

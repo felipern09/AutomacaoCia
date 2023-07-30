@@ -7,8 +7,7 @@
     <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/controler/funcoes.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/funcoes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/modelsfolha.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/modelsfolha.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/view/gerar_lancar_folha.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/gerar_lancar_folha.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -33,14 +32,14 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_ADD_EXTERNAL_FILES": "true",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "last_opened_file_path": "C:/Users/Felipe/PycharmProjects/AutomacaoCia/src/models/static/files"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Felipe/PycharmProjects/AutomacaoCia/src/models/static/files&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Felipe\PycharmProjects\AutomacaoCia\Lanca folha" />
@@ -54,7 +53,7 @@
       <recent name="C:\Users\Felipe\PycharmProjects\PersonalTrainer" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.solicitar_pagamento">
+  <component name="RunManager" selected="Python.gerar_lancar_folha (1)">
     <configuration name="admissao_e_desligamento (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -76,7 +75,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="admissao_e_desligamento" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="gerar_lancar_folha (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -88,28 +87,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="C:\Users\Felipe\PycharmProjects\AutomacaoCia\src\view\admissao_e_desligamento.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="contatos_diversos" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="AutomacaoCia" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/view" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/view/contatos_diversos.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/view/gerar_lancar_folha.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -183,11 +161,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.gerar_lancar_folha (1)" />
         <item itemvalue="Python.solicitar_pagamento" />
         <item itemvalue="Python.admissao_e_desligamento (1)" />
         <item itemvalue="Python.uniformes" />
         <item itemvalue="Python.gerar_lancar_folha" />
-        <item itemvalue="Python.contatos_diversos" />
       </list>
     </recent_temporary>
   </component>
