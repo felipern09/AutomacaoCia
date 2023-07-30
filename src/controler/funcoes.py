@@ -1,34 +1,32 @@
 from datetime import datetime as dt, timedelta as td
 from dateutil.relativedelta import relativedelta
-from datetime import datetime
+from difflib import SequenceMatcher
 import docx
 from docx.shared import Pt, Cm
 import docx2pdf
 from docx2pdf import convert
-from difflib import SequenceMatcher
+from email import encoders
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.base import MIMEBase
-from email import encoders
 import holidays
 import locale
 import numpy as np
 import num2words as nw
-from openpyxl.styles import PatternFill, Font
-import openpyxl.utils.cell
 from openpyxl import load_workbook as l_w
-from openpyxl.styles import NamedStyle
+from openpyxl.styles import PatternFill, Font, NamedStyle
+import openpyxl.utils.cell
 import os
 import pandas as pd
 import pyautogui as pa
 import pyperclip as pp
 from PIL import ImageGrab
-from src.models.modelsfolha import Aula, Folha
+from src.models.modelsfolha import Aula, Folha, Aulas, Faltas, Ferias, Hrcomplement, Atestado, Desligados, \
+    Escala, Substituicao, enginefolha
 from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
 from src.models.listas import municipios
-from src.models.modelsfolha import Aulas, Faltas, Ferias, Hrcomplement, Atestado, Desligados, Escala, Substituicao, engine
 import smtplib
 from src.models.dados_servd import em_rem, em_ti, em_if, k1, host, port
 import tkinter.filedialog
@@ -41,10 +39,8 @@ import win32com.client as client
 
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-Sessions = sessionmaker(bind=engine)
-session = Sessions()
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
-data = int(input('Digite o mes da competência: '))
+data = 7
 
 atestado = PatternFill(start_color='A9D08E',
                       end_color='A9D08E',
@@ -262,6 +258,8 @@ def somar_aulas_da_grade(diasem, inic, fim, competencia, iniciograd, fimgrad):
 
 
 def listar_aulas_ativas():
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
     aulasativasdb = session.query(Aulas).filter_by(status='Ativa').all()
     aula = []
     for i, a in enumerate(aulasativasdb):
@@ -272,6 +270,8 @@ def listar_aulas_ativas():
 
 
 def listar_departamentos_ativos():
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
     aulasativasdb = session.query(Aulas).filter_by(status='Ativa').all()
     departamentos = []
     for i, a in enumerate(aulasativasdb):
@@ -281,6 +281,8 @@ def listar_departamentos_ativos():
 
 
 def listar_professores_ativos():
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
     aulasativasdb = session.query(Aulas).filter_by(status='Ativa').all()
     professores = []
     for i, a in enumerate(aulasativasdb):
@@ -306,7 +308,7 @@ def somar_horas_professor(folha, prof, depto, nome):
 
 
 def consultar_faltas(comp):
-    sessions = sessionmaker(bind=engine)
+    sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     falt = session.query(Faltas).all()
     inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
@@ -325,7 +327,7 @@ def consultar_faltas(comp):
 
 
 def consultar_ferias(comp):
-    sessions = sessionmaker(bind=engine)
+    sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     fer = session.query(Ferias).all()
     inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
@@ -344,7 +346,7 @@ def consultar_ferias(comp):
 
 
 def consultar_atestados(comp):
-    sessions = sessionmaker(bind=engine)
+    sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     ates = session.query(Atestado).all()
     inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
@@ -376,7 +378,7 @@ def listar_feriados(comp):
 
 
 def consultar_substituicoes(comp):
-    sessions = sessionmaker(bind=engine)
+    sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     subst = session.query(Substituicao).all()
     inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
@@ -395,7 +397,7 @@ def consultar_substituicoes(comp):
 
 
 def consultar_desligamentos(comp):
-    sessions = sessionmaker(bind=engine)
+    sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     desl = session.query(Desligados).all()
     inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
@@ -414,7 +416,7 @@ def consultar_desligamentos(comp):
 
 
 def consultar_escalas(comp):
-    sessions = sessionmaker(bind=engine)
+    sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     esc = session.query(Escala).all()
     inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
@@ -433,7 +435,7 @@ def consultar_escalas(comp):
 
 
 def consultar_horas_complementares(comp):
-    sessions = sessionmaker(bind=engine)
+    sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     hrsc = session.query(Hrcomplement).all()
     inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
@@ -1193,6 +1195,8 @@ def salvar_planilha_grade_horaria(dic, comp):
 
 
 def somar_aulas_de_segunda(nome, depto):
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
     aulasseg = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Segunda') \
         .filter_by(departamento=depto).all()
     somas = 0
@@ -1205,6 +1209,8 @@ def somar_aulas_de_segunda(nome, depto):
 
 
 def somar_aulas_de_terca(nome, depto):
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
     aulaster = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Terça') \
         .filter_by(departamento=depto).all()
     somas = 0
@@ -1217,6 +1223,8 @@ def somar_aulas_de_terca(nome, depto):
 
 
 def somar_aulas_de_quarta(nome, depto):
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
     aulasqua = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Quarta') \
         .filter_by(departamento=depto).all()
     somas = 0
@@ -1229,6 +1237,8 @@ def somar_aulas_de_quarta(nome, depto):
 
 
 def somar_aulas_de_quinta(nome, depto):
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
     aulasqui = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Quinta') \
         .filter_by(departamento=depto).all()
     somas = 0
@@ -1241,6 +1251,8 @@ def somar_aulas_de_quinta(nome, depto):
 
 
 def somar_aulas_de_sexta(nome, depto):
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
     aulassex = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Sexta') \
         .filter_by(departamento=depto).all()
     somas = 0
@@ -1253,6 +1265,8 @@ def somar_aulas_de_sexta(nome, depto):
 
 
 def somar_aulas_de_sabado(nome, depto):
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
     aulassab = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Sábado') \
         .filter_by(departamento=depto).all()
     somas = 0
@@ -1265,6 +1279,8 @@ def somar_aulas_de_sabado(nome, depto):
 
 
 def somar_aulas_de_domingo(nome, depto):
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
     aulasdom = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Domingo') \
         .filter_by(departamento=depto).all()
     somas = 0
@@ -1277,6 +1293,8 @@ def somar_aulas_de_domingo(nome, depto):
 
 
 def salvar_planilha_soma_final():
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
     folhadehoje = Folha(data, list(listar_aulas_ativas()), listar_departamentos_ativos())
     somaaulas = {}
     for i in listar_professores_ativos():
@@ -1509,7 +1527,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         pa.press('tab', 6)
                     else:
                         pa.press('tab', 5)
-                    pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
+                    pa.write(dt.strftime(dt.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
                     t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
                     t.sleep(1), pa.write(pessoa.uf_nas), pa.press('tab'), pa.write(pessoa.cod_municipionas), pa.press(
                         'tab')
@@ -1525,7 +1543,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         'tab'), pa.write(
                         pessoa.sec_eleit), pa.press('tab'), pa.write(pessoa.ctps)
                     pa.press('tab'), pa.write(pessoa.serie_ctps), pa.press('tab'), pa.write(pessoa.uf_ctps), pa.press(
-                        'tab'), pa.write(datetime.strftime(datetime.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
+                        'tab'), pa.write(dt.strftime(dt.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
                                                            '%d%m%Y'))
                     pa.press('tab', 5), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
                     pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press('tab')
@@ -1698,7 +1716,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         pa.press('tab', 6)
                     else:
                         pa.press('tab', 5)
-                    pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
+                    pa.write(dt.strftime(dt.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
                     t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
                     t.sleep(1), pa.write(pessoa.uf_nas), pa.press('tab'), pa.write(pessoa.cod_municipionas), pa.press(
                         'tab')
@@ -1714,7 +1732,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         'tab'), pa.write(
                         pessoa.sec_eleit), pa.press('tab'), pa.write(pessoa.ctps)
                     pa.press('tab'), pa.write(pessoa.serie_ctps), pa.press('tab'), pa.write(pessoa.uf_ctps), pa.press(
-                        'tab'), pa.write(datetime.strftime(datetime.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
+                        'tab'), pa.write(dt.strftime(dt.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
                                                            '%d%m%Y'))
                     pa.press('tab', 5), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
                     pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press('tab')
@@ -1844,7 +1862,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         pa.press('tab', 6)
                     else:
                         pa.press('tab', 5)
-                    pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
+                    pa.write(dt.strftime(dt.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
                     pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
                     pa.write(pessoa.uf_nas), pa.press('tab'), pa.write(pessoa.cod_municipionas), pa.press('tab')
                     pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press('tab')
@@ -1858,7 +1876,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         'tab'), pa.write(
                         pessoa.sec_eleit), pa.press('tab'), pa.write(pessoa.ctps)
                     pa.press('tab'), pa.write(pessoa.serie_ctps), pa.press('tab'), pa.write(pessoa.uf_ctps), pa.press(
-                        'tab'), pa.write(datetime.strftime(datetime.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
+                        'tab'), pa.write(dt.strftime(dt.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
                                                            '%d%m%Y'))
                     pa.press('tab', 5), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
                     pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press('tab')
@@ -1964,7 +1982,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                             pa.press('tab', 6)
                         else:
                             pa.press('tab', 5)
-                        pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
+                        pa.write(dt.strftime(dt.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
                         t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
                         t.sleep(1), pa.write(pessoa.uf_nas), pa.press('tab'), pa.write(
                             pessoa.cod_municipionas), pa.press('tab')
@@ -1982,7 +2000,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         pa.press('tab'), pa.write(pessoa.serie_ctps), pa.press('tab'), pa.write(
                             pessoa.uf_ctps), pa.press(
                             'tab'), pa.write(
-                            datetime.strftime(datetime.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
+                            dt.strftime(dt.strptime(pessoa.emiss_ctps, '%Y-%m-%d %H:%M:%S'),
                                               '%d%m%Y'))
                         pa.press('tab', 5), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
                         pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press(
@@ -2269,7 +2287,7 @@ def salvar_docs_funcionarios(matricula):
     fch_c.paragraphs[11].text = str(fch_c.paragraphs[11].text).replace('#local', pessoa.endereco)\
         .replace('#qd', pessoa.bairro)
     fch_c.paragraphs[10].text = str(fch_c.paragraphs[10].text)\
-        .replace('#nasc', datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y'))\
+        .replace('#nasc', dt.strftime(dt.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y'))\
         .replace('#gen', pessoa.genero).replace('#est_civ', str(pessoa.estado_civil).replace('1 - ', '')
                                                 .replace('2 - ', '').replace('3 - ', '').replace('4 - ', ''))
     fch_c.save(p_contr + '\\Ficha Cadastral.docx')
@@ -2381,7 +2399,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
     pa.FAILSAFE = False
     salario = 5.10
     if solicitar_contr == 1:
-        hoje = datetime.today()
+        hoje = dt.today()
         wb = l_w(caminho)
         sh = wb['Respostas ao formulário 1']
         num, name = nome.strip().split(' - ')
@@ -2481,7 +2499,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
             solicitacao.tables[0].rows[14].cells[0].paragraphs[0].text).replace('#nome_completo', cadastro['nome'])
         solicitacao.tables[0].rows[15].cells[0].paragraphs[0].text = str(
             solicitacao.tables[0].rows[15].cells[0].paragraphs[0].text).replace('#nasc',
-                                                                                datetime.strftime(cadastro['nasc_ed'],
+                                                                                dt.strftime(cadastro['nasc_ed'],
                                                                                                   '%d/%m/%Y')
                                                                                 ).replace('#rg',
                                                                                           cadastro['rg']).replace(
@@ -2514,7 +2532,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
             ficha_cadastral.tables[1].rows[0].cells[0].paragraphs[0].text).replace('#nome_completo', cadastro['nome'])
         ficha_cadastral.tables[1].rows[1].cells[0].paragraphs[0].text = str(
             ficha_cadastral.tables[1].rows[1].cells[0].paragraphs[0].text)\
-            .replace('#nasc', datetime.strftime(cadastro['nasc_ed'], '%d/%m/%Y'))
+            .replace('#nasc', dt.strftime(cadastro['nasc_ed'], '%d/%m/%Y'))
         ficha_cadastral.tables[1].rows[1].cells[2].paragraphs[0].text = str(
             ficha_cadastral.tables[1].rows[1].cells[2].paragraphs[0].text).replace('#gen', cadastro['genero'])
         ficha_cadastral.tables[1].rows[1].cells[4].paragraphs[0].text = str(
@@ -2551,7 +2569,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                                                                                        ).replace('#rg', cadastro['rg']
                                                                                                  ).replace(
             '#cpf', cadastro['cpf']).replace('#endereço', cadastro['end']).replace('#cep', cadastro['cep']).replace(
-            '#bairro', cadastro['bairro']).replace('#desde#', datetime.strftime(hoje, '%d/%m/%Y'))
+            '#bairro', cadastro['bairro']).replace('#desde#', dt.strftime(hoje, '%d/%m/%Y'))
         carta_banco.save(pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.docx')
         docx2pdf.convert(pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.docx',
                          pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.pdf')
@@ -2759,7 +2777,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 else:
                     pa.write('1')
                     pa.press('tab', 5)
-                pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
+                pa.write(dt.strftime(dt.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
                 t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
                 t.sleep(1), pa.write(pessoa.uf), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press('tab')
                 t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press(
@@ -2954,7 +2972,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 else:
                     pa.write('1')
                     pa.press('tab', 5)
-                pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
+                pa.write(dt.strftime(dt.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
                 t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
                 t.sleep(1), pa.write(pessoa.uf), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press('tab')
                 t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press(
@@ -3171,7 +3189,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 else:
                     pa.write('1')
                     pa.press('tab', 5)
-                pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
+                pa.write(dt.strftime(dt.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
                 t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
                 t.sleep(1), pa.write(pessoa.uf), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press('tab')
                 t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press(
@@ -3287,7 +3305,7 @@ def cadastrar_autonomo(caminhoaut, nomeaut, matriculaaut, admissaoaut, cargoaut,
     else:
         pa.write('1')
         pa.press('tab', 5)
-    pa.write(datetime.strftime(datetime.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
+    pa.write(dt.strftime(dt.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
     t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v')
     # # clique em documentos
     pa.click(pa.center(pa.locateOnScreen('./static/Documentos.png')))
@@ -3505,8 +3523,8 @@ def gerar_excel_from_ponto_secullum() -> None:
     :return: one .xlsx file per employee
     """
     locale.setlocale(locale.LC_ALL, 'pt_pt.UTF-8')
-    data_inicial = datetime.strptime('01/10/2022', '%d/%m/%Y')
-    data_final = datetime.strptime('13/11/2022', '%d/%m/%Y')
+    data_inicial = dt.strptime('01/10/2022', '%d/%m/%Y')
+    data_final = dt.strptime('13/11/2022', '%d/%m/%Y')
 
     # Ler planilha geral
     geral = pd.read_excel('../Ponto/xls/zzPonto Geral.xls')
@@ -3537,29 +3555,29 @@ def gerar_excel_from_ponto_secullum() -> None:
             for cell in row:
                 if cell.value == f'{geral[0][linha]}':
                     if ws.cell(row=cell.row, column=5).value is None:
-                        ent1 = datetime.strptime('00:00:00', '%H:%M:%S')
+                        ent1 = dt.strptime('00:00:00', '%H:%M:%S')
                     else:
-                        ent1 = datetime.strptime(str(ws.cell(row=cell.row, column=5).value), '%H:%M:%S')
+                        ent1 = dt.strptime(str(ws.cell(row=cell.row, column=5).value), '%H:%M:%S')
                     if ws.cell(row=cell.row, column=6).value is None:
-                        sai1 = datetime.strptime('00:00:00', '%H:%M:%S')
+                        sai1 = dt.strptime('00:00:00', '%H:%M:%S')
                     else:
-                        sai1 = datetime.strptime(str(ws.cell(row=cell.row, column=6).value), '%H:%M:%S')
+                        sai1 = dt.strptime(str(ws.cell(row=cell.row, column=6).value), '%H:%M:%S')
                     if ws.cell(row=cell.row, column=7).value is None:
-                        ent2 = datetime.strptime('00:00:00', '%H:%M:%S')
+                        ent2 = dt.strptime('00:00:00', '%H:%M:%S')
                     else:
-                        ent2 = datetime.strptime(str(ws.cell(row=cell.row, column=7).value), '%H:%M:%S')
+                        ent2 = dt.strptime(str(ws.cell(row=cell.row, column=7).value), '%H:%M:%S')
                     if ws.cell(row=cell.row, column=8).value is None:
-                        sai2 = datetime.strptime('00:00:00', '%H:%M:%S')
+                        sai2 = dt.strptime('00:00:00', '%H:%M:%S')
                     else:
-                        sai2 = datetime.strptime(str(ws.cell(row=cell.row, column=8).value), '%H:%M:%S')
+                        sai2 = dt.strptime(str(ws.cell(row=cell.row, column=8).value), '%H:%M:%S')
                     if ws.cell(row=cell.row, column=9).value is None:
-                        ent3 = datetime.strptime('00:00:00', '%H:%M:%S')
+                        ent3 = dt.strptime('00:00:00', '%H:%M:%S')
                     else:
-                        ent3 = datetime.strptime(str(ws.cell(row=cell.row, column=9).value), '%H:%M:%S')
+                        ent3 = dt.strptime(str(ws.cell(row=cell.row, column=9).value), '%H:%M:%S')
                     if ws.cell(row=cell.row, column=10).value is None:
-                        sai3 = datetime.strptime('00:00:00', '%H:%M:%S')
+                        sai3 = dt.strptime('00:00:00', '%H:%M:%S')
                     else:
-                        sai3 = datetime.strptime(str(ws.cell(row=cell.row, column=10).value), '%H:%M:%S')
+                        sai3 = dt.strptime(str(ws.cell(row=cell.row, column=10).value), '%H:%M:%S')
         # relacionar dia da semana
         entradacerta = td(hours=ent1.hour, minutes=ent1.minute, seconds=ent1.second)
         saidacerta = td(hours=sai1.hour, minutes=sai1.minute, seconds=sai1.second)
@@ -3589,12 +3607,11 @@ def gerar_excel_from_ponto_secullum() -> None:
         dif = dif.loc[(dif['DifEntr'] >= regra) | (dif['DifEntr'] + dif['DifSaida'] >= regra)]
         dif = dif.astype(str)
         dif['DifEntr'] = dif['DifEntr'].map(
-            lambda x: datetime
-            .strftime(datetime.strptime(str(x).replace('0 days ', '').replace('NaT', '00:00:00'), '%H:%M:%S'),
+            lambda x: dt.strftime(dt.strptime(str(x).replace('0 days ', '').replace('NaT', '00:00:00'), '%H:%M:%S'),
                       '%H hora(s) e %M minutos')
         )
         dif['DifSaida'] = dif['DifSaida'].map(
-            lambda x: datetime.strftime(datetime.strptime(str(x).replace('0 days ', '').replace('NaT', '00:00:00'),
+            lambda x: dt.strftime(dt.strptime(str(x).replace('0 days ', '').replace('NaT', '00:00:00'),
                                                           '%H:%M:%S'), '%H hora(s) e %M minutos')
         )
         dif['DifEntr'] = dif['DifEntr'].map(
@@ -3618,10 +3635,10 @@ def gerar_excel_from_ponto_secullum() -> None:
         plan = plan[plan.Entrada1 != '-']
         plan = plan.rename(columns={'Entrada1': 'Entrada 1'})
         plan = plan.astype(str)
-        plan['Dia'] = plan['Dia'].map(lambda x: datetime.strptime(x, '%d/%m/%y - %a'))
+        plan['Dia'] = plan['Dia'].map(lambda x: dt.strptime(x, '%d/%m/%y - %a'))
         plan = plan[plan.Dia >= data_inicial]
         plan = plan[plan.Dia <= data_final]
-        plan['Dia'] = plan['Dia'].map(lambda x: datetime.strftime(x, '%d/%m/%y - %a'))
+        plan['Dia'] = plan['Dia'].map(lambda x: dt.strftime(x, '%d/%m/%y - %a'))
         plan = plan.rename(columns={'Dia': 'Data'})
         plan = plan.set_index(['Data'])
         plan = plan.to_excel(f'../Ponto/xls/{geral[0][linha]}.xlsx')
@@ -4413,7 +4430,7 @@ def gerar_recibo_uniformes(local, nome, cargo, cpf, genero, tamanho1, tamanho2='
     estoque = relatorio['Estoque']
     entregues = relatorio['Entregues']
     lista = relatorio['Nomes']
-    hoje = datetime.today()
+    hoje = dt.today()
     tipo, gen = genero.split(': ')
     num, pess = nome.split(' - ')
     label, cpf_ed = cpf.split(': ')
@@ -4425,7 +4442,7 @@ def gerar_recibo_uniformes(local, nome, cargo, cpf, genero, tamanho1, tamanho2='
             .replace('#nome', pessoa).replace('#num_cpf', cpf_ed).replace('#tam', tamanho1+' e '+tamanho2).replace(
             '#genero', str(gen).lower())
         recibo.paragraphs[19].text = str(recibo.paragraphs[19].text)\
-            .replace('#data', datetime.strftime(hoje, '%d/%m/%Y'))
+            .replace('#data', dt.strftime(hoje, '%d/%m/%Y'))
         recibo.paragraphs[24].text = str(recibo.paragraphs[24].text).replace('#nome', pessoa)
         recibo.paragraphs[25].text = str(recibo.paragraphs[25].text).replace('#cargo', cargo)
         recibo.save(f'Recibo_alterado {pessoa}.docx')
@@ -4491,7 +4508,7 @@ def gerar_recibo_uniformes(local, nome, cargo, cpf, genero, tamanho1, tamanho2='
             .replace('#nome', pessoa).replace('#num_cpf', cpf_ed)\
             .replace('#tam', tamanho1).replace('#genero', str(gen).lower())
         recibo.paragraphs[19].text = str(recibo.paragraphs[19].text)\
-            .replace('#data', datetime.strftime(hoje, '%d/%m/%Y'))
+            .replace('#data', dt.strftime(hoje, '%d/%m/%Y'))
         recibo.paragraphs[24].text = str(recibo.paragraphs[24].text).replace('#nome', pessoa)
         recibo.paragraphs[25].text = str(recibo.paragraphs[25].text).replace('#cargo', cargo)
         recibo.save(f'Recibo_alterado {pessoa}.docx')

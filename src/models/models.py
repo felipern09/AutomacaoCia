@@ -2,8 +2,10 @@ from sqlalchemy import create_engine
 from sqlalchemy import MetaData
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, Float, String
+import os
+arq = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\colaboradores.db')
 
-engine = create_engine("sqlite+pysqlite:///.\\src\\models\\colaboradores.db", echo=True, future=True)
+engine = create_engine('sqlite+pysqlite:///' + arq, echo=True, future=True)
 metadata_obj = MetaData()
 Base = declarative_base()
 

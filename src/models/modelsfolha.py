@@ -3,8 +3,10 @@ from sqlalchemy import MetaData
 from sqlalchemy.orm import declarative_base
 from sqlalchemy import Column, Integer, String
 from datetime import datetime as dt
+import os
+arqf = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\aulas.db')
 
-engine = create_engine("sqlite+pysqlite:///..\\src\\models\\aulas.db", echo=True, future=True)
+enginefolha = create_engine('sqlite+pysqlite:///' + arqf, echo=True, future=True)
 metadata_obj = MetaData()
 Base = declarative_base()
 
@@ -97,7 +99,7 @@ class Hrcomplement(Base):
     data = Column(String, nullable=False)
 
 
-Base.metadata.create_all(engine)
+Base.metadata.create_all(enginefolha)
 
 
 class Folha:
