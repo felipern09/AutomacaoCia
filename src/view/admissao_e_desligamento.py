@@ -2,10 +2,10 @@ import tkinter as tk
 from tkcalendar import DateEntry
 from datetime import datetime
 import tkinter.filedialog
-from ..controler.funcoes import cadastro_funcionario, salvar_docs_funcionarios, enviar_emails_funcionario, \
+from src.controler.funcoes import cadastro_funcionario, salvar_docs_funcionarios, enviar_emails_funcionario, \
     cadastro_estagiario, cadastrar_autonomo, validar_pis, desligar_pessoa
 from openpyxl import load_workbook as l_w
-from ..models.listas import horarios, cargos, departamentos, tipodecontrato
+from src.models.listas import horarios, cargos, departamentos, tipodecontrato
 import tkinter.filedialog
 from tkinter import ttk
 from tkinter import *

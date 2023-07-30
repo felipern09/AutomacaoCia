@@ -1,36 +1,43 @@
 from datetime import datetime as dt, timedelta as td
 from dateutil.relativedelta import relativedelta
-from src.models.modelsfolha import Aulas, Faltas, Ferias, Hrcomplement, Atestado, Desligados, Escala, Substituicao, engine
-from openpyxl.styles import PatternFill, Font
-import pandas as pd
-import openpyxl.utils.cell
-import holidays
-import locale
-from src.models.modelsfolha import Aula, Folha
-import urllib
-from urllib import parse
 from datetime import datetime
-import tkinter.filedialog
-import pyautogui as pa
-import pyperclip as pp
-import time as t
-from src.models.models import Colaborador, engine
-from sqlalchemy.orm import sessionmaker
-from openpyxl import load_workbook as l_w
-from src.models.listas import municipios
-import os
-import tkinter.filedialog
-from tkinter import messagebox
 import docx
+from docx.shared import Pt, Cm
 import docx2pdf
-import smtplib
+from docx2pdf import convert
+from difflib import SequenceMatcher
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.base import MIMEBase
 from email import encoders
+import holidays
+import locale
+import numpy as np
+import num2words as nw
+from openpyxl.styles import PatternFill, Font
+import openpyxl.utils.cell
+from openpyxl import load_workbook as l_w
+from openpyxl.styles import NamedStyle
+import os
+import pandas as pd
+import pyautogui as pa
+import pyperclip as pp
+from PIL import ImageGrab
+from src.models.modelsfolha import Aula, Folha
+from src.models.models import Colaborador, engine
+from sqlalchemy.orm import sessionmaker
+from src.models.listas import municipios
+from src.models.modelsfolha import Aulas, Faltas, Ferias, Hrcomplement, Atestado, Desligados, Escala, Substituicao, engine
+import smtplib
 from src.models.dados_servd import em_rem, em_ti, em_if, k1, host, port
-from difflib import SequenceMatcher
+import tkinter.filedialog
+from tkinter import messagebox
+import tkinter.filedialog
+import time as t
+import urllib
+from urllib import parse
+import win32com.client as client
 
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -38,8 +45,6 @@ Sessions = sessionmaker(bind=engine)
 session = Sessions()
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
 data = int(input('Digite o mes da competência: '))
-
-
 
 atestado = PatternFill(start_color='A9D08E',
                       end_color='A9D08E',
@@ -3491,3 +3496,1314 @@ def emitir_contracheque():
         pa.write(de), pa.press('tab'), pa.write(ate), pa.click(-787, 731), t.sleep(4)
         pa.hotkey('ctrl', 's'), pa.write(caminho), t.sleep(0.5), pa.press('enter'), t.sleep(0.5), pa.click(-33, 132)
         x += 1
+
+
+def gerar_excel_from_ponto_secullum() -> None:
+    """
+    This function generates excel files from data extracted from external aplication.
+    Its generetaes one excel file per employee with schedules information.
+    :return: one .xlsx file per employee
+    """
+    locale.setlocale(locale.LC_ALL, 'pt_pt.UTF-8')
+    data_inicial = datetime.strptime('01/10/2022', '%d/%m/%Y')
+    data_final = datetime.strptime('13/11/2022', '%d/%m/%Y')
+
+    # Ler planilha geral
+    geral = pd.read_excel('../Ponto/xls/zzPonto Geral.xls')
+    geral = geral.rename(
+        columns={'CARTÃO PONTO': 'Dia', 'Unnamed: 1': 0, 'Unnamed: 2': 1, 'Unnamed: 3': 2, 'Unnamed: 4': 3,
+                 'Unnamed: 5': 4,
+                 'Unnamed: 6': 5})
+    geral = geral.drop(['Unnamed: 7', 'Unnamed: 8'], axis=1)
+    geral = geral[geral.Dia.notnull()]
+
+    # Pegar index onde aparece 'Nome'
+    linhasNomes = geral.index[geral['Dia'].str.contains('Nome')]
+
+    # salvar plan com nome do funcionário pasta ponto (dentro da pasta automação)
+    for linha in linhasNomes:
+        geral = geral.rename(
+            columns={'CARTÃO PONTO': 'Dia', 'Unnamed: 1': 0, 'Unnamed: 2': 1, 'Unnamed: 3': 2, 'Unnamed: 4': 3,
+                     'Unnamed: 5': 4, 'Unnamed: 6': 5})
+        geral = geral[geral.Dia.notnull()]
+        geral = geral[geral['Dia'].str.contains(' - ') | geral['Dia'].str.contains('Nome')]
+        geral2 = geral.loc[linha:(linha + (linhasNomes[1] - linhasNomes[0] - 1))] \
+            .to_excel(f'../Ponto/xls/{geral[0][linha]}.xlsx')
+
+        # Verifica a hora certa na planilha zzBase.xlsx
+        wb = l_w(f'../Ponto/xls/zzBase.xlsx')
+        ws = wb.active
+        for row in ws.rows:
+            for cell in row:
+                if cell.value == f'{geral[0][linha]}':
+                    if ws.cell(row=cell.row, column=5).value is None:
+                        ent1 = datetime.strptime('00:00:00', '%H:%M:%S')
+                    else:
+                        ent1 = datetime.strptime(str(ws.cell(row=cell.row, column=5).value), '%H:%M:%S')
+                    if ws.cell(row=cell.row, column=6).value is None:
+                        sai1 = datetime.strptime('00:00:00', '%H:%M:%S')
+                    else:
+                        sai1 = datetime.strptime(str(ws.cell(row=cell.row, column=6).value), '%H:%M:%S')
+                    if ws.cell(row=cell.row, column=7).value is None:
+                        ent2 = datetime.strptime('00:00:00', '%H:%M:%S')
+                    else:
+                        ent2 = datetime.strptime(str(ws.cell(row=cell.row, column=7).value), '%H:%M:%S')
+                    if ws.cell(row=cell.row, column=8).value is None:
+                        sai2 = datetime.strptime('00:00:00', '%H:%M:%S')
+                    else:
+                        sai2 = datetime.strptime(str(ws.cell(row=cell.row, column=8).value), '%H:%M:%S')
+                    if ws.cell(row=cell.row, column=9).value is None:
+                        ent3 = datetime.strptime('00:00:00', '%H:%M:%S')
+                    else:
+                        ent3 = datetime.strptime(str(ws.cell(row=cell.row, column=9).value), '%H:%M:%S')
+                    if ws.cell(row=cell.row, column=10).value is None:
+                        sai3 = datetime.strptime('00:00:00', '%H:%M:%S')
+                    else:
+                        sai3 = datetime.strptime(str(ws.cell(row=cell.row, column=10).value), '%H:%M:%S')
+        # relacionar dia da semana
+        entradacerta = td(hours=ent1.hour, minutes=ent1.minute, seconds=ent1.second)
+        saidacerta = td(hours=sai1.hour, minutes=sai1.minute, seconds=sai1.second)
+        entradacerta2 = td(hours=ent2.hour, minutes=ent2.minute, seconds=ent2.second)
+        saidacerta2 = td(hours=sai2.hour, minutes=sai2.minute, seconds=sai2.second)
+        entradacerta3 = td(hours=ent3.hour, minutes=ent3.minute, seconds=ent3.second)
+        saidacerta3 = td(hours=sai3.hour, minutes=sai3.minute, seconds=sai3.second)
+        regra = td(hours=0, minutes=10, seconds=0)
+
+        # Salvar planilha adicionando colunas de diferenças
+        plan = pd.read_excel(f'../Ponto/xls/{geral[0][linha]}.xlsx')
+        plan = plan[plan['Dia'].str.contains(' - ')]
+        plan = plan.drop(['Unnamed: 0'], axis=1)
+        plan = plan.rename(columns={'Dia': 'Data'})
+        plan[0] = pd.to_timedelta(plan[0].astype(str))
+        plan[1] = pd.to_timedelta(plan[1].astype(str))
+        plan[2] = pd.to_timedelta(plan[2].astype(str))
+        plan[3] = pd.to_timedelta(plan[3].astype(str))
+        plan[4] = pd.to_timedelta(plan[4].astype(str))
+        plan[5] = pd.to_timedelta(plan[5].astype(str))
+        plan['Entradacerta'] = entradacerta
+        plan['Saídacerta'] = saidacerta
+        plan['DifEntr'] = abs(plan[0] - plan['Entradacerta'])
+        plan['DifSaida'] = abs(plan[1] - plan['Saídacerta'])
+        dif = plan
+        dif = dif[['Data', 'DifEntr', 'DifSaida']]
+        dif = dif.loc[(dif['DifEntr'] >= regra) | (dif['DifEntr'] + dif['DifSaida'] >= regra)]
+        dif = dif.astype(str)
+        dif['DifEntr'] = dif['DifEntr'].map(
+            lambda x: datetime
+            .strftime(datetime.strptime(str(x).replace('0 days ', '').replace('NaT', '00:00:00'), '%H:%M:%S'),
+                      '%H hora(s) e %M minutos')
+        )
+        dif['DifSaida'] = dif['DifSaida'].map(
+            lambda x: datetime.strftime(datetime.strptime(str(x).replace('0 days ', '').replace('NaT', '00:00:00'),
+                                                          '%H:%M:%S'), '%H hora(s) e %M minutos')
+        )
+        dif['DifEntr'] = dif['DifEntr'].map(
+            lambda x: str(x).replace('00 hora(s) e 00 minutos', '-').replace('00 hora(s) e ', '')
+        )
+        dif['DifSaida'] = dif['DifSaida'].map(
+            lambda x: str(x).replace('00 hora(s) e 00 minutos', '-').replace('00 hora(s) e ', '')
+        )
+        plan = plan[['Data', 0, 1, 2, 3]]
+        plan = plan.merge(dif, on='Data', how='outer')
+        plan = plan.astype(str)
+        # plan = plan.fillna('-')
+        # plan['Data'] = plan['Data'].map(lambda x: x.rstrip('- qua qui sex sab ter seg sá dom'))
+        plan[0] = plan[0].map(lambda x: x.lstrip('0 days 00:'))
+        plan[1] = plan[1].map(lambda x: x.lstrip('0 days 00:'))
+        plan[2] = plan[2].map(lambda x: x.lstrip('0 days 00:'))
+        plan[3] = plan[3].map(lambda x: x.lstrip('0 days 00:'))
+        plan = plan.replace('NaT', '-').replace('nan', '-')
+        plan = plan.rename(columns={'Data': 'Dia', 0: 'Entrada1', 1: 'Saída 1', 2: 'Entrada 2', 3: 'Saída 2', 'DifEntr':
+            'Diferença Entrada', 'DifSaida': 'Diferença Saída 1'})
+        plan = plan[plan.Entrada1 != '-']
+        plan = plan.rename(columns={'Entrada1': 'Entrada 1'})
+        plan = plan.astype(str)
+        plan['Dia'] = plan['Dia'].map(lambda x: datetime.strptime(x, '%d/%m/%y - %a'))
+        plan = plan[plan.Dia >= data_inicial]
+        plan = plan[plan.Dia <= data_final]
+        plan['Dia'] = plan['Dia'].map(lambda x: datetime.strftime(x, '%d/%m/%y - %a'))
+        plan = plan.rename(columns={'Dia': 'Data'})
+        plan = plan.set_index(['Data'])
+        plan = plan.to_excel(f'../Ponto/xls/{geral[0][linha]}.xlsx')
+        func = l_w(f'../Ponto/xls/{geral[0][linha]}.xlsx', read_only=False)
+        sh = func['Sheet1']
+        sh.column_dimensions['A'].width = 15
+        sh.column_dimensions['F'].width = 22
+        sh.column_dimensions['G'].width = 22
+        sh.column_dimensions['H'].width = 22
+        sh.column_dimensions['I'].width = 22
+        sh.column_dimensions['J'].width = 22
+        sh.column_dimensions['K'].width = 22
+        func.save(f'../Ponto/xls/{geral[0][linha]}.xlsx')
+
+
+def gerar_relatorios_de_atrasos_estagiarios():
+    # Ler arquivo txt dos registror rejeitados
+    geral = pd.read_csv('Rejeitados.txt', sep=' ', header=None, encoding='iso8859-1')
+    geral = geral.rename(columns={0: 'matricula', 16: 'data', 17: 'dia', 18: 'hora'})
+    geral = geral[geral.dia != 'Batida']
+    geral = geral[geral.matricula < 9999]
+    mat = []
+    mat_unicas = []
+    for matricula in geral['matricula']:
+        mat.append(matricula)
+        mat_unicas = list(set(mat))
+    for matr in mat_unicas:
+        geral2 = geral[geral.matricula == matr]
+        geral2 = geral2.set_index('matricula')
+        geral2 = geral2.dropna(axis='columns')
+        geral2 = geral2.drop(geral2.iloc[:, [2, 3, 4, 5]], axis=1)
+        geral2['dia'] = pd.to_datetime(geral2['dia'], format='%d/%m/%Y')
+        geral2['dia'] = geral2['dia'].apply(lambda y: dt.strftime(y, '%d/%m/%Y'))
+        geral2['hora'] = geral2['hora'].apply(lambda x: f'{x}:00')
+        geral2['hora'] = pd.to_timedelta(geral2['hora'])
+        # geral2 = geral2.set_index('dia')
+        # geral2 = geral2.groupby('dia')
+        geral2.to_excel(f'../Ponto/xls/Ponto Estágio - {matr}.xlsx')
+        wb = l_w(f'../Ponto/xls/Ponto Estágio - {matr}.xlsx')
+        sh = wb['Sheet1']
+        sh['A1'].value = 'Matrícula'
+        sh['B1'].value = 'Data'
+        sh['C1'].value = 'Entrada 1'
+        sh['D1'].value = 'Saída 1'
+        sh['E1'].value = 'Entrada 2'
+        sh['F1'].value = 'Saída 2'
+        sh['G1'].value = 'Entrada 3'
+        sh['H1'].value = 'Saída 3'
+        x = 2
+        for row in sh:
+            if sh[f'B{x}'].value == sh[f'B{x - 1}'].value:
+                if sh[f'D{x - 1}'].value is None:
+                    sh[f'D{x - 1}'].value = sh[f'C{x}'].value
+                    sh.delete_rows(x, 1)
+                else:
+                    if sh[f'E{x - 1}'].value is None:
+                        sh[f'E{x - 1}'].value = sh[f'C{x}'].value
+                        sh.delete_rows(x, 1)
+                    else:
+                        if sh[f'F{x - 1}'].value is None:
+                            sh[f'F{x - 1}'].value = sh[f'C{x}'].value
+                            sh.delete_rows(x, 1)
+                        else:
+                            if sh[f'G{x - 1}'].value is None:
+                                sh[f'G{x - 1}'].value = sh[f'C{x}'].value
+                                sh.delete_rows(x, 1)
+                            else:
+                                if sh[f'H{x - 1}'].value is None:
+                                    sh[f'H{x - 1}'].value = sh[f'C{x}'].value
+                                    sh.delete_rows(x, 1)
+        for row in sh:
+            if sh[f'B{x}'].value == sh[f'B{x - 1}'].value:
+                if sh[f'D{x - 1}'].value is None:
+                    sh[f'D{x - 1}'].value = sh[f'C{x}'].value
+                    sh.delete_rows(x, 1)
+                else:
+                    if sh[f'E{x - 1}'].value is None:
+                        sh[f'E{x - 1}'].value = sh[f'C{x}'].value
+                        sh.delete_rows(x, 1)
+                    else:
+                        if sh[f'F{x - 1}'].value is None:
+                            sh[f'F{x - 1}'].value = sh[f'C{x}'].value
+                            sh.delete_rows(x, 1)
+                        else:
+                            if sh[f'G{x - 1}'].value is None:
+                                sh[f'G{x - 1}'].value = sh[f'C{x}'].value
+                                sh.delete_rows(x, 1)
+                            else:
+                                if sh[f'H{x - 1}'].value is None:
+                                    sh[f'H{x - 1}'].value = sh[f'C{x}'].value
+                                    sh.delete_rows(x, 1)
+            for row in sh:
+                if sh[f'B{x}'].value == sh[f'B{x - 1}'].value:
+                    if sh[f'D{x - 1}'].value is None:
+                        sh[f'D{x - 1}'].value = sh[f'C{x}'].value
+                        sh.delete_rows(x, 1)
+                    else:
+                        if sh[f'E{x - 1}'].value is None:
+                            sh[f'E{x - 1}'].value = sh[f'C{x}'].value
+                            sh.delete_rows(x, 1)
+                        else:
+                            if sh[f'F{x - 1}'].value is None:
+                                sh[f'F{x - 1}'].value = sh[f'C{x}'].value
+                                sh.delete_rows(x, 1)
+                            else:
+                                if sh[f'G{x - 1}'].value is None:
+                                    sh[f'G{x - 1}'].value = sh[f'C{x}'].value
+                                    sh.delete_rows(x, 1)
+                                else:
+                                    if sh[f'H{x - 1}'].value is None:
+                                        sh[f'H{x - 1}'].value = sh[f'C{x}'].value
+                                        sh.delete_rows(x, 1)
+            x += 1
+
+        estilo_data = NamedStyle(name='data', number_format='DD/MM/YYYY')
+        estilo_hora = NamedStyle(name='hora', number_format='HH:MM:SS')
+        for cell in sh['B']:
+            sh[f'B{int(cell.row)}'].style = estilo_data
+        for item in sh['C']:
+            sh[f'C{int(item.row)}'].style = estilo_hora
+        for item in sh['D']:
+            sh[f'D{int(item.row)}'].style = estilo_hora
+        for item in sh['E']:
+            sh[f'E{int(item.row)}'].style = estilo_hora
+        for item in sh['F']:
+            sh[f'F{int(item.row)}'].style = estilo_hora
+        for item in sh['G']:
+            sh[f'G{int(item.row)}'].style = estilo_hora
+        for item in sh['H']:
+            sh[f'H{int(item.row)}'].style = estilo_hora
+        sh.column_dimensions['A'].width = 11
+        sh.column_dimensions['B'].width = 11
+        sh.column_dimensions['C'].width = 11
+        sh.column_dimensions['D'].width = 11
+        sh.column_dimensions['E'].width = 11
+        sh.column_dimensions['F'].width = 11
+        sh.column_dimensions['G'].width = 11
+        sh.column_dimensions['H'].width = 11
+        wb2 = l_w(f'../Ponto/xls/zzBase.xlsx')
+        ws2 = wb2.active
+        for row in ws2.rows:
+            for cell in row:
+                if cell.value == matr:
+                    nome = ws2.cell(row=cell.row, column=3).value
+                    wb.save(f'../Ponto/xls/Ponto Estágio - {nome}.xlsx')
+                    os.remove(f'../Ponto/xls/Ponto Estágio - {matr}.xlsx')
+        plan = l_w(f'../Ponto/xls/Ponto Estágio - {nome}.xlsx')
+        splan = plan.active
+        # Verifica a hora certa na planilha zzBase.xlsx
+        wb = l_w(f'../Ponto/xls/zzBase.xlsx')
+        ws = wb.active
+        for row in ws.rows:
+            for cell in row:
+                if cell.value == f'{nome}':
+                    for rowsplan in splan.rows:
+                        for cellplan in rowsplan:
+                            if str(splan.cell(row=cellplan.row, column=2).value) == 'Data':
+                                pass
+                            # se o dia no ponto for segunda
+                            if dt.strptime(str(splan.cell(row=cellplan.row, column=2).value),
+                                           '%d/%m/%Y').isoweekday() == 1:
+                                pass
+                            # se o dia no ponto for terça
+                            if dt.strptime(str(splan.cell(row=cellplan.row, column=2).value),
+                                           '%d/%m/%Y').isoweekday() == 2:
+                                pass
+                            # se o dia no ponto for quarta
+                            if dt.strptime(str(splan.cell(row=cellplan.row, column=2).value),
+                                           '%d/%m/%Y').isoweekday() == 3:
+                                pass
+                            # se o dia no ponto for quinta
+                            if dt.strptime(str(splan.cell(row=cellplan.row, column=2).value),
+                                           '%d/%m/%Y').isoweekday() == 4:
+                                pass
+                            # se o dia no ponto for sexta
+                            if dt.strptime(str(splan.cell(row=cellplan.row, column=2).value),
+                                           '%d/%m/%Y').isoweekday() == 5:
+                                pass
+                            # se o dia no ponto for sábado
+                            if dt.strptime(str(splan.cell(row=cellplan.row, column=2).value),
+                                           '%d/%m/%Y').isoweekday() == 6:
+                                pass
+                            # se o dia no ponto for domingo
+                            if dt.strptime(str(splan.cell(row=cellplan.row, column=2).value),
+                                           '%d/%m/%Y').isoweekday() == 7:
+                                pass
+                    if ws.cell(row=cell.row, column=5).value is None:
+                        ent1 = dt.strptime('00:00:00', '%H:%M:%S')
+                    else:
+                        ent1 = dt.strptime(str(ws.cell(row=cell.row, column=5).value), '%H:%M:%S')
+                    if ws.cell(row=cell.row, column=6).value is None:
+                        sai1 = dt.strptime('00:00:00', '%H:%M:%S')
+                    else:
+                        sai1 = dt.strptime(str(ws.cell(row=cell.row, column=6).value), '%H:%M:%S')
+                    if ws.cell(row=cell.row, column=7).value is None:
+                        ent2 = dt.strptime('00:00:00', '%H:%M:%S')
+                    else:
+                        ent2 = dt.strptime(str(ws.cell(row=cell.row, column=7).value), '%H:%M:%S')
+                    if ws.cell(row=cell.row, column=8).value is None:
+                        sai2 = dt.strptime('00:00:00', '%H:%M:%S')
+                    else:
+                        sai2 = dt.strptime(str(ws.cell(row=cell.row, column=8).value), '%H:%M:%S')
+                    if ws.cell(row=cell.row, column=9).value is None:
+                        ent3 = dt.strptime('00:00:00', '%H:%M:%S')
+                    else:
+                        ent3 = dt.strptime(str(ws.cell(row=cell.row, column=9).value), '%H:%M:%S')
+                    if ws.cell(row=cell.row, column=10).value is None:
+                        sai3 = dt.strptime('00:00:00', '%H:%M:%S')
+                    else:
+                        sai3 = dt.strptime(str(ws.cell(row=cell.row, column=10).value), '%H:%M:%S')
+                # relacionar dia da semana
+                entradacerta = td(hours=ent1.hour, minutes=ent1.minute, seconds=ent1.second)
+                saidacerta = td(hours=sai1.hour, minutes=sai1.minute, seconds=sai1.second)
+                entradacerta2 = td(hours=ent2.hour, minutes=ent2.minute, seconds=ent2.second)
+                saidacerta2 = td(hours=sai2.hour, minutes=sai2.minute, seconds=sai2.second)
+                entradacerta3 = td(hours=ent3.hour, minutes=ent3.minute, seconds=ent3.second)
+                saidacerta3 = td(hours=sai3.hour, minutes=sai3.minute, seconds=sai3.second)
+                regra = td(hours=0, minutes=10, seconds=0)
+    # # procurar na planilha base.xlsx nome e-mail matricula no ponto e horarios de entrada e saida
+
+
+def gerar_excel_ponto_estagiarios():
+    # Ler arquivo txt dos registror rejeitados
+    geral = pd.read_csv(
+        r'C:\Users\Felipe Rodrigues\Desktop\Relatorios Ponto\Rej - 16-03-2023.txt', sep=' ', header=None,
+        encoding='iso8859-1'
+    )
+    geral = geral.rename(columns={0: 'matricula', 16: 'data', 17: 'dia', 18: 'hora'})
+    geral = geral[geral.dia != 'Batida']
+    geral = geral[geral.matricula < 9999]
+    mat = []
+    mat_unicas = []
+    for matricula in geral['matricula']:
+        mat.append(matricula)
+        mat_unicas = list(set(mat))
+    for matr in mat_unicas:
+        geral2 = geral[geral.matricula == matr]
+        geral2 = geral2.set_index('matricula')
+        geral2 = geral2.dropna(axis='columns')
+        # print(geral2)
+        geral2 = geral2.drop(geral2.iloc[:, [2, 3, 4]], axis=1)
+        geral2['dia'] = pd.to_datetime(geral2['dia'], format='%d/%m/%Y')
+        geral2['dia'] = geral2['dia'].apply(lambda y: dt.strftime(y, '%d/%m/%Y'))
+        geral2['hora'] = geral2['hora'].apply(lambda x: f'{x}:00')
+        geral2['hora'] = pd.to_timedelta(geral2['hora'])
+        # geral2 = geral2.set_index('dia')
+        # geral2 = geral2.groupby('dia')
+        geral2.to_excel(f'../Ponto/xls/Ponto Estágio - {matr}.xlsx')
+        wb = l_w(f'../Ponto/xls/Ponto Estágio - {matr}.xlsx')
+        sh = wb['Sheet1']
+        sh['A1'].value = 'Matrícula'
+        sh['B1'].value = 'Data'
+        sh['C1'].value = 'Entrada 1'
+        sh['D1'].value = 'Saída 1'
+        sh['E1'].value = 'Entrada 2'
+        sh['F1'].value = 'Saída 2'
+        sh['G1'].value = 'Entrada 3'
+        sh['H1'].value = 'Saída 3'
+        x = 2
+        for row in sh:
+            if sh[f'B{x}'].value == sh[f'B{x - 1}'].value:
+                if sh[f'D{x - 1}'].value is None:
+                    sh[f'D{x - 1}'].value = sh[f'C{x}'].value
+                    sh.delete_rows(x, 1)
+                else:
+                    if sh[f'E{x - 1}'].value is None:
+                        sh[f'E{x - 1}'].value = sh[f'C{x}'].value
+                        sh.delete_rows(x, 1)
+                    else:
+                        if sh[f'F{x - 1}'].value is None:
+                            sh[f'F{x - 1}'].value = sh[f'C{x}'].value
+                            sh.delete_rows(x, 1)
+                        else:
+                            if sh[f'G{x - 1}'].value is None:
+                                sh[f'G{x - 1}'].value = sh[f'C{x}'].value
+                                sh.delete_rows(x, 1)
+                            else:
+                                if sh[f'H{x - 1}'].value is None:
+                                    sh[f'H{x - 1}'].value = sh[f'C{x}'].value
+                                    sh.delete_rows(x, 1)
+        for row in sh:
+            if sh[f'B{x}'].value == sh[f'B{x - 1}'].value:
+                if sh[f'D{x - 1}'].value is None:
+                    sh[f'D{x - 1}'].value = sh[f'C{x}'].value
+                    sh.delete_rows(x, 1)
+                else:
+                    if sh[f'E{x - 1}'].value is None:
+                        sh[f'E{x - 1}'].value = sh[f'C{x}'].value
+                        sh.delete_rows(x, 1)
+                    else:
+                        if sh[f'F{x - 1}'].value is None:
+                            sh[f'F{x - 1}'].value = sh[f'C{x}'].value
+                            sh.delete_rows(x, 1)
+                        else:
+                            if sh[f'G{x - 1}'].value is None:
+                                sh[f'G{x - 1}'].value = sh[f'C{x}'].value
+                                sh.delete_rows(x, 1)
+                            else:
+                                if sh[f'H{x - 1}'].value is None:
+                                    sh[f'H{x - 1}'].value = sh[f'C{x}'].value
+                                    sh.delete_rows(x, 1)
+            for row in sh:
+                if sh[f'B{x}'].value == sh[f'B{x - 1}'].value:
+                    if sh[f'D{x - 1}'].value is None:
+                        sh[f'D{x - 1}'].value = sh[f'C{x}'].value
+                        sh.delete_rows(x, 1)
+                    else:
+                        if sh[f'E{x - 1}'].value is None:
+                            sh[f'E{x - 1}'].value = sh[f'C{x}'].value
+                            sh.delete_rows(x, 1)
+                        else:
+                            if sh[f'F{x - 1}'].value is None:
+                                sh[f'F{x - 1}'].value = sh[f'C{x}'].value
+                                sh.delete_rows(x, 1)
+                            else:
+                                if sh[f'G{x - 1}'].value is None:
+                                    sh[f'G{x - 1}'].value = sh[f'C{x}'].value
+                                    sh.delete_rows(x, 1)
+                                else:
+                                    if sh[f'H{x - 1}'].value is None:
+                                        sh[f'H{x - 1}'].value = sh[f'C{x}'].value
+                                        sh.delete_rows(x, 1)
+            x += 1
+
+        estilo_data = NamedStyle(name='data', number_format='DD/MM/YYYY')
+        estilo_hora = NamedStyle(name='hora', number_format='HH:MM:SS')
+        for cell in sh['B']:
+            sh[f'B{int(cell.row)}'].style = estilo_data
+        for item in sh['C']:
+            sh[f'C{int(item.row)}'].style = estilo_hora
+        for item in sh['D']:
+            sh[f'D{int(item.row)}'].style = estilo_hora
+        for item in sh['E']:
+            sh[f'E{int(item.row)}'].style = estilo_hora
+        for item in sh['F']:
+            sh[f'F{int(item.row)}'].style = estilo_hora
+        for item in sh['G']:
+            sh[f'G{int(item.row)}'].style = estilo_hora
+        for item in sh['H']:
+            sh[f'H{int(item.row)}'].style = estilo_hora
+        sh.column_dimensions['A'].width = 11
+        sh.column_dimensions['B'].width = 11
+        sh.column_dimensions['C'].width = 11
+        sh.column_dimensions['D'].width = 11
+        sh.column_dimensions['E'].width = 11
+        sh.column_dimensions['F'].width = 11
+        sh.column_dimensions['G'].width = 11
+        sh.column_dimensions['H'].width = 11
+        wb2 = l_w(f'../Ponto/xls/zzBase.xlsx')
+        ws2 = wb2.active
+        for row in ws2.rows:
+            for cell in row:
+                if cell.value == matr:
+                    nome = ws2.cell(row=cell.row, column=3).value
+                    linha = int((len(sh['A']) / 2) + 1)
+                    wb.save(f'../Ponto/xls/Ponto Estágio - {nome}.xlsx')
+                    os.remove(f'../Ponto/xls/Ponto Estágio - {matr}.xlsx')
+                    # t.sleep(2)
+                    # inserir código de envio de email aqui
+                    excel = client.Dispatch('Excel.Application')
+                    plan = excel.Workbooks.Open(
+                        r'C:\Users\Felipe Rodrigues\PycharmProjects\AutomacaoCia\Ponto\xls\Ponto Estágio - {}.xlsx'
+                        .format(nome)
+                    )
+                    folha = plan.Sheets['Sheet1']
+                    excel.visible = 0
+                    copyrange = folha.Range(f'B1:F{linha}')
+                    copyrange.CopyPicture(Format=2)
+                    ImageGrab.grabclipboard().save(f'Ponto {str(nome).title().split(" ")[0]}.png')
+                    excel.Quit()
+                    html_body = f'''
+                    <p>Olá {str(nome).title().split(" ")[0]},</p>
+                    <p> Segue em anexo seu relatório de ponto do mês Fevereiro/2023.</p><br>
+                    Atenciosamente,<br>
+                    Felipe Rodrigues,<br>
+                    '''
+                    outlook = client.Dispatch('Outlook.Application')
+                    message = outlook.CreateItem(0)
+                    message.To = 'felipe.rodrigs09@gmail.com'
+                    message.Subject = 'Relatório de Ponto'
+                    message.HTMLBody = html_body
+                    message.Attachments.Add(
+                        f'C:\\Users\\{os.getlogin()}\\PycharmProjects\\AutomacaoCia\\Ponto\\'
+                        f'Ponto {str(nome).title().split(" ")[0]}.png'
+                    )
+                    message.Send()
+    # # procurar na planilha base.xlsx nome e-mail matricula no ponto e horarios de entrada e saida
+
+
+def cadastrar_funcionario_no_secullum():
+    wb = l_w('PlanPonto.xlsx')
+    sh = wb['Planilha1']
+    x = 2
+    while x <= len(sh['A']):
+        matricula = str(sh[f'A{x}'].value)
+        nome = str(sh[f'B{x}'].value)
+        pis = str(sh[f'C{x}'].value)
+        horario = '1'
+        funcao = str(sh[f'D{x}'].value)
+        depto = str(sh[f'E{x}'].value)
+        admiss = str(sh[f'F{x}'].value)
+        # # clicar incluir
+        pa.click(-1507, 147), t.sleep(3)
+        pa.write(matricula), pa.press('tab')
+        pp.copy(nome), pa.hotkey('ctrl', 'v'), pa.press('tab')
+        pa.write(pis), pa.press('tab', 4)
+        pa.write(horario), pa.press('tab')
+        pp.copy(funcao), pa.hotkey('ctrl', 'v'), pa.press('tab')
+        pp.copy(depto), pa.hotkey('ctrl', 'v'), pa.press('tab')
+        pa.write(admiss)
+        # click concluir
+        pa.click(-1492, 617)
+        t.sleep(2)
+        x += 1
+
+
+def gerar_relatorios_ponto_pdf():
+    # define excel plans to work with
+    wb = l_w('../src/models/static/files/zzBase.xlsx')
+    sh = wb['Funcionários e e-mail']
+    pl = l_w('Hrs Folha.xlsx')
+    fl = pl['Planilha1']
+
+    # datainicio = dt.strptime(input('Digite a data de início: '), '%d/%m/%Y')
+    # datafim = dt.strptime(input('Digite a data fim: '), '%d/%m/%Y')
+    datainicio = dt.strptime('21/04/2023', '%d/%m/%Y')
+    datafim = dt.strptime('20/05/2023', '%d/%m/%Y')
+
+    def intervalo(inicio, fim):
+        for n in range(int((fim - inicio).days) + 1):
+            yield [inicio + td(n), np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]
+
+    # creating dicts to save employees datas
+    planbase = {}
+    planmat = {}
+    planfunc = {}
+    plandept = {}
+
+    x = 2
+    while x <= len(sh['B']):
+        planbase.update(
+            {str(sh[f'B{x}'].value).replace('.', '').replace('-', ''): str(sh[f'C{x}'].value).title().strip()})
+        planmat.update(
+            {str(sh[f'B{x}'].value).replace('.', '').replace('-', ''): str(sh[f'A{x}'].value).title().strip()})
+        planfunc.update({str(sh[f'B{x}'].value).replace('.', '').replace('-', ''): str(sh[f'D{x}'].value).strip()})
+        plandept.update(
+            {str(sh[f'B{x}'].value).replace('.', '').replace('-', ''): str(sh[f'E{x}'].value).title().strip()})
+        x += 1
+
+    geral = pd.read_csv(r'../src/models/static/file/AFD.txt', sep=' ', header=None, encoding='iso8859-1')
+    geral = geral[geral[0].str.len() <= 34]
+    geral.dropna(axis=1, inplace=True)
+    geral = geral.rename(columns={0: 'Dados'})
+
+    # dividir ultimos 11 caracteres em outra col
+    geral['Matricula'] = geral['Dados'].str[-11:]
+    geral = geral.drop('Dados', axis=1)
+    mat = []
+    matriculas_unicas = []
+    for item in geral['Matricula']:
+        mat.append(item)
+    matnum = list(map(int, mat))
+    matriculas_unicas = list(set(matnum))
+    for matricula in matriculas_unicas:
+        base = pd.DataFrame(list(intervalo(datainicio, datafim)),
+                            columns=['Data', 'Entrada 1', 'Saída 1', 'Entrada 2', 'Saída 2', 'Entrada 3', 'Saída 3'])
+        base = base.set_index('Data')
+        geral = pd.read_csv(r'../src/models/static/files/AFD.txt', sep=' ', header=None, encoding='iso8859-1')
+        geral = geral[geral[0].str.len() <= 34]
+        geral.dropna(axis=1, inplace=True)
+        geral = geral.rename(columns={0: 'Dados'})
+        # dividir ultimos 11 caracteres em outra col
+        geral['Matricula'] = geral['Dados'].str[-11:]
+        # dividir caracteres da data em outra col
+        geral['Data'] = geral['Dados'].str[-24:-16]
+        geral['Data'] = pd.to_datetime(geral['Data'], format='%d%m%Y')
+        # dividir caracteres da hr em outra col
+        geral['Hora'] = geral['Dados'].str[-16:-12]
+        geral['Hora'] = pd.to_datetime(geral['Hora'], format='%H%M')
+
+        geral1 = pd.DataFrame(geral)
+
+        geral = geral.loc[(geral['Data'] < datafim) & (geral['Data'] > datainicio)]
+        geral1 = geral1.loc[(geral1['Data'] < datafim) & (geral1['Data'] > datainicio)]
+
+        geral = geral.loc[geral['Matricula'] == str(matricula).zfill(11)]
+        geral1 = geral1.loc[geral1['Matricula'] == str(matricula).zfill(11)]
+
+        geral['Hora'] = geral['Hora'].apply(lambda k: dt.strftime(k, '%H:%M'))
+        geral1['Hora'] = geral1['Hora'].apply(lambda l: dt.strftime(l, '%H:%M:%S'))
+
+        geral = geral.drop('Dados', axis=1)
+        geral1 = geral1.drop('Dados', axis=1)
+
+        geral = geral.drop('Matricula', axis=1)
+        geral1 = geral1.drop('Matricula', axis=1)
+
+        geral = geral.reset_index(drop=True)
+        geral = geral.pivot_table(index='Data', columns=geral.groupby('Data').cumcount() + 1, values='Hora',
+                                  aggfunc='first')
+        geral = geral.reset_index(level=[0])
+        geral = geral.rename(
+            columns={0: 'Data', 1: 'Entrada 1', 2: 'Saída 1', 3: 'Entrada 2', 4: 'Saída 2', 5: 'Entrada 3',
+                     6: 'Saída 3'})
+
+        geral1 = geral1.reset_index(drop=True)
+        geral1 = geral1.pivot_table(index='Data', columns=geral1.groupby('Data').cumcount() + 1, values='Hora',
+                                    aggfunc='first')
+        geral1 = geral1.reset_index(level=[0])
+        geral1 = geral1.rename(
+            columns={0: 'Data', 1: 'Entrada 1', 2: 'Saída 1', 3: 'Entrada 2', 4: 'Saída 2', 5: 'Entrada 3',
+                     6: 'Saída 3'})
+
+        geral1['Entrada 1a'] = geral1['Entrada 1'].apply(lambda z: pd.to_timedelta(str(z)))
+        geral1['Saída 1a'] = geral1['Saída 1'].apply(lambda z: pd.to_timedelta(str(z)))
+        geral1['Tot1'] = geral1['Saída 1a'] - geral1['Entrada 1a']
+        total_horas = round(geral1['Tot1'].sum().total_seconds() / 3600, 2)
+
+        if geral1.shape[1] > 6:
+            if geral1.shape[1] < 10:
+                geral1['Entrada 2a'] = geral1['Entrada 2'].apply(lambda z: pd.to_timedelta(str(z)))
+                geral1['Saída 2a'] = geral1['Saída 2'].apply(lambda z: pd.to_timedelta(str(z)))
+                geral1['Tot2'] = geral1['Saída 2a'] - geral1['Entrada 2a']
+                geral1['Soma'] = geral1['Tot1'] + geral1['Tot2']
+                total_horas = round(geral1['Soma'].sum().total_seconds() / 3600, 2)
+                geral1 = geral1.drop('Entrada 2a', axis=1)
+                geral1 = geral1.drop('Saída 2a', axis=1)
+                geral1 = geral1.drop('Tot2', axis=1)
+                geral1 = geral1.drop('Soma', axis=1)
+
+        if geral1.shape[1] > 8:
+            geral1['Entrada 2a'] = geral1['Entrada 2'].apply(lambda z: pd.to_timedelta(str(z)))
+            geral1['Saída 2a'] = geral1['Saída 2'].apply(lambda z: pd.to_timedelta(str(z)))
+            geral1['Entrada 3a'] = geral1['Entrada 3'].apply(lambda z: pd.to_timedelta(str(z)))
+            geral1['Saída 3a'] = geral1['Saída 3'].apply(lambda z: pd.to_timedelta(str(z)))
+            geral1['Tot1'] = geral1['Saída 1a'] - geral1['Entrada 1a']
+            geral1['Tot2'] = geral1['Saída 2a'] - geral1['Entrada 2a']
+            geral1['Tot3'] = geral1['Saída 3a'] - geral1['Entrada 3a']
+            geral1['Soma'] = geral1['Tot1'] + geral1['Tot2'] + geral1['Tot3']
+            total_horas = round(geral1['Soma'].sum().total_seconds() / 3600, 2)
+            geral1 = geral1.drop('Entrada 2a', axis=1)
+            geral1 = geral1.drop('Saída 2a', axis=1)
+            geral1 = geral1.drop('Entrada 3a', axis=1)
+            geral1 = geral1.drop('Saída 3a', axis=1)
+            geral1 = geral1.drop('Tot2', axis=1)
+            geral1 = geral1.drop('Tot3', axis=1)
+            geral1 = geral1.drop('Soma', axis=1)
+
+        geral1 = geral1.drop('Entrada 1a', axis=1)
+        geral1 = geral1.drop('Saída 1a', axis=1)
+        geral1 = geral1.drop('Tot1', axis=1)
+
+        geral = geral.set_index('Data')
+        base = base.combine_first(geral)
+        base = base.reset_index(level=[0])
+        base['Data'] = base['Data'].apply(lambda h: dt.strftime(h, '%d/%m/%Y - %a'))
+        base = base[['Data', 'Entrada 1', 'Saída 1', 'Entrada 2', 'Saída 2', 'Entrada 3', 'Saída 3']]
+        dias = base['Entrada 1'].count()
+        base = base.fillna('-')
+        ponto = docx.Document('modelo.docx')
+        ponto.paragraphs[1].text = str(ponto.paragraphs[1].text).replace('#data1',
+                                                                         dt.strftime(datainicio, '%d/%m/%Y')).replace(
+            '#data2', dt.strftime(datafim, '%d/%m/%Y'))
+        ponto.paragraphs[2].text = str(ponto.paragraphs[2].text).replace('#emissao',
+                                                                         dt.strftime(dt.today(), '%d/%m/%Y'))
+        ponto.tables[0].rows[3].cells[1].paragraphs[0].text = str(
+            ponto.tables[0].rows[3].cells[1].paragraphs[0].text).replace('#nome', planbase[str(matricula)])
+        ponto.tables[0].rows[4].cells[1].paragraphs[0].text = str(
+            ponto.tables[0].rows[4].cells[1].paragraphs[0].text).replace('#cod', str(matricula))
+        ponto.tables[0].rows[5].cells[1].paragraphs[0].text = str(
+            ponto.tables[0].rows[5].cells[1].paragraphs[0].text).replace('#mat', planmat[str(matricula)])
+        ponto.tables[0].rows[6].cells[1].paragraphs[0].text = str(
+            ponto.tables[0].rows[6].cells[1].paragraphs[0].text).replace('#func', planfunc[str(matricula)])
+        ponto.tables[0].rows[7].cells[1].paragraphs[0].text = str(
+            ponto.tables[0].rows[7].cells[1].paragraphs[0].text).replace('#depto', plandept[str(matricula)])
+        # ponto.tables[0].rows[5].cells[4].paragraphs[0].text = 'HH:MM'
+        style = ponto.styles['Normal']
+        font = style.font
+        font.name = 'Times New Roman'
+        font.size = Pt(10)
+        style8 = ponto.styles['Default']
+        font = style8.font
+        font.name = 'Times New Roman'
+        font.size = Pt(8)
+
+        ponto.paragraphs[0].style = ponto.styles['Normal']
+        ponto.paragraphs[1].style = ponto.styles['Normal']
+        ponto.paragraphs[2].style = ponto.styles['Normal']
+        ponto.paragraphs[3].style = ponto.styles['Normal']
+        ponto.paragraphs[4].style = ponto.styles['Normal']
+        ponto.tables[0].rows[5].cells[4].paragraphs[0].style = ponto.styles['Default']
+        t = ponto.add_table(base.shape[0] + 1, base.shape[1])
+        t.style = 'Estilo2'
+        # add the header rows.
+        for j in range(base.shape[-1]):
+            t.cell(0, j).text = base.columns[j]
+        # add the rest of the data frame
+        for i in range(base.shape[0]):
+            for j in range(base.shape[-1]):
+                t.cell(i + 1, j).text = str(base.values[i, j])
+                t.cell(i + 1, j).paragraphs[0].alignment = 1
+                t.cell(i + 1, 0).paragraphs[0].alignment = 0
+
+        ponto.tables[1].columns[0].cells[0].width = Cm(4.2)
+        ponto.tables[1].columns[1].cells[0].width = Cm(2.6)
+        ponto.tables[1].columns[2].cells[0].width = Cm(2.6)
+        ponto.tables[1].columns[3].cells[0].width = Cm(2.6)
+        ponto.tables[1].columns[4].cells[0].width = Cm(2.6)
+        ponto.tables[1].columns[5].cells[0].width = Cm(2.6)
+        ponto.tables[1].columns[6].cells[0].width = Cm(2.6)
+        ponto.tables[1].rows[0].cells[0].paragraphs[0].alignment = 1
+        ponto.tables[1].rows[0].cells[1].paragraphs[0].alignment = 1
+        ponto.tables[1].rows[0].cells[2].paragraphs[0].alignment = 1
+        ponto.tables[1].rows[0].cells[3].paragraphs[0].alignment = 1
+        ponto.tables[1].rows[0].cells[4].paragraphs[0].alignment = 1
+        ponto.tables[1].rows[0].cells[5].paragraphs[0].alignment = 1
+        ponto.tables[1].rows[0].cells[6].paragraphs[0].alignment = 1
+
+        y = len(fl['A']) + 1
+        fl[f'A{y}'].value = planbase[str(matricula)]
+        fl[f'B{y}'].value = total_horas
+        pl.save('Hrs Folha.xlsx')
+
+        ponto.add_paragraph(f'Total de dias trabalhados: {dias}', 'Default').alignment = 2
+        ponto.add_paragraph('', 'Normal')
+        ponto.add_paragraph('', 'Normal')
+        ponto.add_paragraph('______________________________________________', 'Normal').alignment = 1
+        ponto.add_paragraph(f'{planbase[str(matricula)]}', 'Normal').alignment = 1
+        ponto.save(
+            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\relatorios_ponto\Ponto {planbase[str(matricula)]}.docx')
+        docx2pdf.convert(
+            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\relatorios_ponto\Ponto {planbase[str(matricula)]}.docx',
+            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\relatorios_ponto\Ponto {planbase[str(matricula)]}.pdf')
+        os.remove(
+            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\relatorios_ponto\Ponto {planbase[str(matricula)]}.docx')
+        # print(base)
+
+
+def emitir_certificados():
+    enviar_email = int(
+        str(input('Enviar e-mail? s/n ')).replace('s', '1').replace('S', '1').replace('n', '0').replace('N', '0'))
+    # Subistituir nome nos modellos de certificados e salvar como em uma pasta da área de trabalho
+    outlook = client.Dispatch('outlook.application')
+    wb = l_w('Treinamento.xlsx')
+    pasta = '.\\certificados'
+    cert_terrestre = 'Treinamento Terrestre.docx'
+    cert_aquatico = 'Treinamento Aquático.docx'
+
+    def extenso(datacompleta):
+        dia, mes, ano = datacompleta.split('/')
+        mesext = {
+            '01': 'janeiro',
+            '02': 'fevereiro',
+            '03': 'março',
+            '04': 'abril',
+            '05': 'maio',
+            '06': 'junho',
+            '07': 'julho',
+            '08': 'agosto',
+            '09': 'setembro',
+            '10': 'outubro',
+            '11': 'novembro',
+            '12': 'dezembro'
+        }
+        return f'{dia} de {mesext[mes]} de {ano}.'
+
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
+    pesq = session.query(Colaborador).filter_by(desligamento=None).all()
+    nomes = []
+    dicion = {}
+    for p in pesq:
+        nomes.append(str(p.nome).upper())
+    # Certificado Terrestre
+    x = 2
+    sh = wb['Terrestre']
+    while sh[f'B{x}'].value is not None:
+        t1 = docx.Document(cert_terrestre)
+        nomeplan = str(sh[f'B{x}'].value)
+        for pessoa in nomes:
+            dicion[pessoa] = SequenceMatcher(None, nomeplan, pessoa).ratio()
+        nome = [i for i in dicion if dicion[i] == max(dicion.values())][0]
+        endeletr = str(sh[f'C{x}'].value)
+        dia = dt.strftime(dt.strptime(str(sh[f'D{x}'].value), '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y')
+        diaext = extenso(dia)
+        doc = t1
+        for p in doc.paragraphs:
+            if '#nome' in p.text:
+                inline = p.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#nome' in inline[i].text:
+                        text = inline[i].text.replace('#nome', nome.title())
+                        inline[i].text = text
+            if '#data' in p.text:
+                inline = p.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#data' in inline[i].text:
+                        text = inline[i].text.replace('#data', dia).replace('#dataextens', diaext)
+                        inline[i].text = text
+            if '#extens' in p.text:
+                inline = p.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#extens' in inline[i].text:
+                        text = inline[i].text.replace('#extens', diaext)
+                        inline[i].text = text
+
+        doc.save(pasta + f'\\{nome} PST1.docx')
+        convert(pasta + f'\\{nome} PST1.docx', pasta + f'\\{nome} PST1.pdf')
+        os.remove(pasta + f'\\{nome} PST1.docx')
+        if enviar_email == 1:
+            email = outlook.CreateItem(0)
+            email.to = endeletr
+            email.Subject = 'Certificado Curso Primeiros Socorros'
+            email.HTMLBody = f'''
+            <p>Boa tarde,</p>
+            <p></p>
+            <p>Segue certificado do curso de primeiros socorros.</p>
+            <p></p>
+            <p>Atenciosamente,</p>
+            <p><img src="\\\Qnapcia\\rh\\01 - RH\\01 - Administração.Controles\\08 - Dados, Documentos e Declarações Diversas\\Logo Cia\\Assinatura.png"></p>
+            '''
+            anexo = pasta + f'\\{nome} PST1.pdf'
+            email.Attachments.Add(anexo)
+            email.Send()
+        x += 1
+
+    # Certificado Aquático
+    x = 2
+    sh = wb['Aquatico']
+    while sh[f'B{x}'].value is not None:
+        a1 = docx.Document(cert_aquatico)
+        nomeplan = str(sh[f'B{x}'].value)
+        for pessoa in nomes:
+            dicion[pessoa] = SequenceMatcher(None, nomeplan, pessoa).ratio()
+        nome = [i for i in dicion if dicion[i] == max(dicion.values())][0]
+        endeletr = str(sh[f'C{x}'].value)
+        dia = dt.strftime(dt.strptime(str(sh[f'D{x}'].value), '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y')
+        diaext = extenso(dia)
+        doc = a1
+        for p in doc.paragraphs:
+            if '#nome' in p.text:
+                inline = p.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#nome' in inline[i].text:
+                        text = inline[i].text.replace('#nome', nome.title())
+                        inline[i].text = text
+            if '#data' in p.text:
+                inline = p.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#data' in inline[i].text:
+                        text = inline[i].text.replace('#data', dia).replace('#dataextens', diaext)
+                        inline[i].text = text
+            if '#extens' in p.text:
+                inline = p.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#extens' in inline[i].text:
+                        text = inline[i].text.replace('#extens', diaext)
+                        inline[i].text = text
+        doc.save(pasta + f'\\{nome} PSA1.docx')
+        convert(pasta + f'\\{nome} PSA1.docx', pasta + f'\\{nome} PSA1.pdf')
+        os.remove(pasta + f'\\{nome} PSA1.docx')
+        if enviar_email == 1:
+            email = outlook.CreateItem(0)
+            email.to = endeletr
+            email.Subject = 'Certificado Curso Primeiros Socorros - Aquático'
+            email.HTMLBody = f'''
+                    <p>Boa tarde,</p>
+                    <p></p>
+                    <p>Segue certificado do curso de primeiros socorros.</p>
+                    <p></p>
+                    <p>Atenciosamente,</p>
+                    <p><img src="\\\Qnapcia\\rh\\01 - RH\\01 - Administração.Controles\\08 - Dados, Documentos e Declarações Diversas\\Logo Cia\\Assinatura.png"></p>
+                    '''
+            anexo = pasta + f'\\{nome} PSA1.pdf'
+            email.Attachments.Add(anexo)
+            email.Send()
+        x += 1
+    outlook.quit()
+
+
+def gerar_recibo_uniformes(local, nome, cargo, cpf, genero, tamanho1, tamanho2=''):
+    relatorio = l_w(local, read_only=False)
+    estoque = relatorio['Estoque']
+    entregues = relatorio['Entregues']
+    lista = relatorio['Nomes']
+    hoje = datetime.today()
+    tipo, gen = genero.split(': ')
+    num, pess = nome.split(' - ')
+    label, cpf_ed = cpf.split(': ')
+    pessoa = pess.title()
+
+    if tamanho2 != '':
+        recibo = docx.Document('recibo_uniforme.docx')
+        recibo.paragraphs[11].text = str(recibo.paragraphs[11].text)\
+            .replace('#nome', pessoa).replace('#num_cpf', cpf_ed).replace('#tam', tamanho1+' e '+tamanho2).replace(
+            '#genero', str(gen).lower())
+        recibo.paragraphs[19].text = str(recibo.paragraphs[19].text)\
+            .replace('#data', datetime.strftime(hoje, '%d/%m/%Y'))
+        recibo.paragraphs[24].text = str(recibo.paragraphs[24].text).replace('#nome', pessoa)
+        recibo.paragraphs[25].text = str(recibo.paragraphs[25].text).replace('#cargo', cargo)
+        recibo.save(f'Recibo_alterado {pessoa}.docx')
+        docx2pdf.convert(f'Recibo_alterado {pessoa}.docx', f'Recibo {pessoa}.pdf')
+        # diminuir contagem de estoque
+        if gen == 'Masculino':
+            if tamanho1 == 'P':
+                estoque['C4'].value = estoque['C4'].value - 1
+            if tamanho1 == 'M':
+                estoque['C5'].value = estoque['C5'].value - 1
+            if tamanho1 == 'G':
+                estoque['C6'].value = estoque['C6'].value - 1
+            if tamanho1 == 'XG':
+                estoque['C8'].value = estoque['C8'].value - 1
+            if tamanho1 == 'GG':
+                estoque['C7'].value = estoque['C7'].value - 1
+            if tamanho1 == 'XGG':
+                estoque['C9'].value = estoque['C9'].value - 1
+            if tamanho2 == 'P':
+                estoque['C4'].value = estoque['C4'].value - 1
+            if tamanho2 == 'M':
+                estoque['C5'].value = estoque['C5'].value - 1
+            if tamanho2 == 'G':
+                estoque['C6'].value = estoque['C6'].value - 1
+            if tamanho2 == 'XG':
+                estoque['C8'].value = estoque['C8'].value - 1
+            if tamanho2 == 'GG':
+                estoque['C7'].value = estoque['C7'].value - 1
+            if tamanho2 == 'XGG':
+                estoque['C9'].value = estoque['C9'].value - 1
+        else:
+            if tamanho1 == 'P':
+                estoque['E4'].value = estoque['E4'].value - 1
+            if tamanho1 == 'M':
+                estoque['E5'].value = estoque['E5'].value - 1
+            if tamanho1 == 'G':
+                estoque['E6'].value = estoque['E6'].value - 1
+            if tamanho1 == 'GG':
+                estoque['E7'].value = estoque['E7'].value - 1
+            if tamanho2 == 'P':
+                estoque['E4'].value = estoque['E4'].value - 1
+            if tamanho2 == 'M':
+                estoque['E5'].value = estoque['E5'].value - 1
+            if tamanho2 == 'G':
+                estoque['E6'].value = estoque['E6'].value - 1
+            if tamanho2 == 'GG':
+                estoque['E7'].value = estoque['E7'].value - 1
+        lista[f'E{num}'].value = tamanho1
+        lista[f'F{num}'].value = 'OK'
+        x = len(list(entregues.rows)) + 1
+        entregues[f'A{x}'].value = pessoa
+        entregues[f'B{x}'].value = 1
+        entregues[f'C{x}'].value = tamanho1
+        entregues[f'D{x}'].value = gen
+        entregues[f'E{x}'].value = 1
+        entregues[f'F{x}'].value = tamanho2
+        entregues[f'G{x}'].value = gen
+        relatorio.save(local)
+        tkinter.messagebox.showinfo(title='Recibo ok!', message='Recibo impresso com sucesso!')
+    else:
+        recibo = docx.Document('recibo_uniforme.docx')
+        recibo.paragraphs[11].text = str(recibo.paragraphs[11].text)\
+            .replace('#nome', pessoa).replace('#num_cpf', cpf_ed)\
+            .replace('#tam', tamanho1).replace('#genero', str(gen).lower())
+        recibo.paragraphs[19].text = str(recibo.paragraphs[19].text)\
+            .replace('#data', datetime.strftime(hoje, '%d/%m/%Y'))
+        recibo.paragraphs[24].text = str(recibo.paragraphs[24].text).replace('#nome', pessoa)
+        recibo.paragraphs[25].text = str(recibo.paragraphs[25].text).replace('#cargo', cargo)
+        recibo.save(f'Recibo_alterado {pessoa}.docx')
+        docx2pdf.convert(f'Recibo_alterado {pessoa}.docx', f'Recibo {pessoa}.pdf')
+        # diminuir contagem de estoque
+        if gen == 'Masculino':
+            if tamanho1 == 'P':
+                estoque['C4'].value = estoque['C4'].value - 2
+            if tamanho1 == 'M':
+                estoque['C5'].value = estoque['C5'].value - 2
+            if tamanho1 == 'G':
+                estoque['C6'].value = estoque['C6'].value - 2
+            if tamanho1 == 'XG':
+                estoque['C8'].value = estoque['C8'].value - 2
+            if tamanho1 == 'GG':
+                estoque['C7'].value = estoque['C7'].value - 2
+            if tamanho1 == 'XGG':
+                estoque['C9'].value = estoque['C9'].value - 2
+        else:
+            if tamanho1 == 'P':
+                estoque['E4'].value = estoque['E4'].value - 2
+            if tamanho1 == 'M':
+                estoque['E5'].value = estoque['E5'].value - 2
+            if tamanho1 == 'G':
+                estoque['E6'].value = estoque['E6'].value - 2
+            if tamanho1 == 'GG':
+                estoque['E7'].value = estoque['E7'].value - 2
+        lista[f'E{num}'].value = tamanho1
+        lista[f'F{num}'].value = 'OK'
+        x = len(list(entregues.rows)) + 1
+        entregues[f'A{x}'].value = pessoa
+        entregues[f'B{x}'].value = 2
+        entregues[f'C{x}'].value = tamanho1
+        entregues[f'D{x}'].value = gen
+        entregues[f'E{x}'].value = '-'
+        entregues[f'F{x}'].value = '-'
+        entregues[f'G{x}'].value = '-'
+        relatorio.save(local)
+    tkinter.messagebox.showinfo(title='Recibo ok!', message='Recibo impresso com sucesso!')
+
+
+
+
+def confirmar_pagamento(valor='10,00', tipo1='adiantamento', tipo2='0', tipo3='0', tipo4='0', tipo5='0', tipo6='0',
+                        dia='03/07/2023', competencia='07/2023'):
+    msg_box = tkinter.messagebox.askquestion('Confirma pagamento',
+                                             'Tem certeza que deseja enviar o pagamento ao financeiro?\n'
+                                             f'Valor: R$ {valor}\n'
+                                             f'Data: {dia}\n'
+                                             f'Tipo: {tipo1}\n'
+                                             f'Competência: {competencia}\n',
+                                             icon='warning')
+    if msg_box == 'yes':
+        tkinter.messagebox.showinfo('Pagamento enviado!', 'Pagamento enviado ao financeiro com sucesso!')
+    else:
+        tkinter.messagebox.showinfo('Editar dados', 'Pagamento não enviado. Edite os dados e tente novamente.')
+
+
+def escrever_valor_por_extenso(total):
+    # transformar algarismos do total em número por extenso e com reais e centavos
+    reais, centavos = str(format(total, '.2f')).split('.')
+    if int(reais) == 1:
+        strReal = 'real'
+    else:
+        strReal = 'reais'
+    if int(centavos) == 1:
+        strCentavo = 'centavo'
+    else:
+        strCentavo = 'centavos'
+    if int(reais) == 0:
+        extenso = f'{nw.num2words(centavos, lang="pt_BR").capitalize()} {strCentavo}.'
+    else:
+        if int(centavos) == 0:
+            extenso = f'{nw.num2words(reais, lang="pt_BR").capitalize()} {strReal}.'
+        else:
+            extenso = f'{nw.num2words(reais, lang="pt_BR").capitalize()} {strReal} e {nw.num2words(centavos, lang="pt_BR")} {strCentavo}.'
+    return extenso
+
+
+def gerar_planilha_pgto_itau(nome1, nome2, nome3, nome4, nome5, nome6, nome7, nome8, nome9, nome10, nome11, nome12, nome13, nome14, nome15,
+                             tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9, tipo10, tipo11, tipo12, tipo13, tipo14, tipo15,
+                             val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, val14, val15, data):
+    mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
+              '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
+    if val1 != '':
+        valor1 = float(val1.replace(',','.'))
+    else:
+        valor1 = ''
+
+    if val2 != '':
+        valor2 = float(val2.replace(',','.'))
+    else:
+        valor2 = ''
+
+    if val3 != '':
+        valor3 = float(val3.replace(',','.'))
+    else:
+        valor3 = ''
+
+    if val4 != '':
+        valor4 = float(val4.replace(',','.'))
+    else:
+        valor4 = ''
+
+    if val5 != '':
+        valor5 = float(val5.replace(',','.'))
+    else:
+        valor5 = ''
+
+    if val6 != '':
+        valor6 = float(val6.replace(',','.'))
+    else:
+        valor6 = ''
+
+    if val7 != '':
+        valor7 = float(val7.replace(',','.'))
+    else:
+        valor7 = ''
+
+    if val8 != '':
+        valor8 = float(val8.replace(',','.'))
+    else:
+        valor8 = ''
+
+    if val9 != '':
+        valor9 = float(val9.replace(',','.'))
+    else:
+        valor9 = ''
+
+    if val10 != '':
+        valor10 = float(val10.replace(',','.'))
+    else:
+        valor10 = ''
+
+    if val11 != '':
+        valor11 = float(val11.replace(',','.'))
+    else:
+        valor11 = ''
+
+    if val12 != '':
+        valor12 = float(val12.replace(',','.'))
+    else:
+        valor12 = ''
+
+    if val13 != '':
+        valor13 = float(val13.replace(',','.'))
+    else:
+        valor13 = ''
+
+    if val14 != '':
+        valor14 = float(val14.replace(',','.'))
+    else:
+        valor14 = ''
+
+    if val15 != '':
+        valor15 = float(val15.replace(',','.'))
+    else:
+        valor15 = ''
+
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
+    dia = data.replace('/','.')
+    tipos = {'':'','Salário': '1', 'Férias': '2', 'Vale Transporte': '3', 'Vale Alimentação': '4', 'Comissão': '5',
+             '13º salário': '6', 'Bolsa Estágio': '7', 'Bônus': '8', 'Adiantamento Salarial': '9',
+             'Rescisão': '10', 'Bolsa Auxílio': '11', 'Pensão Alimentícia': '12', 'Pgto em C/C': '13',
+             'Remuneração': '14'}
+    wb = l_w('../Admissao/planilha_itau.xlsx', read_only=False)
+    sh = wb['Planilha1']
+    pessoa1 = session.query(Colaborador).filter_by(nome=nome1).first()
+    pessoa2 = session.query(Colaborador).filter_by(nome=nome2).first()
+    pessoa3 = session.query(Colaborador).filter_by(nome=nome3).first()
+    pessoa4 = session.query(Colaborador).filter_by(nome=nome4).first()
+    pessoa5 = session.query(Colaborador).filter_by(nome=nome5).first()
+    pessoa6 = session.query(Colaborador).filter_by(nome=nome6).first()
+    pessoa7 = session.query(Colaborador).filter_by(nome=nome7).first()
+    pessoa8 = session.query(Colaborador).filter_by(nome=nome8).first()
+    pessoa9 = session.query(Colaborador).filter_by(nome=nome9).first()
+    pessoa10 = session.query(Colaborador).filter_by(nome=nome10).first()
+    pessoa11 = session.query(Colaborador).filter_by(nome=nome11).first()
+    pessoa12 = session.query(Colaborador).filter_by(nome=nome12).first()
+    pessoa13 = session.query(Colaborador).filter_by(nome=nome13).first()
+    pessoa14 = session.query(Colaborador).filter_by(nome=nome14).first()
+    pessoa15 = session.query(Colaborador).filter_by(nome=nome15).first()
+
+    sh['A1'].value = pessoa1.ag
+    sh['A2'].value = pessoa2.ag
+    sh['A3'].value = pessoa3.ag
+    sh['A4'].value = pessoa4.ag
+    sh['A5'].value = pessoa5.ag
+    sh['A6'].value = pessoa6.ag
+    sh['A7'].value = pessoa7.ag
+    sh['A8'].value = pessoa8.ag
+    sh['A9'].value = pessoa9.ag
+    sh['A10'].value = pessoa10.ag
+    sh['A11'].value = pessoa11.ag
+    sh['A12'].value = pessoa12.ag
+    sh['A13'].value = pessoa13.ag
+    sh['A14'].value = pessoa14.ag
+    sh['A15'].value = pessoa15.ag
+
+    sh['B1'].value = pessoa1.conta
+    sh['B2'].value = pessoa2.conta
+    sh['B3'].value = pessoa3.conta
+    sh['B4'].value = pessoa4.conta
+    sh['B5'].value = pessoa5.conta
+    sh['B6'].value = pessoa6.conta
+    sh['B7'].value = pessoa7.conta
+    sh['B8'].value = pessoa8.conta
+    sh['B9'].value = pessoa9.conta
+    sh['B10'].value = pessoa10.conta
+    sh['B11'].value = pessoa11.conta
+    sh['B12'].value = pessoa12.conta
+    sh['B13'].value = pessoa13.conta
+    sh['B14'].value = pessoa14.conta
+    sh['B15'].value = pessoa15.conta
+
+    sh['C1'].value = pessoa1.cdigito
+    sh['C2'].value = pessoa2.cdigito
+    sh['C3'].value = pessoa3.cdigito
+    sh['C4'].value = pessoa4.cdigito
+    sh['C5'].value = pessoa5.cdigito
+    sh['C6'].value = pessoa6.cdigito
+    sh['C7'].value = pessoa7.cdigito
+    sh['C8'].value = pessoa8.cdigito
+    sh['C9'].value = pessoa9.cdigito
+    sh['C10'].value = pessoa10.cdigito
+    sh['C11'].value = pessoa11.cdigito
+    sh['C12'].value = pessoa12.cdigito
+    sh['C13'].value = pessoa13.cdigito
+    sh['C14'].value = pessoa14.cdigito
+    sh['C15'].value = pessoa15.cdigito
+
+    sh['D1'].value = pessoa1.nome
+    sh['D2'].value = pessoa2.nome
+    sh['D3'].value = pessoa3.nome
+    sh['D4'].value = pessoa4.nome
+    sh['D5'].value = pessoa5.nome
+    sh['D6'].value = pessoa6.nome
+    sh['D7'].value = pessoa7.nome
+    sh['D8'].value = pessoa8.nome
+    sh['D9'].value = pessoa9.nome
+    sh['D10'].value = pessoa10.nome
+    sh['D11'].value = pessoa11.nome
+    sh['D12'].value = pessoa12.nome
+    sh['D13'].value = pessoa13.nome
+    sh['D14'].value = pessoa14.nome
+    sh['D15'].value = pessoa15.nome
+
+    sh['E1'].value = pessoa1.cpf
+    sh['E2'].value = pessoa2.cpf
+    sh['E3'].value = pessoa3.cpf
+    sh['E4'].value = pessoa4.cpf
+    sh['E5'].value = pessoa5.cpf
+    sh['E6'].value = pessoa6.cpf
+    sh['E7'].value = pessoa7.cpf
+    sh['E8'].value = pessoa8.cpf
+    sh['E9'].value = pessoa9.cpf
+    sh['E10'].value = pessoa10.cpf
+    sh['E11'].value = pessoa11.cpf
+    sh['E12'].value = pessoa12.cpf
+    sh['E13'].value = pessoa13.cpf
+    sh['E14'].value = pessoa14.cpf
+    sh['E15'].value = pessoa15.cpf
+
+    sh['F1'].value = tipos[tipo1]
+    sh['F2'].value = tipos[tipo2]
+    sh['F3'].value = tipos[tipo3]
+    sh['F4'].value = tipos[tipo4]
+    sh['F5'].value = tipos[tipo5]
+    sh['F6'].value = tipos[tipo6]
+    sh['F7'].value = tipos[tipo7]
+    sh['F8'].value = tipos[tipo8]
+    sh['F9'].value = tipos[tipo9]
+    sh['F10'].value = tipos[tipo10]
+    sh['F11'].value = tipos[tipo11]
+    sh['F12'].value = tipos[tipo12]
+    sh['F13'].value = tipos[tipo13]
+    sh['F14'].value = tipos[tipo14]
+    sh['F15'].value = tipos[tipo15]
+
+    sh['G1'].value = valor1
+    sh['G2'].value = valor2
+    sh['G3'].value = valor3
+    sh['G4'].value = valor4
+    sh['G5'].value = valor5
+    sh['G6'].value = valor6
+    sh['G7'].value = valor7
+    sh['G8'].value = valor8
+    sh['G9'].value = valor9
+    sh['G10'].value = valor10
+    sh['G11'].value = valor11
+    sh['G12'].value = valor12
+    sh['G13'].value = valor13
+    sh['G14'].value = valor14
+    sh['G15'].value = valor15
+
+    sh.column_dimensions['A'].width = 6
+    sh.column_dimensions['B'].width = 8
+    sh.column_dimensions['C'].width = 4
+    sh.column_dimensions['D'].width = 45
+    sh.column_dimensions['E'].width = 20
+    sh.column_dimensions['F'].width = 4
+    sh.column_dimensions['G'].width = 16
+    d, mes, ano = dia.split('.')
+    try:
+        wb.save(rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+        04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Pedidos de pagamento\Pagamento Itau {dia}.xlsx')
+    except Exception:
+        os.makedirs(rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
+        04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Pedidos de pagamento')
+        wb.save(
+            rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\
+            Pedidos de pagamento\Pagamento Itau {dia}.xlsx')
+
+

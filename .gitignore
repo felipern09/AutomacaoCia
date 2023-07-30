@@ -218,7 +218,7 @@ cython_debug/
 /Ponto/Relogio.txt
 /Ponto/teste.py
 /Solicitacao de pagamento/
-/Treinamento Certificados/Certificados/
+/src/models/static/files/certificados/
 /Treinamento Certificados/E-mail.xlsx
 /Treinamento Certificados/Listas Primeiros Socorros_001.pdf
 /Treinamento Certificados/Treinamento.xlsx
@@ -233,7 +233,7 @@ cython_debug/
 /Treinamento Certificados/~$Treinamento.xlsx
 /Uniformes/gerar_recibo_class.py
 /Uniformes/teste.py
-/Uniformes/Relatorio.xlsx
+/src/models/static/files/relatorio_uniformes.xlsx
 /pull_da_rede.py
 /push_para_rede.py
 /testes grade.py
@@ -241,11 +241,11 @@ cython_debug/
 /Contatos diversos/Nomes e e-mails.xlsx
 /src/models/dados_servd.py
 /Personal/sk.py
-/Ponto/Novo codigo/
-/Ponto/AFD.txt
+/src/models/static/files/relatorios_ponto/
+/src/models/static/files/AFD.txt
 /Ponto/Teste.docx
-/Ponto/zzBase.xlsx
-/Ponto/modelo.docx
+/src/models/static/files/zzBase.xlsx
+/src/models/static/files/modelo.docx
 /Ponto/Hrs Folha.xlsx
 /Admissao/colaboradores_antigo.db
 /Admissao/colaboradores_maisantigo.db
@@ -260,8 +260,8 @@ cython_debug/
 /Ponto/AFD abril.txt
 /Vendas e Cancelamentos/Cancelados 2021-2023.xlsx
 /Vendas e Cancelamentos/~$Cancelados 2021-2023.xlsx
-/Treinamento Certificados/Treinamento Aquático.docx
-/Treinamento Certificados/Treinamento Terrestre.docx
+/src/models/static/files/certificados/Treinamento Aquático.docx
+/src/models/static/files/certificados/Treinamento Terrestre.docx
 /Treinamento Certificados/Treinamento Aquático - 2022.docx
 /Treinamento Certificados/Treinamento Terrestre - 2022.docx
 /Vendas e Cancelamentos/Duplicados.xlsx
@@ -299,4 +299,6 @@ cython_debug/
 /Contatos diversos/cht.py
 /Lanca folha/faltas.db
 /src/models/static/files/CadastroAlteracoes.xlsx
-/src/models/aulas.db
+/src/models/static/files/recibo_uniforme.docx
+/src/models/static/files/solicitpgto_modelocapa.docx
+/src/models/static/files/planilha_itau.xlsx
