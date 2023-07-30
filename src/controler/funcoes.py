@@ -70,6 +70,11 @@ comple = PatternFill(start_color='FFC000',
 
 
 def confirma_folha(comp: int):
+    """
+    Confirm that the user wnats to proceed with procedures to post values of payroll in external aplication.
+    :param comp: Month reference to payroll calculate.
+    :return: Call function lancar_folha_no_dexion().
+    """
     resp = messagebox.askyesno(title='Tem certeza?',
                                message=f'Tem certeza que deseja lançar a folha do mês {comp} no Dexion?')
     if resp:
@@ -77,6 +82,11 @@ def confirma_folha(comp: int):
 
 
 def confirma_grade(comp: int):
+    """
+    Confirm that the user wnats to proceed with procedures to register the payroll.
+    :param comp: Month reference to payroll calculate.
+    :return: Call function salvar_planilha_soma_final().
+    """
     r = messagebox.askyesno(title='Tem certeza?',
                             message=f'Tem certeza que deseja gerar a folha do mês {comp}?\n'
                                     f'Essa ação irá sobrepor qualquer arquivo de folha já salvo na pasta.')
@@ -85,6 +95,11 @@ def confirma_grade(comp: int):
 
 
 def lancar_folha_no_dexion(competencia):
+    """
+    Register values of payroll in external aplication through PyAutogui package.
+    :param competencia: Month reference to payroll calculate.
+    :return: External aplication with payroll values registred.
+    """
     pa.hotkey('alt', 'tab'), pa.press('a'), t.sleep(2)
     folhagrd = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\view\Somafinal mes {competencia}.xlsx')
     wb = l_w(folhagrd, read_only=False)
