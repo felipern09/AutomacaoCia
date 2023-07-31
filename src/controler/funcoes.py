@@ -1,4 +1,5 @@
 from datetime import datetime as dt, timedelta as td
+import datetime
 from dateutil.relativedelta import relativedelta
 from difflib import SequenceMatcher
 import docx
@@ -213,8 +214,17 @@ def lancar_folha_no_dexion(competencia):
     )
 
 
-
-def somar_aulas_da_grade(diasem, inic, fim, competencia, iniciograd, fimgrad):
+def somar_aulas_da_grade(diasem: str, inic: datetime.datetime, fim: datetime.datetime, competencia: int, iniciograd: str, fimgrad: str) -> float:
+    """
+    Sum classes that have status 'Active' at the period selected for the payroll.
+    :param diasem: Weekday.
+    :param inic: Class start time.
+    :param fim: End time of the class.
+    :param competencia: Month of the payroll.
+    :param iniciograd: Start day for the payroll.
+    :param fimgrad: End day of the payroll.
+    :return: Sum of all classes times for each day of the week.
+    """
     horas = fim - inic
     hr, minut, seg = str(horas).split(':')
     igrad = dt.strptime(iniciograd, '%d/%m/%Y')
@@ -294,7 +304,11 @@ def somar_aulas_da_grade(diasem, inic, fim, competencia, iniciograd, fimgrad):
     return round(soma, 2)
 
 
-def listar_aulas_ativas():
+def listar_aulas_ativas() -> list:
+    """
+    List all classes with 'Active' status.
+    :return: List of active classes.
+    """
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulasativasdb = session.query(Aulas).filter_by(status='Ativa').all()
@@ -304,9 +318,14 @@ def listar_aulas_ativas():
         aula[i] = Aula(a.nome, a.professor, a.departamento, a.diadasemana, a.inicio, a.fim, a.valor, a.iniciograde,
                        a.fimgrade)
         yield aula[i]
+    return aula
 
 
 def listar_departamentos_ativos() -> list:
+    """
+    List all departments with classes with "Active" status.
+    :return: List of active departments.
+    """
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulasativasdb = session.query(Aulas).filter_by(status='Ativa').all()
@@ -318,6 +337,10 @@ def listar_departamentos_ativos() -> list:
 
 
 def listar_professores_ativos() -> list:
+    """
+    List of all teachers who have active classes.
+    :return: List of active teachers.
+    """
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulasativasdb = session.query(Aulas).filter_by(status='Ativa').all()
@@ -329,14 +352,28 @@ def listar_professores_ativos() -> list:
 
 
 def calcular_total_monetario_folha(compet: int) -> float:
+    """
+    Sum the total payroll payment.
+    :param compet: Month of payroll
+    :return: Payment amount.
+    """
     somatorio = 0
-    for al in list(listar_aulas_ativas()):
+    for al in listar_aulas_ativas():
         somatorio += somar_aulas_da_grade(al.dia, al.inicio, al.fim, compet, al.iniciograde, al.fimgrade) * float(
             str(al.valor).replace(',', '.')) * al.dsr
     return round(somatorio, 2)
 
 
-def somar_horas_professor(folha, prof, depto, nome, compet: int) -> float:
+def somar_horas_professor(folha: Folha, prof: str, depto: str, nome: str, compet: int) -> float:
+    """
+    Sum total of hours for each teacher.
+    :param folha: Payroll reference.
+    :param prof: Teacher.
+    :param depto: Department
+    :param nome: Name of the class.
+    :param compet: Month of payroll
+    :return: The amount of hours for each teacher on this payroll.
+    """
     somahoras = 0
     for aula in folha.aulas:
         if aula.professor == prof and aula.departamento == depto and aula.nome == nome:
