@@ -1,10 +1,8 @@
-from src.controler.funcoes import confirma_grade, lancar_folha_no_dexion, confirma_folha
 import tkinter as tk
 from tkcalendar import DateEntry
 from datetime import datetime
 import tkinter.filedialog
 from openpyxl import load_workbook as l_w
-from src.models.listas import departamentos
 import tkinter.filedialog
 from tkinter import ttk
 from tkinter import *
@@ -45,7 +43,7 @@ class Frame1(ttk.Frame):
         self.combocomp.grid(column=1, row=1, padx=205, pady=50, sticky=W)
         # gerar folha da competencia selecionada
         self.botaogerar = ttk.Button(self, width=20, text="Gerar folha",
-                                     command=lambda: [confirma_grade(self.competencia.get())])
+                                     command=lambda: [])
         self.botaogerar.grid(column=1, row=3, padx=190, pady=1, sticky=W)
 
 
@@ -61,7 +59,7 @@ class Frame2(ttk.Frame):
         self.combocomp.grid(column=1, row=1, padx=205, pady=50, sticky=W)
         # gerar folha da competencia selecionada
         self.botaolancar = ttk.Button(self, width=20, text="Lançar folha no Dexion",
-                                      command=lambda: [confirma_folha(self.competencia.get())])
+                                      command=lambda: [])
         self.botaolancar.grid(column=1, row=3, padx=190, pady=1, sticky=W)
 
 
