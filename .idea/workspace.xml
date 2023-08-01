@@ -5,10 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/certificados.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/certificados.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/contatos_diversos.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/contatos_diversos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/emitir_contrachques.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/emitir_contrachques.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controler/funcoes.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/funcoes.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/view/ponto.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/ponto.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -56,7 +55,7 @@
       <recent name="C:\Users\Felipe\PycharmProjects\PersonalTrainer" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.certificados">
+  <component name="RunManager" selected="Python.ponto">
     <configuration name="certificados" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -164,8 +163,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.certificados" />
         <item itemvalue="Python.ponto" />
+        <item itemvalue="Python.certificados" />
         <item itemvalue="Python.gerar_lancar_folha (1)" />
         <item itemvalue="Python.contatos_diversos" />
         <item itemvalue="Python.solicitar_pagamento" />

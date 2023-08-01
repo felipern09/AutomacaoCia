@@ -4,7 +4,7 @@
 #  relatorio de atrasos -> atraves do relatorio geral salvo em xlsx gerar comparatvo de horários registrados
 # com horarios de cadastro e informar se houve atraso superior a 10 min para cada registro
 # cadastro de funcionário no programa secullum
-
+from src.controler.funcoes import gerar_relatorios_ponto_pdf
 import tkinter as tk
 from tkcalendar import DateEntry
 from datetime import datetime
@@ -82,12 +82,16 @@ class Frame1(ttk.Frame):
                 lista.append(f'{x + 1} - {pessoa[2].value}')
 
         self.botaocadastrar = ttk.Button(self, width=20, text="Gerar Relatórios",
-                                         command=lambda: [])
+                                         command=lambda: [
+                                             gerar_relatorios_ponto_pdf(self.caminho.get(),
+                                                                        self.entryinicial.get(),
+                                                                        self.entryfinal.get())
+                                         ])
         self.botaocadastrar.grid(column=1, row=28, padx=520, pady=1, sticky=W)
 
     def selecionar_funcionario(self):
         try:
-            caminhoplan = tkinter.filedialog.askopenfilename(title='Planilha Funcionários')
+            caminhoplan = tkinter.filedialog.askopenfilename(title='Arquivo AFD')
             self.caminho.set(str(caminhoplan))
         except ValueError:
             pass

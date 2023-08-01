@@ -29,7 +29,7 @@ from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
 from src.models.listas import municipios
 import smtplib
-from src.models.dados_servd import em_rem, em_ti, em_if, k1, host, port
+from src.models.dados_servd import em_rem, em_ti, em_if, k1, host, port, rede
 import tkinter.filedialog
 from tkinter import messagebox
 import tkinter.filedialog
@@ -4134,23 +4134,34 @@ def cadastrar_funcionario_no_secullum():
         x += 1
 
 
-def gerar_relatorios_ponto_pdf():
+def gerar_relatorios_ponto_pdf(arquivo: str, datai: str, dataf: str):
+    """
+    Generates working time reports in .pdf trought analysis of file .AFD.
+    :param arquivo: path of .AFD file.
+    :param datai: Beginning date.
+    :param dataf: End date.
+    :return: Worker reports.
+    """
     # define excel plans to work with
-    wb = l_w('../src/models/static/files/zzBase.xlsx')
+    base = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\zzBase.xlsx')
+    wb = l_w(base)
     sh = wb['Funcionários e e-mail']
-    pl = l_w('Hrs Folha.xlsx')
+    hrsflh = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Hrs Folha.xlsx')
+    pl = l_w(hrsflh)
     fl = pl['Planilha1']
-
-    # datainicio = dt.strptime(input('Digite a data de início: '), '%d/%m/%Y')
-    # datafim = dt.strptime(input('Digite a data fim: '), '%d/%m/%Y')
-    datainicio = dt.strptime('21/04/2023', '%d/%m/%Y')
-    datafim = dt.strptime('20/05/2023', '%d/%m/%Y')
+    dataipt = datai.replace('/', '.')
+    datafpt = dataf.replace('/', '.')
+    dia, mes, ano = dataf.split('/')
+    datainicio = dt.strptime(datai, '%d/%m/%Y')
+    datafim = dt.strptime(dataf, '%d/%m/%Y')
+    mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
+              '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
 
     def intervalo(inicio, fim):
         for n in range(int((fim - inicio).days) + 1):
             yield [inicio + td(n), np.nan, np.nan, np.nan, np.nan, np.nan, np.nan]
 
-    # creating dicts to save employees datas
+    # creating dicts to store employees datas
     planbase = {}
     planmat = {}
     planfunc = {}
@@ -4167,7 +4178,7 @@ def gerar_relatorios_ponto_pdf():
             {str(sh[f'B{x}'].value).replace('.', '').replace('-', ''): str(sh[f'E{x}'].value).title().strip()})
         x += 1
 
-    geral = pd.read_csv(r'../src/models/static/file/AFD.txt', sep=' ', header=None, encoding='iso8859-1')
+    geral = pd.read_csv(arquivo, sep=' ', header=None, encoding='iso8859-1')
     geral = geral[geral[0].str.len() <= 34]
     geral.dropna(axis=1, inplace=True)
     geral = geral.rename(columns={0: 'Dados'})
@@ -4346,13 +4357,22 @@ def gerar_relatorios_ponto_pdf():
         ponto.add_paragraph('', 'Normal')
         ponto.add_paragraph('______________________________________________', 'Normal').alignment = 1
         ponto.add_paragraph(f'{planbase[str(matricula)]}', 'Normal').alignment = 1
-        ponto.save(
-            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\relatorios_ponto\Ponto {planbase[str(matricula)]}.docx')
-        docx2pdf.convert(
-            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\relatorios_ponto\Ponto {planbase[str(matricula)]}.docx',
-            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\relatorios_ponto\Ponto {planbase[str(matricula)]}.pdf')
-        os.remove(
-            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\relatorios_ponto\Ponto {planbase[str(matricula)]}.docx')
+        try:
+            ponto.save(rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
+            docx2pdf.convert(
+                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx',
+                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.pdf')
+            os.remove(
+                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
+        except:
+            os.mkdir(rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}')
+            ponto.save(rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
+            docx2pdf.convert(
+                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx',
+                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.pdf')
+            os.remove(
+                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
+
         # print(base)
 
 
@@ -4627,8 +4647,6 @@ def gerar_recibo_uniformes(local, nome, cargo, cpf, genero, tamanho1, tamanho2='
         entregues[f'G{x}'].value = '-'
         relatorio.save(local)
     tkinter.messagebox.showinfo(title='Recibo ok!', message='Recibo impresso com sucesso!')
-
-
 
 
 def confirmar_pagamento(valor='10,00', tipo1='adiantamento', tipo2='0', tipo3='0', tipo4='0', tipo5='0', tipo6='0',
