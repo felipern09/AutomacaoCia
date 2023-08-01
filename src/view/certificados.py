@@ -1,6 +1,7 @@
+from datetime import datetime
+from src.controler.funcoes import emitir_certificados
 import tkinter as tk
 from tkcalendar import DateEntry
-from datetime import datetime
 from tkinter import ttk
 from tkinter import *
 
@@ -31,21 +32,26 @@ class Frame1(ttk.Frame):
         # definir nome do treinamento
         self.labelnome = ttk.Label(self, width=120, text="Digite o nome do treinamento:")
         self.labelnome.grid(column=1, row=10, padx=25, pady=1, sticky=W)
-        self.entrymatr = ttk.Entry(self, width=100)
-        self.entrymatr.grid(column=1, row=11, padx=25, pady=1, sticky=W)
+        self.entrynome = ttk.Entry(self, width=100)
+        self.entrynome.grid(column=1, row=11, padx=25, pady=1, sticky=W)
         # definir data do trinamento
-        self.labeladmiss = ttk.Label(self, width=60, text="Data do treinamento:")
-        self.labeladmiss.grid(column=1, row=12, padx=25, pady=1, sticky=W)
-        self.entryadmiss = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month,
+        self.labelcert = ttk.Label(self, width=60, text="Data do treinamento:")
+        self.labelcert.grid(column=1, row=12, padx=25, pady=1, sticky=W)
+        self.entrycert = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month,
                                      day=self.hoje.day, locale='pt_BR')
-        self.entryadmiss.grid(column=1, row=12, padx=165, pady=1, sticky=W)
+        self.entrycert.grid(column=1, row=12, padx=165, pady=1, sticky=W)
         # definir horas de duração
         self.labeldurac = ttk.Label(self, width=60, text='Duração em horas:')
         self.labeldurac.grid(column=1, row=13, padx=25, pady=1, sticky=W)
         self.combodur = ttk.Combobox(self, width=12, textvariable=self.horas, values=self.hrs)
         self.combodur.grid(column=1, row=13, padx=165, pady=1, sticky=W)
         # selecionar funcionário que participou
-        self.botaocadastrar = ttk.Button(self, width=20, text="Emitir certificados", command=lambda: [])
+        self.botaocadastrar = ttk.Button(self, width=20, text="Emitir certificados",
+                                         command=lambda: [
+                                             emitir_certificados(self.entrynome.get(),
+                                                                 self.entrycert.get(),
+                                                                 self.horas.get(),
+                                                                 [self.entrynome.get()])])
         self.botaocadastrar.grid(column=1, row=28, padx=520, pady=1, sticky=W)
 
 

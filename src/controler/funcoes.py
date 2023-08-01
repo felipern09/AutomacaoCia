@@ -4389,7 +4389,6 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str):
 
 def emitir_certificados(nome: str, data: str, horas: int, participantes: list):
     modelo = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\certificados\Treinamento.docx')
-    # Subistituir nome nos modellos de certificados e salvar como em uma pasta da área de trabalho
 
     def extenso(datacompleta):
         dia, mes, ano = datacompleta.split('/')
