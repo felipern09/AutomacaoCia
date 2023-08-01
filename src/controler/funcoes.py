@@ -4134,7 +4134,7 @@ def cadastrar_funcionario_no_secullum():
         x += 1
 
 
-def gerar_relatorios_ponto_pdf(arquivo: str, datai: str, dataf: str):
+def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str):
     """
     Generates working time reports in .pdf trought analysis of file .AFD.
     :param arquivo: path of .AFD file.
@@ -4142,6 +4142,15 @@ def gerar_relatorios_ponto_pdf(arquivo: str, datai: str, dataf: str):
     :param dataf: End date.
     :return: Worker reports.
     """
+    # edit arq
+    edic1 = open(arq, 'r')
+    linhas = edic1.readlines()
+    novalinha = [x for x in linhas if len(x) <= 39]
+    out = open(arq, 'w')
+    out.writelines(novalinha)
+    out.close()
+    arquivo = rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\AFD.txt'
+
     # define excel plans to work with
     base = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\zzBase.xlsx')
     wb = l_w(base)
@@ -4196,7 +4205,7 @@ def gerar_relatorios_ponto_pdf(arquivo: str, datai: str, dataf: str):
         base = pd.DataFrame(list(intervalo(datainicio, datafim)),
                             columns=['Data', 'Entrada 1', 'Saída 1', 'Entrada 2', 'Saída 2', 'Entrada 3', 'Saída 3'])
         base = base.set_index('Data')
-        geral = pd.read_csv(r'../src/models/static/files/AFD.txt', sep=' ', header=None, encoding='iso8859-1')
+        geral = pd.read_csv(arquivo, sep=' ', header=None, encoding='iso8859-1')
         geral = geral[geral[0].str.len() <= 34]
         geral.dropna(axis=1, inplace=True)
         geral = geral.rename(columns={0: 'Dados'})
@@ -4288,7 +4297,7 @@ def gerar_relatorios_ponto_pdf(arquivo: str, datai: str, dataf: str):
         base = base[['Data', 'Entrada 1', 'Saída 1', 'Entrada 2', 'Saída 2', 'Entrada 3', 'Saída 3']]
         dias = base['Entrada 1'].count()
         base = base.fillna('-')
-        ponto = docx.Document('modelo.docx')
+        ponto = docx.Document(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\modelo.docx')
         ponto.paragraphs[1].text = str(ponto.paragraphs[1].text).replace('#data1',
                                                                          dt.strftime(datainicio, '%d/%m/%Y')).replace(
             '#data2', dt.strftime(datafim, '%d/%m/%Y'))
@@ -4350,7 +4359,7 @@ def gerar_relatorios_ponto_pdf(arquivo: str, datai: str, dataf: str):
         y = len(fl['A']) + 1
         fl[f'A{y}'].value = planbase[str(matricula)]
         fl[f'B{y}'].value = total_horas
-        pl.save('Hrs Folha.xlsx')
+        pl.save(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Hrs Folha.xlsx')
 
         ponto.add_paragraph(f'Total de dias trabalhados: {dias}', 'Default').alignment = 2
         ponto.add_paragraph('', 'Normal')
@@ -4364,9 +4373,11 @@ def gerar_relatorios_ponto_pdf(arquivo: str, datai: str, dataf: str):
                 rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.pdf')
             os.remove(
                 rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
-        except:
-            os.mkdir(rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}')
-            ponto.save(rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
+        except FileNotFoundError:
+            os.mkdir(rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto')
+            os.mkdir(
+                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}')
+            ponto.save( rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
             docx2pdf.convert(
                 rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx',
                 rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.pdf')
@@ -4376,33 +4387,21 @@ def gerar_relatorios_ponto_pdf(arquivo: str, datai: str, dataf: str):
         # print(base)
 
 
-def emitir_certificados():
-    enviar_email = int(
-        str(input('Enviar e-mail? s/n ')).replace('s', '1').replace('S', '1').replace('n', '0').replace('N', '0'))
+def emitir_certificados(nome: str, data: str, horas: int, participantes: list):
+    modelo = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\certificados\Treinamento.docx')
     # Subistituir nome nos modellos de certificados e salvar como em uma pasta da área de trabalho
-    outlook = client.Dispatch('outlook.application')
-    wb = l_w('Treinamento.xlsx')
-    pasta = '.\\certificados'
-    cert_terrestre = 'Treinamento Terrestre.docx'
-    cert_aquatico = 'Treinamento Aquático.docx'
 
     def extenso(datacompleta):
         dia, mes, ano = datacompleta.split('/')
-        mesext = {
-            '01': 'janeiro',
-            '02': 'fevereiro',
-            '03': 'março',
-            '04': 'abril',
-            '05': 'maio',
-            '06': 'junho',
-            '07': 'julho',
-            '08': 'agosto',
-            '09': 'setembro',
-            '10': 'outubro',
-            '11': 'novembro',
-            '12': 'dezembro'
-        }
+        mesext = {'01': 'janeiro', '02': 'fevereiro', '03': 'março', '04': 'abril', '05': 'maio', '06': 'junho',
+                  '07': 'julho', '08': 'agosto', '09': 'setembro', '10': 'outubro', '11': 'novembro', '12': 'dezembro'}
         return f'{dia} de {mesext[mes]} de {ano}.'
+
+    def exthoras(hr: int):
+        horasext = {'1': 'uma', '2': 'duas', '3': 'três', '4': 'quatro', '5': 'cinco', '6': 'seis', '7': 'sete',
+                    '8': 'oito', '9': 'nove', '10': 'dez', '11': 'onze', '12': 'doze', '13': 'treze', '14': 'quatorze',
+                    '15': 'quinze'}
+        return horasext[str(hr)]
 
     sessions = sessionmaker(bind=engine)
     session = sessions()
@@ -4411,117 +4410,59 @@ def emitir_certificados():
     dicion = {}
     for p in pesq:
         nomes.append(str(p.nome).upper())
-    # Certificado Terrestre
-    x = 2
-    sh = wb['Terrestre']
-    while sh[f'B{x}'].value is not None:
-        t1 = docx.Document(cert_terrestre)
-        nomeplan = str(sh[f'B{x}'].value)
+    #  Emitir certificado
         for pessoa in nomes:
-            dicion[pessoa] = SequenceMatcher(None, nomeplan, pessoa).ratio()
-        nome = [i for i in dicion if dicion[i] == max(dicion.values())][0]
-        endeletr = str(sh[f'C{x}'].value)
-        dia = dt.strftime(dt.strptime(str(sh[f'D{x}'].value), '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y')
-        diaext = extenso(dia)
-        doc = t1
+            for item in participantes:
+                dicion[pessoa] = SequenceMatcher(None, item, pessoa).ratio()
+        pess = [i for i in dicion if dicion[i] == max(dicion.values())][0]
+        doc = docx.Document(modelo)
         for p in doc.paragraphs:
             if '#nome' in p.text:
                 inline = p.runs
                 # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#nome' in inline[i].text:
-                        text = inline[i].text.replace('#nome', nome.title())
+                        text = inline[i].text.replace('#nome', pess.title())
+                        inline[i].text = text
+            if '#treinamento' in p.text:
+                inline = p.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#treinamento' in inline[i].text:
+                        text = inline[i].text.replace('#treinamento', nome.title())
                         inline[i].text = text
             if '#data' in p.text:
                 inline = p.runs
                 # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#data' in inline[i].text:
-                        text = inline[i].text.replace('#data', dia).replace('#dataextens', diaext)
+                        text = inline[i].text.replace('#data', data)
+                        inline[i].text = text
+            if '#duracao' in p.text:
+                inline = p.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#duracao' in inline[i].text:
+                        text = inline[i].text.replace('#duracao', horas)
+                        inline[i].text = text
+            if '#hrsexten' in p.text:
+                inline = p.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#hrsexten' in inline[i].text:
+                        text = inline[i].text.replace('#hrsexten', exthoras(horas))
                         inline[i].text = text
             if '#extens' in p.text:
                 inline = p.runs
                 # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#extens' in inline[i].text:
-                        text = inline[i].text.replace('#extens', diaext)
+                        text = inline[i].text.replace('#extens', extenso(data))
                         inline[i].text = text
-
-        doc.save(pasta + f'\\{nome} PST1.docx')
-        convert(pasta + f'\\{nome} PST1.docx', pasta + f'\\{nome} PST1.pdf')
-        os.remove(pasta + f'\\{nome} PST1.docx')
-        if enviar_email == 1:
-            email = outlook.CreateItem(0)
-            email.to = endeletr
-            email.Subject = 'Certificado Curso Primeiros Socorros'
-            email.HTMLBody = f'''
-            <p>Boa tarde,</p>
-            <p></p>
-            <p>Segue certificado do curso de primeiros socorros.</p>
-            <p></p>
-            <p>Atenciosamente,</p>
-            <p><img src="\\\Qnapcia\\rh\\01 - RH\\01 - Administração.Controles\\08 - Dados, Documentos e Declarações Diversas\\Logo Cia\\Assinatura.png"></p>
-            '''
-            anexo = pasta + f'\\{nome} PST1.pdf'
-            email.Attachments.Add(anexo)
-            email.Send()
-        x += 1
-
-    # Certificado Aquático
-    x = 2
-    sh = wb['Aquatico']
-    while sh[f'B{x}'].value is not None:
-        a1 = docx.Document(cert_aquatico)
-        nomeplan = str(sh[f'B{x}'].value)
-        for pessoa in nomes:
-            dicion[pessoa] = SequenceMatcher(None, nomeplan, pessoa).ratio()
-        nome = [i for i in dicion if dicion[i] == max(dicion.values())][0]
-        endeletr = str(sh[f'C{x}'].value)
-        dia = dt.strftime(dt.strptime(str(sh[f'D{x}'].value), '%Y-%m-%d %H:%M:%S'), '%d/%m/%Y')
-        diaext = extenso(dia)
-        doc = a1
-        for p in doc.paragraphs:
-            if '#nome' in p.text:
-                inline = p.runs
-                # Loop added to work with runs (strings with same style)
-                for i in range(len(inline)):
-                    if '#nome' in inline[i].text:
-                        text = inline[i].text.replace('#nome', nome.title())
-                        inline[i].text = text
-            if '#data' in p.text:
-                inline = p.runs
-                # Loop added to work with runs (strings with same style)
-                for i in range(len(inline)):
-                    if '#data' in inline[i].text:
-                        text = inline[i].text.replace('#data', dia).replace('#dataextens', diaext)
-                        inline[i].text = text
-            if '#extens' in p.text:
-                inline = p.runs
-                # Loop added to work with runs (strings with same style)
-                for i in range(len(inline)):
-                    if '#extens' in inline[i].text:
-                        text = inline[i].text.replace('#extens', diaext)
-                        inline[i].text = text
-        doc.save(pasta + f'\\{nome} PSA1.docx')
-        convert(pasta + f'\\{nome} PSA1.docx', pasta + f'\\{nome} PSA1.pdf')
-        os.remove(pasta + f'\\{nome} PSA1.docx')
-        if enviar_email == 1:
-            email = outlook.CreateItem(0)
-            email.to = endeletr
-            email.Subject = 'Certificado Curso Primeiros Socorros - Aquático'
-            email.HTMLBody = f'''
-                    <p>Boa tarde,</p>
-                    <p></p>
-                    <p>Segue certificado do curso de primeiros socorros.</p>
-                    <p></p>
-                    <p>Atenciosamente,</p>
-                    <p><img src="\\\Qnapcia\\rh\\01 - RH\\01 - Administração.Controles\\08 - Dados, Documentos e Declarações Diversas\\Logo Cia\\Assinatura.png"></p>
-                    '''
-            anexo = pasta + f'\\{nome} PSA1.pdf'
-            email.Attachments.Add(anexo)
-            email.Send()
-        x += 1
-    outlook.quit()
+        caminho = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\certificados')
+        doc.save(caminho + f'\\{pess} - {nome} {data.replace("/",".")}.docx')
+        convert(caminho + f'\\{pess} - {nome} {data.replace("/",".")}.docx', caminho + f'\\{pess} - {nome} {data.replace("/",".")}.pdf')
+        os.remove(caminho + f'\\{pess} - {nome} {data.replace("/",".")}.docx')
 
 
 def gerar_recibo_uniformes(local, nome, cargo, cpf, genero, tamanho1, tamanho2=''):

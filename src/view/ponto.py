@@ -22,7 +22,7 @@ class MainApplication(tk.Tk):
         super().__init__()
 
         self.title("Relatórios de Ponto - Cia BSB")
-        self.geometry('661x350')
+        self.geometry('332x180')
         self.img = PhotoImage(file='../models/static/imgs/Icone.png')
         self.iconphoto(False, self.img)
         self.columnconfigure(0, weight=5)
@@ -50,7 +50,7 @@ class Frame1(ttk.Frame):
         self.labelescolh = ttk.Label(self, width=40, text="Escolha o arquivo AFD: ")
         self.labelescolh.grid(column=1, row=1, padx=25, pady=1, sticky=W)
         self.botaoescolha = ttk.Button(self, text="Selecionar AFD", command=self.selecionar_funcionario)
-        self.botaoescolha.grid(column=1, row=1, padx=350, pady=1, sticky=W)
+        self.botaoescolha.grid(column=1, row=1, padx=165, pady=1, sticky=W)
         self.nome = StringVar()
         self.horario = StringVar()
         self.cargo = StringVar()
@@ -87,7 +87,7 @@ class Frame1(ttk.Frame):
                                                                         self.entryinicial.get(),
                                                                         self.entryfinal.get())
                                          ])
-        self.botaocadastrar.grid(column=1, row=28, padx=520, pady=1, sticky=W)
+        self.botaocadastrar.grid(column=1, row=28, padx=165, pady=1, sticky=W)
 
     def selecionar_funcionario(self):
         try:
@@ -106,7 +106,7 @@ class Frame2(ttk.Frame):
         self.labelescolh = ttk.Label(self, width=40, text="Escolha o arquivo AFD: ")
         self.labelescolh.grid(column=1, row=1, padx=25, pady=1, sticky=W)
         self.botaoescolha = ttk.Button(self, text="Selecionar AFD", command=self.selecionar_funcionario)
-        self.botaoescolha.grid(column=1, row=1, padx=350, pady=1, sticky=W)
+        self.botaoescolha.grid(column=1, row=1, padx=165, pady=1, sticky=W)
         self.nome = StringVar()
         self.horario = StringVar()
         self.cargo = StringVar()
@@ -139,7 +139,7 @@ class Frame2(ttk.Frame):
 
         self.botaocadastrar = ttk.Button(self, width=20, text="Gerar Relatórios",
                                          command=lambda: [])
-        self.botaocadastrar.grid(column=1, row=28, padx=520, pady=1, sticky=W)
+        self.botaocadastrar.grid(column=1, row=28, padx=165, pady=1, sticky=W)
 
     def selecionar_funcionario(self):
         try:
