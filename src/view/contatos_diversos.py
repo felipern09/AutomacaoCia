@@ -50,6 +50,12 @@ class Frame2(ttk.Frame):
         self.botaocadastrar.grid(column=1, row=28, padx=520, pady=1, sticky=W)
 
 
+# get texto escrito, passar para função
+# implementar forma de aparecer lista de nomes com checkbox para adicionar esses nomes em uma lista como parametro
+# da função
+# implementar função para enviar e-mails automáticos aos selecionados
+
+
 if __name__ == '__main__':
     app = MainApplication()
     app.mainloop()

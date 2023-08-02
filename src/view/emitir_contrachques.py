@@ -1,16 +1,21 @@
-import tkinter as tk
-from tkcalendar import DateEntry
-from datetime import datetime
-import tkinter.filedialog
-from ..controler.funcoes import cadastro_funcionario, salvar_docs_funcionarios, enviar_emails_funcionario, \
-    cadastro_estagiario, cadastrar_autonomo, validar_pis
-from openpyxl import load_workbook as l_w
-from ..models.listas import horarios, cargos, departamentos, tipodecontrato
-import tkinter.filedialog
-from tkinter import ttk
-from tkinter import *
-
 # Under development.
+
+# listar todos meses e datas de pgto
+# 	implementar pesquisa por nome
+# 	check box com meses específicos daquela pessoa para escolha de que mês emitir
+#
+# import tkinter as tk
+# from tkcalendar import DateEntry
+# from datetime import datetime
+# import tkinter.filedialog
+# from ..controler.funcoes import cadastro_funcionario, salvar_docs_funcionarios, enviar_emails_funcionario, \
+#     cadastro_estagiario, cadastrar_autonomo, validar_pis
+# from openpyxl import load_workbook as l_w
+# from ..models.listas import horarios, cargos, departamentos, tipodecontrato
+# import tkinter.filedialog
+# from tkinter import ttk
+# from tkinter import *
+
 
 
 

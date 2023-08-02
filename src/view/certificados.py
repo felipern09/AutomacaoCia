@@ -29,6 +29,10 @@ class Frame1(ttk.Frame):
         self.hoje = datetime.today()
         self.horas = IntVar()
         self.hrs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        # lista de nomes de funcionários com checkbox
+        #   loop for pessoa.nome com pesq em db
+        #       i, enumerate(lista de nomes)
+        #           self.label[i], row=i, self.checkbox[i]
         # definir nome do treinamento
         self.labelnome = ttk.Label(self, width=120, text="Digite o nome do treinamento:")
         self.labelnome.grid(column=1, row=10, padx=25, pady=1, sticky=W)
@@ -54,6 +58,8 @@ class Frame1(ttk.Frame):
                                                                  [self.entrynome.get()])])
         self.botaocadastrar.grid(column=1, row=28, padx=520, pady=1, sticky=W)
 
+
+# implementar forma de aparecer lista de nomes com checkbox para adicionar esses nomes em uma lista como parametro da função
 
 if __name__ == '__main__':
     app = MainApplication()

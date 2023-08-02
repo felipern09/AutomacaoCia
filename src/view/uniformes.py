@@ -1,7 +1,7 @@
 from openpyxl import load_workbook as l_w
 from src.controler.funcoes import gerar_recibo_uniformes
 import tkinter.filedialog
-from tkinter import ttk, messagebox
+from tkinter import ttk
 from tkinter import *
 import tkinter.filedialog
 
@@ -12,6 +12,9 @@ root.iconphoto(False, img)
 root.geometry('480x350')
 root.columnconfigure(0, weight=5)
 root.rowconfigure(0, weight=5)
+
+# implementar forma de generalizar controle
+# 		o usuario deve apaenas fornecer os dados do uniforme selecionado e quem recebeu e o sistema controlar o estoque
 
 my_notebook = ttk.Notebook(root)
 my_notebook.pack()

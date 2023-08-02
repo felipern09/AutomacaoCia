@@ -237,6 +237,9 @@ class PgtoFin(ttk.Frame):
         self.botao.grid(column=1, row=28, padx=380, pady=1, sticky=W)
 
 
+# implementar forma de passar os pagamentos gerados em planilha do itau para a outra aba, ja com total e só a um clique de ser enviado e-mail para o financeiro
+
+
 if __name__ == '__main__':
     app = MainApplication()
     app.mainloop()

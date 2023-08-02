@@ -149,6 +149,9 @@ class Frame2(ttk.Frame):
             pass
 
 
+# implementar pesquisa do funcionário direto no banco em vez da planilha base
+# 	criar campo 'ponto' no db para salvar a matrícula do ponto eletrônico
+
 if __name__ == '__main__':
     app = MainApplication()
     app.mainloop()

@@ -63,6 +63,8 @@ class Frame2(ttk.Frame):
         self.botaolancar.grid(column=1, row=3, padx=190, pady=1, sticky=W)
 
 
+# implementar a aba lançamento de folha
+
 if __name__ == '__main__':
     app = MainApplication()
     app.mainloop()

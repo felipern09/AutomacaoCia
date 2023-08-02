@@ -371,6 +371,9 @@ class Frame4(ttk.Frame):
         super().__init__()
 
 
+# fazer checkbox para atualização de dados bancários no db
+
+
 if __name__ == '__main__':
     app = MainApplication()
     app.mainloop()
