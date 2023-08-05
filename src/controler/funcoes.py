@@ -3537,45 +3537,51 @@ def send_wpp():
         x += 1
 
 
-def desligar_pessoa():
-    matricula = int(input('Digite a matrícula desligada: '))
-    data_desligamento = int(input('Digite a matrícula desligada: '))
-    tipo_desligamento = int(input('Digite a matrícula desligada: '))
-    Sessions = sessionmaker(bind=engine)
-    session = Sessions()
-    pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
-    if pessoa:
-        if pessoa.cargo == 'ESTAGIÁRIO' or pessoa.cargo == 'ESTAGIÁRIA':
-            # mandar e-mail para if pedindo deligamento do TCE a partir da data de envio do e-mail, deve conter nome e cpf do estag
-            # mandar e-mail para estag solicitando data para marcar devolução de uniformes, bts, e assinatura da rescisão
-            pass
-        else:
-            # gerar docs de homologação no dexion: Rescisão 5 cópias, av prév, comprovantes recolhimento inss, carta preposto,
-            # folha de registro, carta abono conduta, guia de seguro desemprego(?)
-            if tipo_desligamento == 'Pedido':
-                # e-mail informdando data de crédito na conta e solicitando data para marcar no sindicato e dev uniformes
-                pass
-            if tipo_desligamento == 'Demissao sem aviso':
-                # e-mails com data do pgto, orientações do passo a passo, guias de orientação do FGTS e Seguro desemprego
-                # explicar quanto saca do fgts
-                # solicitar data para agendar no sindicato
-                pass
-            if tipo_desligamento == 'Demissão com aviso':
-                # após gerada a rescisão e guia e-mail informanda dia do crédito em conta, guias de fgts e seguro
-                # explicar quanto saca do fgts
-                # e-mail marcando data para ir no sindicato, dev uniformes e bts
-                pass
-            if tipo_desligamento == 'Acordo':
-                # após gerada a rescisão e guia e-mail informanda dia do crédito em conta, guias de fgts e seguro
-                # explicar quanto saca do fgts
-                # e-mail marcando data para ir no sindicato, dev uniformes e bts
-                # e-mail para TI informando nome e CPF do funcionário/estagiário e solicitando o desligamento
-                pass
-        pessoa.desligamento = data_desligamento
-        session.commit()
+def desligar_pessoa(nome, data, tipo):
 
-    else:
-        print('pessoa não cadastrada')
+    def desligar_estag():
+        # mandar e-mail para if pedindo deligamento do TCE a partir da data de envio do e-mail, deve conter nome e cpf do estag
+        # mandar e-mail para estag solicitando data para marcar devolução de uniformes, bts, e assinatura da rescisão
+        print(f'{nome} foi desligado(a) em {data} com rescisão do tipo: Desligametno de Estagiário(a).')
+
+    def desligar_func_apedido_com_aviso():
+        # e-mail informdando data de crédito na conta e solicitando data para marcar no sindicato e dev uniformes
+        print(f'{nome} foi desligado(a) em {data} com rescisão do tipo: Desligametno de Func à pedido com aviso.')
+
+    def desligar_func_apedido_sam_aviso():
+        print(f'{nome} foi desligado(a) em {data} com rescisão do tipo: Desligametno de Func à pedido sem aviso.')
+
+    def desligar_func_por_acordo():
+        # após gerada a rescisão e guia e-mail informanda dia do crédito em conta, guias de fgts e seguro
+        # explicar quanto saca do fgts
+        # e-mail marcando data para ir no sindicato, dev uniformes e bts
+        # e-mail para TI informando nome e CPF do funcionário/estagiário e solicitando o desligamento
+        print(f'{nome} foi desligado(a) em {data} com rescisão do tipo: Desligametno de Func por acordo.')
+
+    def desligar_func_sem_aviso():
+        # gerar docs de homologação no dexion: Rescisão 5 cópias, av prév, comprovantes recolhimento inss, carta preposto,
+        # folha de registro, carta abono conduta, guia de seguro desemprego(?)
+        # e-mails com data do pgto, orientações do passo a passo, guias de orientação do FGTS e Seguro desemprego
+        # explicar quanto saca do fgts
+        # solicitar data para agendar no sindicato
+        print(f'{nome} foi desligado(a) em {data} com rescisão do tipo: Desligametno de Func sem aviso.')
+
+    def desligar_func_com_aviso():
+        # após gerada a rescisão e guia e-mail informanda dia do crédito em conta, guias de fgts e seguro
+        # explicar quanto saca do fgts
+        # e-mail marcando data para ir no sindicato, dev uniformes e bts
+        print(f'{nome} foi desligado(a) em {data} com rescisão do tipo: Desligametno de Func com aviso.')
+
+    desligamento = {
+        1: desligar_estag,
+        2: desligar_func_apedido_com_aviso,
+        3: desligar_func_apedido_sam_aviso,
+        4: desligar_func_por_acordo,
+        5: desligar_func_sem_aviso,
+        6: desligar_func_com_aviso
+    }
+    if tipo in desligamento:
+        desligamento[tipo]()
 
 
 def emitir_contracheque():

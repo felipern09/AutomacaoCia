@@ -9,6 +9,8 @@ from src.models.listas import horarios, cargos, departamentos, tipodecontrato
 import tkinter.filedialog
 from tkinter import ttk
 from tkinter import *
+from src.models.models import Colaborador, engine
+from sqlalchemy.orm import sessionmaker
 
 
 class MainApplication(tk.Tk):
@@ -126,6 +128,7 @@ class Frame1(ttk.Frame):
         self.labeldig.grid(column=1, row=26, padx=260, pady=1, sticky=W)
         self.entrydig = ttk.Entry(self, width=20, textvariable=self.digito)
         self.entrydig.grid(column=1, row=26, padx=320, pady=1, sticky=W)
+        # checkbutton para indicar onde foi feito
         self.edicao = IntVar()
         self.editar = ttk.Checkbutton(self, text='Editar cadastro feito manualmente.', variable=self.edicao)
         self.editar.grid(column=1, row=26, padx=26, pady=1, sticky=W)
@@ -291,7 +294,6 @@ class Frame3(ttk.Frame):
         super().__init__()
         self.hoje = datetime.today()
         self.caminhoaut = StringVar()
-        self.nomeaut = StringVar()
         self.horarioaut = StringVar()
         self.cargoaut = StringVar()
         self.departamentoaut = StringVar()
@@ -369,6 +371,52 @@ class Frame3(ttk.Frame):
 class Frame4(ttk.Frame):
     def __init__(self, container):
         super().__init__()
+        self.hoje = datetime.today()
+        # definir funcionários ativos
+        sessions = sessionmaker(bind=engine)
+        session = sessions()
+        self.grupo = []
+        pessoas = session.query(Colaborador).filter_by(desligamento=None).all()
+        for pess in pessoas:
+            if pess.nome != '':
+                self.grupo.append(pess.nome)
+        self.ativos = list(sorted(set(filter(None, self.grupo))))
+        # campo nome
+        self.labelnm = ttk.Label(self, text='Nome: ', width=25)
+        self.labelnm.grid(pady=10, padx=15, column=1, row=1, sticky=W)
+        self.combon = ttk.Combobox(self, values=self.ativos, width=40)
+        self.combon.grid(pady=1, padx=140, column=1, row=1, sticky=W)
+        # campo data
+        self.labeldt = ttk.Label(self, text='Data do desligamento: ', width=25)
+        self.labeldt.grid(pady=1, padx=15, column=1, row=2, sticky=W)
+        self.dtentry = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month, day=self.hoje.day,
+                                 locale='pt_BR')
+        self.dtentry.grid(pady=1, padx=140, column=1, row=2, sticky=W)
+        # campo tipo do desligamento
+        self.labeltipo = ttk.Label(self, text='Tipo do desligamento:', width=25)
+        self.labeltipo.grid(pady=1, padx=15, column=1, row=3, sticky=W)
+        # radio buttons
+        self.tipo = IntVar()
+        self.estdem = ttk.Radiobutton(self, text='Estagiário', variable=self.tipo, value=1)
+        self.estdem.grid(pady=5, padx=15, column=1, row=4, sticky=W)
+        self.fpedav = ttk.Radiobutton(self, text='Funcionário (à pedido COM aviso)', variable=self.tipo, value=2)
+        self.fpedav.grid(pady=5, padx=220, column=1, row=4, sticky=W)
+        self.fpedsav = ttk.Radiobutton(self, text='Funcionário (à pedido SEM aviso)', variable=self.tipo, value=3)
+        self.fpedsav.grid(pady=5, padx=15, column=1, row=5, sticky=W)
+        self.fdemac = ttk.Radiobutton(self, text='Funcionário demitido por acordo', variable=self.tipo, value=4)
+        self.fdemac.grid(pady=5, padx=220, column=1, row=5, sticky=W)
+        self.fdemsav = ttk.Radiobutton(self, text='Funcionário demitido SEM aviso', variable=self.tipo, value=5)
+        self.fdemsav.grid(pady=5, padx=15, column=1, row=6, sticky=W)
+        self.fdemav = ttk.Radiobutton(self, text='Funcionário demitido COM aviso', variable=self.tipo, value=6)
+        self.fdemav.grid(pady=5, padx=220, column=1, row=6, sticky=W)
+
+        # button registrar desligamento
+        self.btdesligar = ttk.Button(self, text="Registrar desligamento",
+                                     command=lambda: [
+                                         desligar_pessoa(self.combon.get(), self.dtentry.get(), self.tipo.get())
+                                     ])
+        self.btdesligar.grid(column=1, row=7, padx=480, pady=1, sticky=W)
+
 
 
 # fazer checkbox para atualização de dados bancários no db

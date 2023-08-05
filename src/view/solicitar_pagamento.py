@@ -32,17 +32,12 @@ class Pgto(ttk.Frame):
                       'Remuneração']
         sessions = sessionmaker(bind=engine)
         session = sessions()
-        pessoas = session.query(Colaborador).filter_by(desligamento='None').all()
         self.grupo = []
-        for pessoa in pessoas:
-            self.grupo.append(pessoa.nome)
-            self.grupo.sort()
-        pessoas2 = session.query(Colaborador).filter_by(desligamento=None).all()
-        for pess in pessoas2:
-            self.grupo.append(pess.nome)
-            self.grupo.sort()
-        self.nomes = self.grupo
-        print(self.nomes)
+        pessoas = session.query(Colaborador).filter_by(desligamento=None).all()
+        for pess in pessoas:
+            if pess.nome != '':
+                self.grupo.append(pess.nome)
+        self.nomes = list(sorted(set(filter(None, self.grupo))))
         self.hoje = datetime.today()
         self.nome1 = StringVar()
         self.nome2 = StringVar()
