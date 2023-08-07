@@ -31,11 +31,13 @@ class MainApplication(tk.Tk):
         self.Frame2 = Frame2(self.notebook)
         self.Frame3 = Frame3(self.notebook)
         self.Frame4 = Frame4(self.notebook)
+        self.Frame5 = Frame5(self.notebook)
 
         self.notebook.add(self.Frame1, text='Cadastrar Funcionário')
         self.notebook.add(self.Frame2, text='Cadastrar Estagiário')
         self.notebook.add(self.Frame3, text='Cadastrar Autônomo')
         self.notebook.add(self.Frame4, text='Desligamento')
+        self.notebook.add(self.Frame5, text='Atualizar Banco de Dados')
 
         self.notebook.pack()
 
@@ -422,8 +424,42 @@ class Frame4(ttk.Frame):
         self.btdesligar.grid(column=1, row=7, padx=480, pady=1, sticky=W)
 
 
-
-# fazer checkbox para atualização de dados bancários no db
+class Frame5(ttk.Frame):
+    def __init__(self, container):
+        super().__init__()
+        sessions = sessionmaker(bind=engine)
+        session = sessions()
+        self.grupo = []
+        pessoas = session.query(Colaborador).filter_by(desligamento=None).all()
+        for pess in pessoas:
+            if pess.nome != '':
+                self.grupo.append(pess.nome)
+        pessoas2 = session.query(Colaborador).filter_by(desligamento='None').all()
+        for pess in pessoas2:
+            if pess.nome != '':
+                self.grupo.append(pess.nome)
+        self.ativos = list(sorted(set(filter(None, self.grupo))))
+        # choose employee
+        self.labelnom = ttk.Label(self, text='Escolha o colaborador a ser atualizado: ')
+        self.labelnom.grid(column=1, row=1, padx=10, pady=5, sticky=W)
+        self.combnom = ttk.Combobox(self, values=self.ativos, width=40)
+        self.combnom.grid(column=2, row=1, padx=10, pady=5, sticky=W)
+        # add label to choose wich data the user want to update
+        self.labelescol = ttk.Label(self, text='Escolha a informação que deseja atualizar:')
+        self.labelescol.grid(column=1, row=2, padx=10, pady=15, sticky=W)
+        # radio buttons
+        self.tipo = IntVar()
+        self.nom = ttk.Radiobutton(self, text='Nome', variable=self.tipo, value=1)
+        self.nom.grid(pady=5, padx=15, column=1, row=3, sticky=W)
+        self.crg = ttk.Radiobutton(self, text='Cargo', variable=self.tipo, value=2)
+        self.crg.grid(pady=5, padx=220, column=2
+                      , row=3, sticky=W)
+        self.dept = ttk.Radiobutton(self, text='Departamento', variable=self.tipo, value=3)
+        self.dept.grid(pady=5, padx=15, column=1, row=4, sticky=W)
+        self.conta = ttk.Radiobutton(self, text='Conta Bancária', variable=self.tipo, value=4)
+        self.conta.grid(pady=5, padx=220, column=2, row=4, sticky=W)
+        self.bttatualizar = ttk.Button(self, text='Atualizar cadastro', command=lambda: [])
+        self.bttatualizar.grid(pady=5, padx=220, column=2, row=10, sticky=W)
 
 
 if __name__ == '__main__':
