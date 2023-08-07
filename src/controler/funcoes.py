@@ -3538,6 +3538,20 @@ def send_wpp():
 
 
 def desligar_pessoa(nome, data, tipo):
+    """
+    This function does all the procedures for terminating an employee: it issues documents, sends them by e-mail,
+    saves them in the respective folders, moves folders and schedules appointments.
+
+    The function works according to the type of dismissal entered at 'tipo' parameter. For each type of dismissal
+    there are specific procedures to be performed.
+
+    Through the 'tipo' parameter, the subfunction of the dictionary 'desligamento' is called by an if condition.
+
+    :param nome: Employee's name
+    :param data: Dismiss date
+    :param tipo: Dismiss type
+    :return: Procedures to dismiss employee
+    """
     sessions = sessionmaker(engine)
     session = sessions()
     pessoa = session.query(Colaborador).filter_by(nome=nome).first()
@@ -3552,7 +3566,7 @@ def desligar_pessoa(nome, data, tipo):
         s.starttls()
         s.login(email_remetente, senha)
 
-        # send e-mail to intern with a pdf file so he/she can go to bank to open an account
+        # send e-mail to intern
         msg = MIMEMultipart('alternative')
         arquivo = pasta_rescisao + f'\\TRCT.pdf'
         text = MIMEText(f'''Olá, {pessoa.nome.split(" ")[0].title()}!<br><br>
@@ -3594,7 +3608,7 @@ def desligar_pessoa(nome, data, tipo):
         msg.attach(text)
         image = MIMEImage(
             open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\assinatura.png', 'rb').read())
-        # Define the image's ID as referenced in the HTML body above
+        # define the image's ID as referenced in the HTML body above
         image.add_header('Content-ID', '<image1>')
         msg.attach(image)
         # set up the parameters of the message
@@ -3604,7 +3618,7 @@ def desligar_pessoa(nome, data, tipo):
         s.sendmail(email_remetente, em_ti, msg.as_string())
         del msg
 
-        # send document asking for the intern contract
+        # send document asking for terminate intern's contract
         msg = MIMEMultipart('alternative')
         text = MIMEText(
             f'''Olá!<br><br>
@@ -3614,7 +3628,7 @@ def desligar_pessoa(nome, data, tipo):
         msg.attach(text)
         image = MIMEImage(
             open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\assinatura.png', 'rb').read())
-        # Define the image's ID as referenced in the HTML body above
+        # define the image's ID as referenced in the HTML body above
         image.add_header('Content-ID', '<image1>')
         msg.attach(image)
         # set up the parameters of the message
@@ -3665,6 +3679,7 @@ def desligar_pessoa(nome, data, tipo):
     }
     if tipo in desligamento:
         desligamento[tipo]()
+
     pessoa.desligamento = data
     session.commit()
     tkinter.messagebox.showinfo(
