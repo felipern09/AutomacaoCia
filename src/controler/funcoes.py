@@ -3537,7 +3537,7 @@ def send_wpp():
         x += 1
 
 
-def desligar_pessoa(nome, data, tipo):
+def desligar_pessoa(nome: str, data: str, tipo: int):
     """
     This function does all the procedures for terminating an employee: it issues documents, sends them by e-mail,
     saves them in the respective folders, moves folders and schedules appointments.
@@ -4822,7 +4822,8 @@ def gerar_planilha_pgto_itau(nome1, nome2, nome3, nome4, nome5, nome6, nome7, no
              '13º salário': '6', 'Bolsa Estágio': '7', 'Bônus': '8', 'Adiantamento Salarial': '9',
              'Rescisão': '10', 'Bolsa Auxílio': '11', 'Pensão Alimentícia': '12', 'Pgto em C/C': '13',
              'Remuneração': '14'}
-    wb = l_w('../Admissao/planilha_itau.xlsx', read_only=False)
+    p = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\planilha_itau.xlsx')
+    wb = l_w(p, read_only=False)
     sh = wb['Planilha1']
     pessoa1 = session.query(Colaborador).filter_by(nome=nome1).first()
     pessoa2 = session.query(Colaborador).filter_by(nome=nome2).first()
@@ -4961,13 +4962,10 @@ def gerar_planilha_pgto_itau(nome1, nome2, nome3, nome4, nome5, nome6, nome7, no
     sh.column_dimensions['G'].width = 16
     d, mes, ano = dia.split('.')
     try:
-        wb.save(rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
-        04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Pedidos de pagamento\Pagamento Itau {dia}.xlsx')
+        wb.save(rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Pedidos de pagamento\Pagamento Itau {dia}.xlsx')
     except Exception:
-        os.makedirs(rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
-        04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Pedidos de pagamento')
+        os.makedirs(rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Pedidos de pagamento')
         wb.save(
-            rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\
-            Pedidos de pagamento\Pagamento Itau {dia}.xlsx')
+            rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Pedidos de pagamento\Pagamento Itau {dia}.xlsx')
 
 
