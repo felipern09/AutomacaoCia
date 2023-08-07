@@ -380,6 +380,10 @@ class Frame4(ttk.Frame):
         for pess in pessoas:
             if pess.nome != '':
                 self.grupo.append(pess.nome)
+        pessoas2 = session.query(Colaborador).filter_by(desligamento='None').all()
+        for pess in pessoas2:
+            if pess.nome != '':
+                self.grupo.append(pess.nome)
         self.ativos = list(sorted(set(filter(None, self.grupo))))
         # campo nome
         self.labelnm = ttk.Label(self, text='Nome: ', width=25)

@@ -3538,11 +3538,94 @@ def send_wpp():
 
 
 def desligar_pessoa(nome, data, tipo):
+    sessions = sessionmaker(engine)
+    session = sessions()
+    pessoa = session.query(Colaborador).filter_by(nome=nome).first()
 
     def desligar_estag():
-        # mandar e-mail para if pedindo deligamento do TCE a partir da data de envio do e-mail, deve conter nome e cpf do estag
-        # mandar e-mail para estag solicitando data para marcar devolução de uniformes, bts, e assinatura da rescisão
-        print(f'{nome} foi desligado(a) em {data} com rescisão do tipo: Desligametno de Estagiário(a).')
+        pasta_rescisao = rede + rf'\02 - Funcionários, Departamentos e Férias\000 - Pastas Funcionais\00 - ATIVOS\0 - Estagiários\{pessoa.nome}\Rescisao'
+        # send e-mails to end intern contract
+        email_remetente = em_rem
+        senha = k1
+        # set up smtpp connection
+        s = smtplib.SMTP(host=host, port=port)
+        s.starttls()
+        s.login(email_remetente, senha)
+
+        # send e-mail to intern with a pdf file so he/she can go to bank to open an account
+        msg = MIMEMultipart('alternative')
+        arquivo = pasta_rescisao + f'\\TRCT.pdf'
+        text = MIMEText(f'''Olá, {pessoa.nome.split(" ")[0].title()}!<br><br>
+        Obrigado por sua dedicação no Programa Novos Talentos da Companhia Athletica de Brasília!<br>
+        Seu desligamento do estágio foi efetuado em {data}.<br>
+        Para concluirmos essa etapa precisamos que você compareça a Companhia para devolver uniformes, BTS e assinar o termo de rescisão anexo.<br>
+        Algumas faculdades exigem o termo de desligamento do IF, vou solicitar a eles que nos envie.<br>
+        Qual o melhor dia para você para nos encontrarmos na Cia Athletica e assinarmos o seu termo de rescisão?<br>
+        Assim que o termo for assinado agendamos o pagamento do valor final.<br>
+        Aguardo você me informar a melhor data para assinarmos o termo.<br><br>
+        
+        Atenciosamente,<br>
+        <img src="cid:image1">''', 'html')
+        msg.attach(text)
+        image = MIMEImage(
+            open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\assinatura.png', 'rb').read())
+        image.add_header('Content-ID', '<image1>')
+        msg.attach(image)
+        # set up the parameters of the message
+        msg['From'] = email_remetente
+        msg['To'] = pessoa.email
+        msg['Subject'] = "Desligamento Estágio Cia Athletica"
+        # attach pdf file
+        part = MIMEBase('application', "octet-stream")
+        part.set_payload(open(arquivo, "rb").read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', 'attachment',
+                        filename=f'TRCT {pessoa.nome.split(" ")[0].title()}.pdf')
+        msg.attach(part)
+        s.sendmail(email_remetente, pessoa.email, msg.as_string())
+        del msg
+
+        # send e-mail to coworker asking to exclude intern register
+        msg = MIMEMultipart('alternative')
+        text = MIMEText(f'''Oi, Wallace!<br><br>
+        Favor desativar o(a) estagiário(a) {pessoa.nome.title()}.<br><br>
+        Abs.,<br>
+        <img src="cid:image1">''', 'html')
+        msg.attach(text)
+        image = MIMEImage(
+            open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\assinatura.png', 'rb').read())
+        # Define the image's ID as referenced in the HTML body above
+        image.add_header('Content-ID', '<image1>')
+        msg.attach(image)
+        # set up the parameters of the message
+        msg['From'] = email_remetente
+        msg['To'] = em_ti
+        msg['Subject'] = f"Desligamento Estágio - {str(pessoa.nome).split(' ')[0].title()}"
+        s.sendmail(email_remetente, em_ti, msg.as_string())
+        del msg
+
+        # send document asking for the intern contract
+        msg = MIMEMultipart('alternative')
+        text = MIMEText(
+            f'''Olá!<br><br>
+            Favor desligar estagiário(a) {pessoa.nome.title()}, CPF: {pessoa.cpf}, na data {data}.<br><br>
+            Atenciosamente,<br><img src="cid:image1">''',
+            'html')
+        msg.attach(text)
+        image = MIMEImage(
+            open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\assinatura.png', 'rb').read())
+        # Define the image's ID as referenced in the HTML body above
+        image.add_header('Content-ID', '<image1>')
+        msg.attach(image)
+        # set up the parameters of the message
+        msg['From'] = email_remetente
+        msg['To'] = em_if
+        msg['Subject'] = f"Desligamento Estágio - {str(pessoa.nome).split(' ')[0]}"
+        s.sendmail(email_remetente, em_if, msg.as_string())
+        del msg
+        s.quit()
+        os.rename(pasta_rescisao.replace(r'\Rescisao',''), pasta_rescisao.replace(r'\Rescisao','')
+                  .replace('00 - ATIVOS', '01 - Inativos'))
 
     def desligar_func_apedido_com_aviso():
         # e-mail informdando data de crédito na conta e solicitando data para marcar no sindicato e dev uniformes
@@ -3582,6 +3665,12 @@ def desligar_pessoa(nome, data, tipo):
     }
     if tipo in desligamento:
         desligamento[tipo]()
+    pessoa.desligamento = data
+    session.commit()
+    tkinter.messagebox.showinfo(
+        title='Desligamento ok!',
+        message='Desligamento registrado com sucesso!'
+    )
 
 
 def emitir_contracheque():

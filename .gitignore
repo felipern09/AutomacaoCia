@@ -303,3 +303,4 @@ cython_debug/
 /src/models/static/files/solicitpgto_modelocapa.docx
 /src/models/static/files/planilha_itau.xlsx
 /src/models/static/files/Hrs Folha.xlsx
+/test/testes_diversos.py
