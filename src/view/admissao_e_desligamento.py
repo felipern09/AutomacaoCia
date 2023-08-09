@@ -18,7 +18,7 @@ class MainApplication(tk.Tk):
         super().__init__()
 
         self.title("Atividades DP - Cia BSB")
-        self.geometry('661x550')
+        self.geometry('480x510')
         self.img = PhotoImage(file='../models/static/imgs/Icone.png')
         self.iconphoto(False, self.img)
         self.columnconfigure(0, weight=5)
@@ -27,22 +27,22 @@ class MainApplication(tk.Tk):
             child.grid_configure(padx=1, pady=3)
         self.notebook = ttk.Notebook(self)
 
-        self.Frame1 = Frame1(self.notebook)
-        self.Frame2 = Frame2(self.notebook)
-        self.Frame3 = Frame3(self.notebook)
-        self.Frame4 = Frame4(self.notebook)
-        self.Frame5 = Frame5(self.notebook)
+        self.Frame1 = CadastrarFunc(self.notebook)
+        self.Frame2 = CadastrarEst(self.notebook)
+        self.Frame3 = CadastrarAut(self.notebook)
+        self.Frame4 = Deslig(self.notebook)
+        self.Frame5 = AtualizaBanco(self.notebook)
 
-        self.notebook.add(self.Frame1, text='Cadastrar Funcionário')
-        self.notebook.add(self.Frame2, text='Cadastrar Estagiário')
-        self.notebook.add(self.Frame3, text='Cadastrar Autônomo')
-        self.notebook.add(self.Frame4, text='Desligamento')
-        self.notebook.add(self.Frame5, text='Atualizar Banco de Dados')
+        self.notebook.add(self.Frame1, text='Cad. Func.')
+        self.notebook.add(self.Frame2, text='Cad. Estag.')
+        self.notebook.add(self.Frame3, text='Cad. Aut.')
+        self.notebook.add(self.Frame4, text='Deslig.')
+        self.notebook.add(self.Frame5, text='Update DB')
 
         self.notebook.pack()
 
 
-class Frame1(ttk.Frame):
+class CadastrarFunc(ttk.Frame):
     def __init__(self, container):
         super().__init__()
 
@@ -175,13 +175,13 @@ class Frame1(ttk.Frame):
                                                                                self.agencia.get(),
                                                                                self.conta.get(),
                                                                                self.digito.get())])
-        self.botaocadastrar.grid(column=1, row=28, padx=520, pady=1, sticky=W)
+        self.botaocadastrar.grid(column=1, row=28, padx=320, pady=1, sticky=W)
         self.botaosalvar = ttk.Button(self, width=20, text="Salvar Docs",
                                       command=lambda: [salvar_docs_funcionarios(self.entrymatr.get())])
-        self.botaosalvar.grid(column=1, row=29, padx=520, pady=1, sticky=W)
+        self.botaosalvar.grid(column=1, row=29, padx=320, pady=1, sticky=W)
         self.botaoenviaemail = ttk.Button(self, width=20, text="Enviar e-mails",
                                           command=lambda: [enviar_emails_funcionario(self.entrymatr.get())])
-        self.botaoenviaemail.grid(column=1, row=30, padx=520, pady=1, sticky=W)
+        self.botaoenviaemail.grid(column=1, row=30, padx=320, pady=1, sticky=W)
 
     def selecionar_funcionario(self):
         try:
@@ -191,7 +191,7 @@ class Frame1(ttk.Frame):
             pass
 
 
-class Frame2(ttk.Frame):
+class CadastrarEst(ttk.Frame):
     def __init__(self, container):
         super().__init__()
         self.hoje = datetime.today()
@@ -269,7 +269,7 @@ class Frame2(ttk.Frame):
                                                 )
                                             ]
                                             )
-        self.botaocadastrarest.grid(column=1, row=28, padx=520, pady=1, sticky=W)
+        self.botaocadastrarest.grid(column=1, row=28, padx=320, pady=1, sticky=W)
 
         def carregarest(local):
             planwb = l_w(local)
@@ -291,7 +291,7 @@ class Frame2(ttk.Frame):
             pass
 
 
-class Frame3(ttk.Frame):
+class CadastrarAut(ttk.Frame):
     def __init__(self, container):
         super().__init__()
         self.hoje = datetime.today()
@@ -352,7 +352,7 @@ class Frame3(ttk.Frame):
         self.botaocarregar.grid(column=1, row=9, padx=350, pady=25, sticky=W)
         self.botaovalidarpis = ttk.Button(self, width=20, text="Validar PIS",
                                           command=lambda: [validar_pis(self.caminhoaut.get(), self.combonomeaut.get())])
-        self.botaovalidarpis.grid(column=1, row=10, padx=520, pady=1, sticky=W)
+        self.botaovalidarpis.grid(column=1, row=11, padx=320, pady=1, sticky=W)
 
         self.botaocarregar = ttk.Button(self, width=20, text="Cadastrar autônomo",
                                         command=lambda: [
@@ -360,7 +360,7 @@ class Frame3(ttk.Frame):
                                                                self.entrymatraut.get(), self.entryadmissaut.get(),
                                                                self.combocargoaut.get(),
                                                                self.combodeptoaut.get(), self.feitondeaut.get())])
-        self.botaocarregar.grid(column=1, row=28, padx=520, pady=1, sticky=W)
+        self.botaocarregar.grid(column=1, row=28, padx=320, pady=1, sticky=W)
 
     def selecionaraut(self):
         try:
@@ -370,7 +370,7 @@ class Frame3(ttk.Frame):
             pass
 
 
-class Frame4(ttk.Frame):
+class Deslig(ttk.Frame):
     def __init__(self, container):
         super().__init__()
         self.hoje = datetime.today()
@@ -421,10 +421,10 @@ class Frame4(ttk.Frame):
                                      command=lambda: [
                                          desligar_pessoa(self.combon.get(), self.dtentry.get(), self.tipo.get())
                                      ])
-        self.btdesligar.grid(column=1, row=7, padx=480, pady=1, sticky=W)
+        self.btdesligar.grid(column=1, row=7, padx=320, pady=1, sticky=W)
 
 
-class Frame5(ttk.Frame):
+class AtualizaBanco(ttk.Frame):
     def __init__(self, container):
         super().__init__()
         sessions = sessionmaker(bind=engine)
@@ -442,8 +442,8 @@ class Frame5(ttk.Frame):
         # choose employee
         self.labelnom = ttk.Label(self, text='Escolha o colaborador a ser atualizado: ')
         self.labelnom.grid(column=1, row=1, padx=10, pady=5, sticky=W)
-        self.combnom = ttk.Combobox(self, values=self.ativos, width=40)
-        self.combnom.grid(column=2, row=1, padx=10, pady=5, sticky=W)
+        self.combnom = ttk.Combobox(self, values=self.ativos, width=30)
+        self.combnom.grid(column=2, row=1, padx=2, pady=5, sticky=W)
         # add label to choose wich data the user want to update
         self.labelescol = ttk.Label(self, text='Escolha a informação que deseja atualizar:')
         self.labelescol.grid(column=1, row=2, padx=10, pady=15, sticky=W)
@@ -458,7 +458,7 @@ class Frame5(ttk.Frame):
         self.conta = ttk.Radiobutton(self, text='Conta Bancária', variable=self.tipo, value=4)
         self.conta.grid(pady=5, padx=10, column=2, row=4, sticky=W)
         self.bttatualizar = ttk.Button(self, text='Atualizar cadastro', command=lambda: [])
-        self.bttatualizar.grid(pady=5, padx=220, column=2, row=10, sticky=W)
+        self.bttatualizar.grid(pady=5, padx=90, column=2, row=10, sticky=W)
 
 
 if __name__ == '__main__':

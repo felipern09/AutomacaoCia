@@ -550,13 +550,15 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
     def intervalo(inicio, fechamento):
         for n in range(int((fechamento - inicio).days) + 1):
             yield dt.strftime(inicio + td(n), '%d/%m/%Y')
-
+    # inserir data no cabeçalho da grade
     col = 3
     for item in list(intervalo(inicio, fechamento)):
         plan1.cell(column=col, row=3, value=dt.strftime(dt.strptime(item, '%d/%m/%Y'), '%a'))
         plan1.cell(column=col, row=4, value=dt.strftime(dt.strptime(item, '%d/%m/%Y'), '%d/%m'))
         col += 1
+    # indesir total na coluna ao final das datas
     plan1.cell(column=col, row=3, value='Total')
+    # formatar coloração de fds
     for itens in plan1.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
         for cell in itens:
             if cell.value != 'Total':
@@ -564,6 +566,7 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                     letras = openpyxl.utils.cell.get_column_letter(cell.column)
                     for numero in range(3, 150):
                         plan1[f'{letras}{numero}'].fill = fds
+    # separar cada prof de cada depto
     musculacao = []
     ginastica = []
     esportes = []
@@ -1265,7 +1268,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
     plan1['J2'].value = 'Substituiu'
     plan1['M1'].fill = comple
     plan1['N1'].value = 'Horas Complementares'
-    # plan1[]
     grade.save(f'Grade {fechamento.month}-{fechamento.year}.xlsx')
 
 
@@ -1509,6 +1511,14 @@ def salvar_planilha_soma_final(compet: int):
         title='Grade ok!',
         message=f'Grade do mês {compet} salva com sucesso!'
     )
+    planilha3 = l_w(f'Grade {compet}-2023.xlsx', read_only=False)
+    aba3 = planilha3['Planilha1']
+    for row in aba3.iter_cols(min_row=3, min_col=3, max_row=120, max_col=35):
+        for cell in row:
+            if cell.value == 0:
+                cell.value = ''
+
+    planilha3.save(f'Grade {compet}-2023.xlsx')
     print('Férias \n', feriasl)
     print('Desligados \n', desligadosl)
     print('Substitutos \n', substitutos)
@@ -4964,5 +4974,5 @@ def gerar_planilha_pgto_itau(nome1, nome2, nome3, nome4, nome5, nome6, nome7, no
     tps = [tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9, tipo10, tipo11, tipo12, tipo13, tipo14, tipo15]
     tp = [x for x in tps if x != '']
     tipos_unicos = sorted(list(set(filter(None, tp))))
-    tkinter.messagebox.showinfo(title=f'Planilha salva dia {data}!', message=f'{len(tipos_unicos)} tipo(s) de pgto diferente(s).\n Eles são: {tipos_unicos}.')
+    tkinter.messagebox.showinfo(title=f'Planilha salva dia {data}!', message=f'{len(tipos_unicos)} tipo(s) de pgto diferente(s).\n {str(tipos_unicos).replace("[","").replace("]","")}.')
 

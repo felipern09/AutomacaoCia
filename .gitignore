@@ -155,7 +155,7 @@ cython_debug/
 /Admissao/alteracoes.txt
 /Admissao/Banco.xlsx
 /Admissao/Banco - Total.xlsx
-/test/cadastrar_banco.py
+/test/cadastrar_bancoColaborador.py
 /src/models/static/files/Cadastro de Funcionário (respostas).xlsx
 /src/models/static/files/Cadastro Est Cia (respostas).xlsx
 /Admissao/Cadastro Funcionários.xlsm
@@ -266,7 +266,7 @@ cython_debug/
 /Treinamento Certificados/Treinamento Terrestre - 2022.docx
 /Vendas e Cancelamentos/Duplicados.xlsx
 /src/models/aulas.db
-/test/alterar_banco.py
+/test/alterar_bancoAulas.py
 /Lanca folha/Aulas.xlsx
 /Lanca folha/~$Aulas.xlsx
 /src/models/static/files/CadastroAulas.xlsx
@@ -304,3 +304,5 @@ cython_debug/
 /src/models/static/files/planilha_itau.xlsx
 /src/models/static/files/Hrs Folha.xlsx
 /test/testes_diversos.py
+/test/alterar_bancoAulas.py
+/test/cadastrar_bancoColaborador.py
