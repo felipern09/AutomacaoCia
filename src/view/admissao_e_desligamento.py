@@ -452,12 +452,11 @@ class Frame5(ttk.Frame):
         self.nom = ttk.Radiobutton(self, text='Nome', variable=self.tipo, value=1)
         self.nom.grid(pady=5, padx=15, column=1, row=3, sticky=W)
         self.crg = ttk.Radiobutton(self, text='Cargo', variable=self.tipo, value=2)
-        self.crg.grid(pady=5, padx=220, column=2
-                      , row=3, sticky=W)
+        self.crg.grid(pady=5, padx=10, column=2, row=3, sticky=W)
         self.dept = ttk.Radiobutton(self, text='Departamento', variable=self.tipo, value=3)
         self.dept.grid(pady=5, padx=15, column=1, row=4, sticky=W)
         self.conta = ttk.Radiobutton(self, text='Conta Bancária', variable=self.tipo, value=4)
-        self.conta.grid(pady=5, padx=220, column=2, row=4, sticky=W)
+        self.conta.grid(pady=5, padx=10, column=2, row=4, sticky=W)
         self.bttatualizar = ttk.Button(self, text='Atualizar cadastro', command=lambda: [])
         self.bttatualizar.grid(pady=5, padx=220, column=2, row=10, sticky=W)
 
