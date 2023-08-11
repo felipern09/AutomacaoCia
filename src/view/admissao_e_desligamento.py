@@ -3,7 +3,7 @@ from tkcalendar import DateEntry
 from datetime import datetime
 import tkinter.filedialog
 from src.controler.funcoes import cadastro_funcionario, salvar_docs_funcionarios, enviar_emails_funcionario, \
-    cadastro_estagiario, cadastrar_autonomo, validar_pis, desligar_pessoa
+    cadastro_estagiario, cadastrar_autonomo, validar_pis, desligar_pessoa, enviar_emails_contratacao
 from openpyxl import load_workbook as l_w
 from src.models.listas import horarios, cargos, departamentos, tipodecontrato
 import tkinter.filedialog
@@ -182,6 +182,12 @@ class CadastrarFunc(ttk.Frame):
         self.botaoenviaemail = ttk.Button(self, width=20, text="Enviar e-mails",
                                           command=lambda: [enviar_emails_funcionario(self.entrymatr.get())])
         self.botaoenviaemail.grid(column=1, row=30, padx=320, pady=1, sticky=W)
+        self.botaoemailcontrat = ttk.Button(self, width=20, text="E-mail contratação",
+                                          command=lambda: [
+                                              enviar_emails_contratacao(self.caminho.get(), self.combonome.get(),
+                                                                        self.combodepto.get(), self.combocargo.get(),
+                                                                        self.entrysal.get(), self.entryadmiss.get())])
+        self.botaoemailcontrat.grid(column=1, row=11, padx=320, pady=1, sticky=W)
 
     def selecionar_funcionario(self):
         try:
