@@ -2308,6 +2308,11 @@ def salvar_docs_funcionarios(matricula):
 
 
 def enviar_emails_funcionario(matricula):
+    """
+    Send e-mails to employee about his/her admission.
+
+    :param matricula: Employee registration number
+    """
     sessions = sessionmaker(bind=engine)
     session = sessions()
     pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
@@ -2343,7 +2348,7 @@ def enviar_emails_funcionario(matricula):
                 É importante lembrar que o tempo dos intervalos entre aulas não é remunerado.<br><br>
                 Seguem alguns lembretes do nosso código de ética já enviado a você:<br>
                 Você pode treinar todas as modalidades da academia gratuitamente, sempre respeitando a prioridade aos alunos.<br>
-                Você tem direito a uma folga no exato dia do seu aniversário (essa folga não pode ser transferida para outro dia).<br>
+                Você tem direito a uma folga no dia do seu aniversário (essa folga não pode ser transferida para outro dia).<br>
                 A academia oferece descontos especiais para parentes de funcionários.<br>
                 Nosso período de folha é do dia 21 do mês ao dia 20 do mês seguinte. Então, no seu primeiro salário você receberá o valor proporcional do dia que entrou até o próximo dia 20.<br>
                 Quando completar um ano de contrato terá direito a férias. Para pedir férias você deve solicitar ao seu superior direto com antecedência de 2 meses da data que pretende sair.<br><br>
@@ -2357,7 +2362,7 @@ def enviar_emails_funcionario(matricula):
                 Seu contrato está pronto para ser assinado.<br><br>
                 Seguem alguns lembretes do nosso código de ética já enviado a você:<br>
                 Você pode treinar todas as modalidades da academia gratuitamente, sempre respeitando a prioridade aos alunos.<br>
-                Você tem direito a uma folga no exato dia do seu aniversário (essa folga não pode ser transferida para outro dia).<br>
+                Você tem direito a uma folga no dia do seu aniversário (essa folga não pode ser transferida para outro dia).<br>
                 A academia oferece descontos especiais para parentes de funcionários.<br>
                 Nosso período de folha é do dia 21 do mês ao dia 20 do mês seguinte. Então, no seu primeiro salário você receberá o valor proporcional do dia que entrou até o próximo dia 20.<br>
                 Quando completar um ano de contrato terá direito a férias. Para pedir férias você deve solicitar ao seu superior direto com antecedência de 2 meses da data que pretende sair.<br><br>
@@ -2376,7 +2381,7 @@ def enviar_emails_funcionario(matricula):
                 É importante lembrar que o tempo dos intervalos entre aulas não é remunerado.<br><br>
                 Seguem alguns lembretes do nosso código de ética já enviado a você:<br>
                 Você pode treinar todas as modalidades da academia gratuitamente, sempre respeitando a prioridade aos alunos.<br>
-                Você tem direito a uma folga no exato dia do seu aniversário (essa folga não pode ser transferida para outro dia).<br>
+                Você tem direito a uma folga no dia do seu aniversário (essa folga não pode ser transferida para outro dia).<br>
                 A academia oferece descontos especiais para parentes de funcionários.<br>
                 Nosso período de folha é do dia 21 do mês ao dia 20 do mês seguinte. Então, no seu primeiro salário você receberá o valor proporcional do dia que entrou até o próximo dia 20.<br>
                 Quando completar um ano de contrato terá direito a férias. Para pedir férias você deve solicitar ao seu superior direto com antecedência de 2 meses da data que pretende sair.<br><br>
@@ -2390,7 +2395,7 @@ def enviar_emails_funcionario(matricula):
                 Seu contrato está pronto para ser assinado.<br><br>
                 Seguem alguns lembretes do nosso código de ética já enviado a você:<br>
                 Você pode treinar todas as modalidades da academia gratuitamente, sempre respeitando a prioridade aos alunos.<br>
-                Você tem direito a uma folga no exato dia do seu aniversário (essa folga não pode ser transferida para outro dia).<br>
+                Você tem direito a uma folga no dia do seu aniversário (essa folga não pode ser transferida para outro dia).<br>
                 A academia oferece descontos especiais para parentes de funcionários.<br>
                 Nosso período de folha é do dia 21 do mês ao dia 20 do mês seguinte. Então, no seu primeiro salário você receberá o valor proporcional do dia que entrou até o próximo dia 20.<br>
                 Quando completar um ano de contrato terá direito a férias. Para pedir férias você deve solicitar ao seu superior direto com antecedência de 2 meses da data que pretende sair.<br><br>
@@ -2430,7 +2435,18 @@ def enviar_emails_funcionario(matricula):
         )
 
 
-def enviar_emails_contratacao(caminho, nome, departamento, cargo, salario, admissao):
+def enviar_emails_contratacao(caminho: str, nome: str, departamento: str, cargo: str, salario: str, admissao: str):
+    """
+    This function send e-mails to employee
+
+    :param caminho:
+    :param nome:
+    :param departamento:
+    :param cargo:
+    :param salario:
+    :param admissao:
+    :return:
+    """
     if nome == '' or departamento == '' or cargo == '' or salario == '' or admissao == '':
         tkinter.messagebox.showinfo(
             title='Erro de preenchimento',
