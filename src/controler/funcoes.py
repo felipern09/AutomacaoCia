@@ -4781,10 +4781,18 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str):
         # print(base)
 
 
-def emitir_certificados(nome: str, data: str, horas: int, participantes: list):
-    modelo = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\certificados\Treinamento.docx')
+def emitir_certificados(pst: int, psa: int, nome: str, data: str, horas: int, participantes: list):
+    if pst != 0:
+        nome = 'Primeiros Socorros - Terrestre'
+        modelo = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\certificados\Treinamento.docx')
+    else:
+        if psa != 0:
+            nome = 'Primeiros Socorros - Aquático'
+            modelo = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\certificados\Treinamento.docx')
+        else:
+            modelo = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\certificados\TreinamentoGeral.docx')
 
-    def extenso(datacompleta):
+    def extenso(datacompleta: str):
         dia, mes, ano = datacompleta.split('/')
         mesext = {'01': 'janeiro', '02': 'fevereiro', '03': 'março', '04': 'abril', '05': 'maio', '06': 'junho',
                   '07': 'julho', '08': 'agosto', '09': 'setembro', '10': 'outubro', '11': 'novembro', '12': 'dezembro'}
@@ -4796,66 +4804,74 @@ def emitir_certificados(nome: str, data: str, horas: int, participantes: list):
                     '15': 'quinze'}
         return horasext[str(hr)]
 
-    sessions = sessionmaker(bind=engine)
-    session = sessions()
-    pesq = session.query(Colaborador).filter_by(desligamento=None).all()
-    nomes = []
-    dicion = {}
-    for p in pesq:
-        nomes.append(str(p.nome).upper())
-    #  Emitir certificado
-        for pessoa in nomes:
-            for item in participantes:
-                dicion[pessoa] = SequenceMatcher(None, item, pessoa).ratio()
-        pess = [i for i in dicion if dicion[i] == max(dicion.values())][0]
+    # sessions = sessionmaker(bind=engine)
+    # session = sessions()
+    # pesq = session.query(Colaborador).filter_by(desligamento=None).all()
+    # pesq2 = session.query(Colaborador).filter_by(desligamento='None').all()
+    # nomes = []
+    # dicion = {}
+    # for p in pesq:
+    #     nomes.append(str(p.nome).upper())
+    # for p2 in pesq2:
+    #     nomes.append(str(p2.nome).upper())
+    #     nomes.sort()
+    # #  Emitir certificado
+    #     for pessoa in nomes:
+    for item in participantes:
+        #         dicion[pessoa] = SequenceMatcher(None, item, pessoa).ratio()
+        # pess = [i for i in dicion if dicion[i] == max(dicion.values())][0]
         doc = docx.Document(modelo)
-        for p in doc.paragraphs:
-            if '#nome' in p.text:
-                inline = p.runs
+        for parag in doc.paragraphs:
+            if '#nome' in parag.text:
+                inline = parag.runs
                 # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#nome' in inline[i].text:
-                        text = inline[i].text.replace('#nome', pess.title())
+                        text = inline[i].text.replace('#nome', item.title())
                         inline[i].text = text
-            if '#treinamento' in p.text:
-                inline = p.runs
+            if '#treinamento' in parag.text:
+                inline = parag.runs
                 # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#treinamento' in inline[i].text:
                         text = inline[i].text.replace('#treinamento', nome.title())
                         inline[i].text = text
-            if '#data' in p.text:
-                inline = p.runs
+            if '#data' in parag.text:
+                inline = parag.runs
                 # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#data' in inline[i].text:
                         text = inline[i].text.replace('#data', data)
                         inline[i].text = text
-            if '#duracao' in p.text:
-                inline = p.runs
+            if '#duracao' in parag.text:
+                inline = parag.runs
                 # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#duracao' in inline[i].text:
-                        text = inline[i].text.replace('#duracao', horas)
+                        text = inline[i].text.replace('#duracao', str(horas))
                         inline[i].text = text
-            if '#hrsexten' in p.text:
-                inline = p.runs
+            if '#hrsexten' in parag.text:
+                inline = parag.runs
                 # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#hrsexten' in inline[i].text:
                         text = inline[i].text.replace('#hrsexten', exthoras(horas))
                         inline[i].text = text
-            if '#extens' in p.text:
-                inline = p.runs
+            if '#extens' in parag.text:
+                inline = parag.runs
                 # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#extens' in inline[i].text:
                         text = inline[i].text.replace('#extens', extenso(data))
                         inline[i].text = text
         caminho = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\certificados')
-        doc.save(caminho + f'\\{pess} - {nome} {data.replace("/",".")}.docx')
-        convert(caminho + f'\\{pess} - {nome} {data.replace("/",".")}.docx', caminho + f'\\{pess} - {nome} {data.replace("/",".")}.pdf')
-        os.remove(caminho + f'\\{pess} - {nome} {data.replace("/",".")}.docx')
+        doc.save(caminho + f'\\{item} - {nome} {data.replace("/",".")}.docx')
+        convert(caminho + f'\\{item} - {nome} {data.replace("/",".")}.docx', caminho + f'\\{item} - {nome} {data.replace("/",".")}.pdf')
+        os.remove(caminho + f'\\{item} - {nome} {data.replace("/",".")}.docx')
+    tkinter.messagebox.showinfo(
+        title='Certificados ok!',
+        message='Certificados gerados com sucesso!'
+    )
 
 
 def gerar_recibo_uniformes(local, nome, cargo, cpf, genero, tamanho1, tamanho2=''):

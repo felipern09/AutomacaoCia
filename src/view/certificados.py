@@ -76,18 +76,37 @@ class Frame1(ttk.Frame):
         self.labelparticp = ttk.Label(self.canvframe, width=60, text='Participantes:')
         self.labelparticp.grid(column=1, row=14, padx=25, pady=5, sticky=W)
         self.participantes = []
+
+        def configparticip(event):
+            widget = event.widget
+            nome = widget.cget('text')
+            if nome in self.participantes:
+                self.participantes.remove(nome)
+            else:
+                self.participantes.append(nome)
+            self.participantes.sort()
+
         for i, item in enumerate(self.nomes):
-            self.label = ttk.Label(self.canvframe, width=200, text=item)
-            self.label.grid(column=1, row=i+16, padx=55, pady=1, sticky=W)
-            self.v = IntVar(value=0)
-            self.item = tk.Checkbutton(self.canvframe, variable=self.v)
+            var_name = f'var_{i}'
+            value = IntVar()
+            globals()[var_name] = value
+            self.item = tk.Checkbutton(self.canvframe, text=item, variable=globals()[var_name])
             self.item.grid(column=1, row=i+16, padx=25, pady=1, sticky=W)
+            self.item.bind('<Button-1>', configparticip)
+        self.pst = IntVar(value=0)
+        self.primsocrrt = tk.Checkbutton(self.canvframe, text='PS Terrestre', variable=self.pst)
+        self.primsocrrt.grid(column=1, row=206, padx=500, pady=4, sticky=W)
+        self.psa = IntVar(value=0)
+        self.primsocrra = tk.Checkbutton(self.canvframe, text='PS Aquático', variable=self.psa)
+        self.primsocrra.grid(column=1, row=207, padx=500, pady=4, sticky=W)
         self.botaocadastrar = ttk.Button(self.canvframe, width=20, text="Emitir certificados",
                                          command=lambda: [
-                                             emitir_certificados(self.entrynome.get(),
+                                             emitir_certificados(self.pst.get(), self.psa.get(),
+                                                                 self.entrynome.get(),
                                                                  self.entrycert.get(),
                                                                  self.horas.get(),
-                                                                 self.participantes)])
+                                                                 self.participantes)
+                                         ])
         self.botaocadastrar.grid(column=1, row=208, padx=500, pady=1, sticky=W)
 
 
