@@ -4999,16 +4999,29 @@ def gerar_recibo_uniformes(local, nome, cargo, cpf, genero, tamanho1, tamanho2='
     tkinter.messagebox.showinfo(title='Recibo ok!', message='Recibo impresso com sucesso!')
 
 
-def confirmar_pagamento(valor='10,00', tipo1='adiantamento', tipo2='0', tipo3='0', tipo4='0', tipo5='0', tipo6='0',
-                        dia='03/07/2023', competencia='07/2023'):
+def confirmar_pagamento(tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9,
+                        tipo10,tipo11, tipo12, tipo13, tipo14, tipo15, entryvalor1,
+                        valor2,valor3, valor4, valor5,
+                        valor6,valor7, valor8, valor9,
+                        valor10,valor11, valor12, valor13,
+                        valor14,valor15, data):
+    tps = [tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9, tipo10, tipo11, tipo12, tipo13, tipo14, tipo15]
+    tp = [x for x in tps if x != '']
+    tipos_unicos = sorted(list(set(filter(None, tp))))
+
     msg_box = tkinter.messagebox.askquestion('Confirma pagamento',
                                              'Tem certeza que deseja enviar o pagamento ao financeiro?\n'
-                                             f'Valor: R$ {valor}\n'
-                                             f'Data: {dia}\n'
-                                             f'Tipo: {tipo1}\n'
-                                             f'Competência: {competencia}\n',
+                                             f'Data: {data}\n'
+                                             f'Tipos: {tipos_unicos}\n',
                                              icon='warning')
     if msg_box == 'yes':
+        gerar_capa_email(tipo1,
+            tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9,
+            tipo10,tipo11, tipo12, tipo13, tipo14, tipo15, entryvalor1,
+            valor2,valor3, valor4, valor5,
+            valor6,valor7, valor8, valor9,
+            valor10,valor11, valor12, valor13,
+            valor14,valor15, data)
         tkinter.messagebox.showinfo('Pagamento enviado!', 'Pagamento enviado ao financeiro com sucesso!')
     else:
         tkinter.messagebox.showinfo('Editar dados', 'Pagamento não enviado. Edite os dados e tente novamente.')
@@ -5273,3 +5286,211 @@ def gerar_planilha_pgto_itau(nome1, nome2, nome3, nome4, nome5, nome6, nome7, no
     tipos_unicos = sorted(list(set(filter(None, tp))))
     tkinter.messagebox.showinfo(title=f'Planilha salva dia {data}!', message=f'{len(tipos_unicos)} tipo(s) de pgto diferente(s).\n {str(tipos_unicos).replace("[","").replace("]","")}.')
 
+
+def gerar_capa_email(tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9, tipo10, tipo11, tipo12, tipo13, tipo14, tipo15,
+                     val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, val14, val15, data):
+    mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
+              '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
+    somas = {}
+
+    if val1 != '':
+        valor1 = float(val1.replace(',','.'))
+    else:
+        valor1 = 0
+
+    if val2 != '':
+        valor2 = float(val2.replace(',','.'))
+    else:
+        valor2 = 0
+
+    if val3 != '':
+        valor3 = float(val3.replace(',','.'))
+    else:
+        valor3 = 0
+
+    if val4 != '':
+        valor4 = float(val4.replace(',','.'))
+    else:
+        valor4 = 0
+
+    if val5 != '':
+        valor5 = float(val5.replace(',','.'))
+    else:
+        valor5 = 0
+
+    if val6 != '':
+        valor6 = float(val6.replace(',','.'))
+    else:
+        valor6 = 0
+
+    if val7 != '':
+        valor7 = float(val7.replace(',','.'))
+    else:
+        valor7 = 0
+
+    if val8 != '':
+        valor8 = float(val8.replace(',','.'))
+    else:
+        valor8 = 0
+
+    if val9 != '':
+        valor9 = float(val9.replace(',','.'))
+    else:
+        valor9 = 0
+
+    if val10 != '':
+        valor10 = float(val10.replace(',','.'))
+    else:
+        valor10 = 0
+
+    if val11 != '':
+        valor11 = float(val11.replace(',','.'))
+    else:
+        valor11 = 0
+
+    if val12 != '':
+        valor12 = float(val12.replace(',','.'))
+    else:
+        valor12 = 0
+
+    if val13 != '':
+        valor13 = float(val13.replace(',','.'))
+    else:
+        valor13 = 0
+
+    if val14 != '':
+        valor14 = float(val14.replace(',','.'))
+    else:
+        valor14 = 0
+
+    if val15 != '':
+        valor15 = float(val15.replace(',','.'))
+    else:
+        valor15 = 0
+    
+    if tipo1 in somas:
+        somas[tipo1] = somas[tipo1] + valor1
+    else:
+        somas[tipo1] = valor1
+
+    if tipo2 in somas:
+        somas[tipo2] = somas[tipo2] + valor2
+    else:
+        somas[tipo2] = valor2
+
+    if tipo3 in somas:
+        somas[tipo3] = somas[tipo3] + valor3
+    else:
+        somas[tipo3] = valor3
+
+    if tipo4 in somas:
+        somas[tipo4] = somas[tipo4] + valor4
+    else:
+        somas[tipo4] = valor4
+
+    if tipo5 in somas:
+        somas[tipo5] = somas[tipo5] + valor5
+    else:
+        somas[tipo5] = valor5
+
+    if tipo6 in somas:
+        somas[tipo6] = somas[tipo6] + valor6
+    else:
+        somas[tipo6] = valor6
+
+    if tipo7 in somas:
+        somas[tipo7] = somas[tipo7] + valor7
+    else:
+        somas[tipo7] = valor7
+
+    if tipo8 in somas:
+        somas[tipo8] = somas[tipo8] + valor8
+    else:
+        somas[tipo8] = valor8
+
+    if tipo9 in somas:
+        somas[tipo9] = somas[tipo9] + valor9
+    else:
+        somas[tipo9] = valor9
+
+    if tipo10 in somas:
+        somas[tipo10] = somas[tipo10] + valor10
+    else:
+        somas[tipo10] = valor10
+
+    if tipo11 in somas:
+        somas[tipo11] = somas[tipo11] + valor11
+    else:
+        somas[tipo11] = valor11
+
+    if tipo12 in somas:
+        somas[tipo12] = somas[tipo12] + valor12
+    else:
+        somas[tipo12] = valor12
+
+    if tipo13 in somas:
+        somas[tipo13] = somas[tipo13] + valor13
+    else:
+        somas[tipo13] = valor13
+
+    if tipo14 in somas:
+        somas[tipo14] = somas[tipo14] + valor14
+    else:
+        somas[tipo14] = valor14
+
+    if tipo15 in somas:
+        somas[tipo15] = somas[tipo15] + valor15
+    else:
+        somas[tipo15] = valor15
+    del somas['']
+    quantidade_de_pgtos = len(somas)
+    total = 0
+    for item in somas:
+        total += somas[item]
+    somas['Total'] = total
+
+    def umpgto():
+        modelo = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa.docx')
+        print('Procedimentos para UM pgto')
+
+    def doispgtos():
+        modelo = os.path.relpath(
+            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa2.docx')
+        print('Procedimentos para DOIS pgtos')
+
+    def trespgtos():
+        modelo = os.path.relpath(
+            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa3.docx')
+        print('Procedimentos para TRES pgtos')
+
+    def quatropgtos():
+        modelo = os.path.relpath(
+            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa4.docx')
+        print('Procedimentos para QUATRO pgtos')
+
+    def cincopgtos():
+        modelo = os.path.relpath(
+            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa5.docx')
+        print('Procedimentos para CINCO pgtos')
+
+    def seispgtos():
+        modelo = os.path.relpath(
+            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa6.docx')
+        print('Procedimentos para SEIS pgtos')
+
+    def setepgtos():
+        modelo = os.path.relpath(
+            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa.docx')
+        print('Procedimentos para SETE pgtos')
+
+    qtidades = {
+        1: umpgto,
+        2: doispgtos,
+        3: trespgtos,
+        4: quatropgtos,
+        5: cincopgtos,
+        6: seispgtos,
+        7: setepgtos
+    }
+
+    qtidades[quantidade_de_pgtos]()

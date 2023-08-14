@@ -17,9 +17,7 @@ class MainApplication(tk.Tk):
         self.iconphoto(False, self.img)
         self.notebook = ttk.Notebook(self)
         self.Frame1 = Pgto(self.notebook)
-        self.Frame2 = PgtoFin(self.notebook)
-        self.notebook.add(self.Frame1, text='Gerar Plan Itau')
-        self.notebook.add(self.Frame2, text='Enviar Pedido ao Financeiro')
+        self.notebook.add(self.Frame1, text='Gerar Pedido Pgto')
         self.notebook.pack()
 
 
@@ -176,8 +174,8 @@ class Pgto(ttk.Frame):
         self.entryvalor15 = ttk.Entry(self, width=20)
         self.entryvalor15.grid(column=1, row=16, padx=525, pady=1, sticky=W)
         self.data = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month, day=self.hoje.day, locale='pt_BR')
-        self.data.grid(column=1, row=28, padx=225, pady=1, sticky=W)
-        self.botao = ttk.Button(self, width=35, text="Criar Planilha",command=lambda: [gerar_planilha_pgto_itau(
+        self.data.grid(column=1, row=28, padx=25, pady=1, sticky=W)
+        self.botao = ttk.Button(self, text="Criar Planilha",command=lambda: [gerar_planilha_pgto_itau(
             self.nome1.get(), self.nome2.get(), self.nome3.get(), self.nome4.get(), self.nome5.get(), self.nome6.get(), self.nome7.get(), self.nome8.get(),
             self.nome9.get(),self.nome10.get(), self.nome11.get(), self.nome12.get(), self.nome13.get(), self.nome14.get(), self.nome15.get(), self.tipo1.get(),
             self.tipo2.get(), self.tipo3.get(), self.tipo4.get(), self.tipo5.get(), self.tipo6.get(), self.tipo7.get(), self.tipo8.get(), self.tipo9.get(),
@@ -187,64 +185,19 @@ class Pgto(ttk.Frame):
             self.entryvalor10.get(),self.entryvalor11.get(), self.entryvalor12.get(), self.entryvalor13.get(),
             self.entryvalor14.get(),self.entryvalor15.get(), self.data.get()
         )])
-        self.botao.grid(column=1, row=28, padx=380, pady=1, sticky=W)
-
-
-class PgtoFin(ttk.Frame):
-    def __init__(self, container):
-        super().__init__()
-        self.hoje = datetime.today()
-        self.nome = StringVar()
-        self.horario = StringVar()
-        self.cargo = StringVar()
-        self.departamento = StringVar()
-        self.tipocontr = StringVar()
-        self.nomesplan = []
-        # aparecer entry para preencher matricula
-        self.labelvalor = ttk.Label(self, width=20, text="Valor do pagamento:")
-        self.labelvalor.grid(column=1, row=11, padx=25, pady=1, sticky=W)
-        self.entryvalor = ttk.Entry(self, width=20)
-        self.entryvalor.grid(column=1, row=11, padx=225, pady=1, sticky=W)
-        # aparecer horario preenchido e dropdown para escolher horario
-        self.labelquantos = ttk.Label(self, width=55, text="Quantos tipos de pgto: ")
-        self.labelquantos.grid(column=1, row=14, padx=25, pady=1, sticky=W)
-        self.comboquantos = ttk.Combobox(self, values=['1', '2', '3', '4', '5', '6'], textvariable=self.horario, width=50)
-        self.comboquantos.grid(column=1, row=15, padx=225, pady=1, sticky=W)
-        # aparecer entry para preencher salario
-        self.labelsal = ttk.Label(self, width=20, text="Tipos: (colocar checkbox)")
-        self.labelsal.grid(column=1, row=16, padx=25, pady=1, sticky=W)
-        self.entrysal = ttk.Entry(self, width=20)
-        self.entrysal.grid(column=1, row=16, padx=225, pady=1, sticky=W)
-        # aparecer dropdown para escolher depto
-        self.labelcalendario = ttk.Label(self, width=20, text="Data:")
-        self.labelcalendario.grid(column=1, row=19, padx=25, pady=1, sticky=W)
-        self.calendario = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month, day=self.hoje.day, locale='pt_BR')
-        self.calendario.grid(column=1, row=19, padx=225, pady=1, sticky=W)
-        # aparecer dropdown para escolher tipo_contr
-        self.labelcompetencia = ttk.Label(self, width=20, text="Competencia:")
-        self.labelcompetencia.grid(column=1, row=21, padx=25, pady=1, sticky=W)
-        self.combocompetencia = ttk.Combobox(self, values=['mespassado', 'mesatual', 'mesquevem'], textvariable=self.tipocontr, width=50)
-        self.combocompetencia.grid(column=1, row=21, padx=225, pady=1, sticky=W)
-        self.edicao = IntVar()
-        self.editar = ttk.Checkbutton(self, text='Editar cadastro feito manualmente.', variable=self.edicao)
-        self.editar.grid(column=1, row=26, padx=26, pady=1, sticky=W)
-        self.feitonde = IntVar()
-        self.onde = ttk.Checkbutton(self, text='Cadastro realizado fora da Cia.', variable=self.feitonde)
-        self.onde.grid(column=1, row=27, padx=26, pady=1, sticky=W)
-        self.botao = ttk.Button(self, width=35, text="Cria capa e envia e-mail",
-                                command=lambda: [confirmar_pagamento()])
-        self.botao.grid(column=1, row=28, padx=380, pady=1, sticky=W)
-
-
-# implementar forma de passar os pagamentos gerados em planilha do itau para a outra aba, ja com total e só a um clique de ser enviado e-mail para o financeiro
+        self.botao.grid(column=1, row=28, padx=430, pady=1, sticky=W)
+        self.botao = ttk.Button(self, text="Cria capa e envia e-mail",
+                                command=lambda: [confirmar_pagamento(self.tipo1.get(),
+            self.tipo2.get(), self.tipo3.get(), self.tipo4.get(), self.tipo5.get(), self.tipo6.get(), self.tipo7.get(), self.tipo8.get(), self.tipo9.get(),
+            self.tipo10.get(),self.tipo11.get(), self.tipo12.get(), self.tipo13.get(), self.tipo14.get(), self.tipo15.get(), self.entryvalor1.get(),
+            self.entryvalor2.get(),self.entryvalor3.get(), self.entryvalor4.get(), self.entryvalor5.get(),
+            self.entryvalor6.get(),self.entryvalor7.get(), self.entryvalor8.get(), self.entryvalor9.get(),
+            self.entryvalor10.get(),self.entryvalor11.get(), self.entryvalor12.get(), self.entryvalor13.get(),
+            self.entryvalor14.get(),self.entryvalor15.get(), self.data.get())])
+        self.botao.grid(column=1, row=28, padx=515, pady=1, sticky=W)
+        # self.botao.bind('<Button-1>', PgtoFin.altera(PgtoFin(ttk.Frame),'10'))
 
 
 if __name__ == '__main__':
     app = MainApplication()
     app.mainloop()
-
-
-# alterar o modelo de pagamento inserindo dados armazenados
-# salvar como o modelo na pasta do mês e do tipo de pagamento solicitaçao de pgto-> Mes ->arquivos
-# transformar modelo salvo na pasta "arquivos" mes para pdf e salvar na pasta definitiva solicitaçao de pgto-> Mes ->Tipo pgto-> pgto x dia y
-# enviar o arquivo definitivo para o financeiro com corpo do e-mail definindo tipo pgto, valor total e data

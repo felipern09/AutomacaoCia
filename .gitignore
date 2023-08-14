@@ -306,3 +306,9 @@ cython_debug/
 /test/testes_diversos.py
 /test/alterar_bancoAulas.py
 /test/cadastrar_bancoColaborador.py
+/src/models/static/files/solicitpgto_modelocapa2.docx
+/src/models/static/files/solicitpgto_modelocapa3.docx
+/src/models/static/files/solicitpgto_modelocapa4.docx
+/src/models/static/files/solicitpgto_modelocapa5.docx
+/src/models/static/files/solicitpgto_modelocapa6.docx
+/src/models/static/files/solicitpgto_modelocapa7.docx
