@@ -20,12 +20,14 @@ class MainApplication(tk.Tk):
         for child in self.winfo_children():
             child.grid_configure(padx=1, pady=3)
         self.notebook = ttk.Notebook(self)
-        self.Frame1 = Frame1(self.notebook)
+        self.Frame1 = Certificados(self.notebook)
+        self.Frame2 = CertUnico(self.notebook)
         self.notebook.add(self.Frame1, text='Emissão de Certificados')
+        self.notebook.add(self.Frame2, text='Emissão Cert único')
         self.notebook.pack(fill=BOTH)
 
 
-class Frame1(ttk.Frame):
+class Certificados(ttk.Frame):
     def __init__(self, container):
         super().__init__()
         self.hoje = datetime.today()
@@ -110,7 +112,57 @@ class Frame1(ttk.Frame):
         self.botaocadastrar.grid(column=1, row=208, padx=500, pady=1, sticky=W)
 
 
-# implementar forma de aparecer lista de nomes com checkbox para adicionar esses nomes em uma lista como parametro da função
+class CertUnico(ttk.Frame):
+    def __init__(self, container):
+        super().__init__()
+        self.hoje = datetime.today()
+        self.horas = IntVar()
+        self.hrs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        # lista de nomes de funcionários com checkbox
+        self.canvas = Canvas(self)
+        self.canvas.pack(side=LEFT, fill=BOTH, expand=1)
+        self.barraroll = ttk.Scrollbar(self, orient=VERTICAL, command=self.canvas.yview)
+        self.barraroll.pack(side=LEFT, fill=Y)
+        self.canvas.config(yscrollcommand=self.barraroll.set)
+        self.canvas.bind('<Configure>', lambda e: self.canvas.config(scrollregion=self.canvas.bbox('all')))
+
+        self.canvframe = Frame(self.canvas)
+        self.canvas.create_window((0,0), window=self.canvframe, anchor='nw')
+
+        #   loop for pessoa.nome com pesq em db
+        #       i, enumerate(lista de nomes)
+        #           self.label[i], row=i, self.checkbox[i]
+        # definir nome do treinamento
+        self.labelnome = ttk.Label(self.canvframe, width=120, text="Digite o nome do treinamento:")
+        self.labelnome.grid(column=1, row=10, padx=25, pady=1, sticky=W)
+        self.entrynome = ttk.Entry(self.canvframe, width=100)
+        self.entrynome.grid(column=1, row=11, padx=25, pady=1, sticky=W)
+        # definir data do trinamento
+        self.labelcert = ttk.Label(self.canvframe, width=60, text="Data do treinamento:")
+        self.labelcert.grid(column=1, row=12, padx=25, pady=1, sticky=W)
+        self.entrycert = DateEntry(self.canvframe, selectmode='day', year=self.hoje.year, month=self.hoje.month,
+                                     day=self.hoje.day, locale='pt_BR')
+        self.entrycert.grid(column=1, row=12, padx=165, pady=1, sticky=W)
+        # definir horas de duração
+        self.labeldurac = ttk.Label(self.canvframe, width=60, text='Duração em horas:')
+        self.labeldurac.grid(column=1, row=13, padx=25, pady=1, sticky=W)
+        self.combodur = ttk.Combobox(self.canvframe, width=12, textvariable=self.horas, values=self.hrs)
+        self.combodur.grid(column=1, row=13, padx=165, pady=1, sticky=W)
+        # nome do participante
+        self.labelparticp = ttk.Label(self.canvframe, width=60, text='Digite o nome do participante:')
+        self.labelparticp.grid(column=1, row=14, padx=25, pady=5, sticky=W)
+        self.entrynomepart = ttk.Entry(self.canvframe, width=100)
+        self.entrynomepart.grid(column=1, row=15, padx=25, pady=1, sticky=W)
+        self.pst = IntVar(value=0)
+        self.primsocrrt = tk.Checkbutton(self.canvframe, text='PS Terrestre', variable=self.pst)
+        self.primsocrrt.grid(column=1, row=206, padx=500, pady=4, sticky=W)
+        self.psa = IntVar(value=0)
+        self.primsocrra = tk.Checkbutton(self.canvframe, text='PS Aquático', variable=self.psa)
+        self.primsocrra.grid(column=1, row=207, padx=500, pady=4, sticky=W)
+        self.botaocadastrar = ttk.Button(self.canvframe, width=20, text="Emitir certificados",
+                                         command=lambda: [])
+        self.botaocadastrar.grid(column=1, row=208, padx=500, pady=1, sticky=W)
+
 
 if __name__ == '__main__':
     app = MainApplication()
