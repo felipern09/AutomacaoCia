@@ -6,7 +6,6 @@ from src.controler.funcoes import cadastro_funcionario, salvar_docs_funcionarios
     cadastro_estagiario, cadastrar_autonomo, validar_pis, desligar_pessoa, enviar_emails_contratacao
 from openpyxl import load_workbook as l_w
 from src.models.listas import horarios, cargos, departamentos, tipodecontrato
-import tkinter.filedialog
 from tkinter import ttk
 from tkinter import *
 from src.models.models import Colaborador, engine

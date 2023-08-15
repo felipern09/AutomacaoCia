@@ -1,11 +1,12 @@
 import tkinter as tk
+import tkinter.filedialog
 from tkcalendar import DateEntry
 from tkinter import ttk
 from datetime import datetime
 from tkinter import *
 from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
-from src.controler.funcoes import confirmar_pagamento, gerar_planilha_pgto_itau
+from src.controler.funcoes import confirmar_pagamento, gerar_planilha_pgto_itau, gerar_pedido_pgto_por_arquivo
 
 
 class MainApplication(tk.Tk):
@@ -202,10 +203,57 @@ class Pgto(ttk.Frame):
 class PgtoPorAqr(ttk.Frame):
     def __init__(self, container):
         super().__init__()
-        self.labelnome = ttk.Label(self, width=20, text="Escolha o arquivo")
+        self.hoje = datetime.today()
+        self.caminho1 = StringVar()
+        self.caminho2 = StringVar()
+        self.caminho3 = StringVar()
+        self.caminho4 = StringVar()
+        self.labelnome = ttk.Label(self, width=40, text="Escolha até quatro arquivos:")
         self.labelnome.grid(column=1, row=1, padx=25, pady=1, sticky=W)
-        self.botao = ttk.Button(self, text="Gerar Pedido",command=lambda: [])
-        self.botao.grid(column=1, row=28, padx=430, pady=1, sticky=W)
+        self.botaoescolha = ttk.Button(self, text="Escolha um arquivo", command=self.selecionar_arq1)
+        self.botaoescolha.grid(column=1, row=2, padx=190, pady=1, sticky=W)
+        self.botaoescolha = ttk.Button(self, text="Escolha outro arquivo", command=self.selecionar_arq2)
+        self.botaoescolha.grid(column=1, row=3, padx=190, pady=1, sticky=W)
+        self.botaoescolha = ttk.Button(self, text="Escolha outro arquivo", command=self.selecionar_arq3)
+        self.botaoescolha.grid(column=1, row=4, padx=190, pady=1, sticky=W)
+        self.botaoescolha = ttk.Button(self, text="Escolha outro arquivo", command=self.selecionar_arq4)
+        self.botaoescolha.grid(column=1, row=5, padx=190, pady=1, sticky=W)
+        self.labeldata = ttk.Label(self, width=40, text="Data do pagamento:")
+        self.labeldata.grid(column=1, row=27, padx=25, pady=20, sticky=W)
+        self.data = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month, day=self.hoje.day, locale='pt_BR')
+        self.data.grid(column=1, row=27, padx=190, pady=20, sticky=W)
+        self.botao = ttk.Button(self, text="Gerar Pedido",command=lambda: [
+            gerar_pedido_pgto_por_arquivo(self.data.get(), self.caminho1.get(), self.caminho2.get(),
+                                          self.caminho3.get(), self.caminho4.get())])
+        self.botao.grid(column=1, row=28, padx=300, pady=20, sticky=W)
+
+    def selecionar_arq1(self):
+        try:
+            caminhoplan = tkinter.filedialog.askopenfilename(title='Planilha Funcionários')
+            self.caminho1.set(str(caminhoplan))
+        except ValueError:
+            pass
+
+    def selecionar_arq2(self):
+        try:
+            caminhoplan = tkinter.filedialog.askopenfilename(title='Planilha Funcionários')
+            self.caminho2.set(str(caminhoplan))
+        except ValueError:
+            pass
+
+    def selecionar_arq3(self):
+        try:
+            caminhoplan = tkinter.filedialog.askopenfilename(title='Planilha Funcionários')
+            self.caminho3.set(str(caminhoplan))
+        except ValueError:
+            pass
+
+    def selecionar_arq4(self):
+        try:
+            caminhoplan = tkinter.filedialog.askopenfilename(title='Planilha Funcionários')
+            self.caminho4.set(str(caminhoplan))
+        except ValueError:
+            pass
 
 
 if __name__ == '__main__':
