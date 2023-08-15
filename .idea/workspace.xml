@@ -53,7 +53,7 @@
       <recent name="C:\Users\Felipe\PycharmProjects\PersonalTrainer" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.certificados">
+  <component name="RunManager" selected="Python.solicitar_pagamento">
     <configuration name="admissao_e_desligamento" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -161,8 +161,8 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.certificados" />
         <item itemvalue="Python.solicitar_pagamento" />
+        <item itemvalue="Python.certificados" />
         <item itemvalue="Python.admissao_e_desligamento" />
         <item itemvalue="Python.testes_diversos" />
         <item itemvalue="Python.cadastrar_bancoColaborador" />
