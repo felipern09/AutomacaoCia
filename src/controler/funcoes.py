@@ -15,6 +15,7 @@ import holidays
 import locale
 import numpy as np
 import num2words as nw
+from num2words import num2words
 from openpyxl import load_workbook as l_w
 from openpyxl.styles import PatternFill, Font, NamedStyle
 import openpyxl.utils.cell
@@ -3950,7 +3951,7 @@ def desligar_pessoa(nome: str, data: str, tipo: int):
         # RELAÇÃO SALÁRIOS DE CONTRIBUIÇ
         # DISCRIMINAÇÃO DAS PARCELAS DE CONTRIB
         # CARTA PREPOSTO
-        # ATESTADO DEMISSIONAL
+        # ATESTADO   DEMISSIONAL
         print(f'{nome} foi desligado(a) em {data} com rescisão do tipo: Desligametno de Func com aviso.')
 
     desligamento = {
@@ -5287,12 +5288,52 @@ def gerar_planilha_pgto_itau(nome1, nome2, nome3, nome4, nome5, nome6, nome7, no
     tkinter.messagebox.showinfo(title=f'Planilha salva dia {data}!', message=f'{len(tipos_unicos)} tipo(s) de pgto diferente(s).\n {str(tipos_unicos).replace("[","").replace("]","")}.')
 
 
+def valor_por_extenso(number_p):
+    if number_p.find(',') != -1:
+        number_p = number_p.split(',')
+        number_p1 = int(number_p[0].replace('.', ''))
+        number_p2 = int(number_p[1])
+    else:
+        number_p1 = int(number_p.replace('.', ''))
+        number_p2 = 0
+
+    if number_p1 == 1:
+        aux1 = ' real'
+    else:
+        aux1 = ' reais'
+
+    if number_p2 == 1:
+        aux2 = ' centavo'
+    else:
+        aux2 = ' centavos'
+
+    text1 = ''
+    if number_p1 > 0:
+        text1 = num2words(number_p1, lang='pt_BR') + str(aux1)
+    else:
+        text1 = ''
+
+    if number_p2 > 0:
+        text2 = num2words(number_p2, lang='pt_BR') + str(aux2)
+    else:
+        text2 = ''
+
+    if (number_p1 > 0 and number_p2 > 0):
+        result = text1 + ' e ' + text2
+    else:
+        result = text1 + text2
+    return result
+
+
 def gerar_capa_email(tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9, tipo10, tipo11, tipo12, tipo13, tipo14, tipo15,
                      val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, val14, val15, data):
     mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
               '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
+    dia, mes, ano = data.split('/')
+    hoje = dt.strftime(dt.today(), '%d/%m/%Y')
     somas = {}
-
+    competencia = data[-7:]
+    pasta_pgto = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Pedidos de pagamento'
     if val1 != '':
         valor1 = float(val1.replace(',','.'))
     else:
@@ -5448,40 +5489,538 @@ def gerar_capa_email(tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tip
     for item in somas:
         total += somas[item]
     somas['Total'] = total
+    for item in somas:
+        somas[item] = '{0:,.2f}'.format(somas[item])
 
     def umpgto():
         modelo = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa.docx')
-        print('Procedimentos para UM pgto')
+        pgto1 = docx.Document(modelo)
+        pagamento = list(somas)[0]
+        # # Alterar Modelo e Salvar na pasta do mes correspondente
+        for parag in pgto1.paragraphs:
+            if '#tipo_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#tipo_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#tipo_pgto', pagamento)
+                        inline[i].text = text
+            if '#valor' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#valor' in inline[i].text:
+                        text = inline[i].text.replace('#valor', str(somas[pagamento]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if '#extenso' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#extenso' in inline[i].text:
+                        text = inline[i].text.replace('#extenso',
+                                                      valor_por_extenso(str(somas[pagamento]).replace(',', '_').replace('.', ',').replace('_', '.')))
+                        inline[i].text = text
+            if '#competencia' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#competencia' in inline[i].text:
+                        text = inline[i].text.replace('#competencia', competencia)
+                        inline[i].text = text
+            if '#dia_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#dia_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#dia_pgto', data)
+                        inline[i].text = text
+            if '#hoje' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#hoje' in inline[i].text:
+                        text = inline[i].text.replace('#hoje', hoje)
+                        inline[i].text = text
+        pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
 
     def doispgtos():
         modelo = os.path.relpath(
             rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa2.docx')
-        print('Procedimentos para DOIS pgtos')
+        pgto2 = docx.Document(modelo)
+        pagamento = list(somas)[0]
+        pagamento2 = list(somas)[1]
+        totalpgto = list(somas)[2]
+        # # Alterar Modelo e Salvar na pasta do mes correspondente
+        for parag in pgto2.paragraphs:
+            if 'tipo1' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if 'tipo1' in inline[i].text:
+                        text = inline[i].text.replace('tipo1', pagamento)
+                        inline[i].text = text
+            if '#tipo2_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#tipo2_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#tipo2_pgto', pagamento2)
+                        inline[i].text = text
+            if 'valor1' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if 'valor1' in inline[i].text:
+                        text = inline[i].text.replace('valor1', str(somas[pagamento]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if '#valor2' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#valor2' in inline[i].text:
+                        text = inline[i].text.replace('#valor2', str(somas[pagamento2]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+
+            if '#valortot' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#valortot' in inline[i].text:
+                        text = inline[i].text.replace('#valortot', str(somas[totalpgto]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if 'textototal' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if 'textototal' in inline[i].text:
+                        text = inline[i].text.replace('textototal', str(somas[totalpgto]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if 'valorum' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if 'valorum' in inline[i].text:
+                        text = inline[i].text.replace('valorum', str(somas[totalpgto]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if '#extenso' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#extenso' in inline[i].text:
+                        text = inline[i].text.replace('#extenso',
+                                                      valor_por_extenso(str(somas[totalpgto]).replace(',', '_').replace('.', ',').replace('_', '.')))
+                        inline[i].text = text
+            if '#competencia' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#competencia' in inline[i].text:
+                        text = inline[i].text.replace('#competencia', competencia)
+                        inline[i].text = text
+            if '#dia_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#dia_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#dia_pgto', data)
+                        inline[i].text = text
+            if '#hoje' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#hoje' in inline[i].text:
+                        text = inline[i].text.replace('#hoje', hoje)
+                        inline[i].text = text
+            if '#tipo1_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#tipo1_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#tipo1_pgto', pagamento)
+                        inline[i].text = text
+            if 'tipo1' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if 'tipo1' in inline[i].text:
+                        text = inline[i].text.replace('tipo1', pagamento)
+                        inline[i].text = text
+
+        pgto2.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
 
     def trespgtos():
         modelo = os.path.relpath(
             rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa3.docx')
-        print('Procedimentos para TRES pgtos')
+        pgto3 = docx.Document(modelo)
+        pagamento = list(somas)[0]
+        pagamento2 = list(somas)[1]
+        pagamento3 = list(somas)[2]
+        totalpgto = list(somas)[3]
+
+        # # Alterar Modelo e Salvar na pasta do mes correspondente
+        for parag in pgto3.paragraphs:
+            if 'tipo1' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if 'tipo1' in inline[i].text:
+                        text = inline[i].text.replace('tipo1', pagamento)
+                        inline[i].text = text
+            if '#tipo2_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#tipo2_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#tipo2_pgto', pagamento2)
+                        inline[i].text = text
+            if '#tipo3_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#tipo3_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#tipo3_pgto', pagamento3)
+                        inline[i].text = text
+            if 'valor1' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if 'valor1' in inline[i].text:
+                        text = inline[i].text.replace('valor1', str(somas[pagamento]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if '#valor2' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#valor2' in inline[i].text:
+                        text = inline[i].text.replace('#valor2', str(somas[pagamento2]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if '#valor3' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#valor3' in inline[i].text:
+                        text = inline[i].text.replace('#valor3', str(somas[pagamento3]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if '#valortot' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#valortot' in inline[i].text:
+                        text = inline[i].text.replace('#valortot', str(somas[totalpgto]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if 'textototal' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if 'textototal' in inline[i].text:
+                        text = inline[i].text.replace('textototal', str(somas[totalpgto]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if 'valorum' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if 'valorum' in inline[i].text:
+                        text = inline[i].text.replace('valorum', str(somas[totalpgto]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if '#extenso' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#extenso' in inline[i].text:
+                        text = inline[i].text.replace('#extenso',
+                                                      valor_por_extenso(str(somas[totalpgto]).replace(',', '_').replace('.', ',').replace('_', '.')))
+                        inline[i].text = text
+            if '#competencia' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#competencia' in inline[i].text:
+                        text = inline[i].text.replace('#competencia', competencia)
+                        inline[i].text = text
+            if '#dia_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#dia_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#dia_pgto', data)
+                        inline[i].text = text
+            if '#hoje' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#hoje' in inline[i].text:
+                        text = inline[i].text.replace('#hoje', hoje)
+                        inline[i].text = text
+            if '#tipo1_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#tipo1_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#tipo1_pgto', pagamento)
+                        inline[i].text = text
+            if 'tipo1' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if 'tipo1' in inline[i].text:
+                        text = inline[i].text.replace('tipo1', pagamento)
+                        inline[i].text = text
+        pgto3.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
 
     def quatropgtos():
         modelo = os.path.relpath(
             rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa4.docx')
-        print('Procedimentos para QUATRO pgtos')
+        pgto1 = docx.Document(modelo)
+        pagamento = list(somas)[0]
+        pagamento2 = list(somas)[1]
+        pagamento3 = list(somas)[2]
+        pagamento4 = list(somas)[3]
+        totalpgto = list(somas)[4]
+
+        # # Alterar Modelo e Salvar na pasta do mes correspondente
+        for parag in pgto1.paragraphs:
+            if '#tipo1_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#tipo1_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#tipo1_pgto', pagamento)
+                        inline[i].text = text
+            if '#valor' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#valor' in inline[i].text:
+                        text = inline[i].text.replace('#valor', str(somas[pagamento]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if '#extenso' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#extenso' in inline[i].text:
+                        text = inline[i].text.replace('#extenso',
+                                                      valor_por_extenso(str(somas[pagamento]).replace(',', '_').replace('.', ',').replace('_', '.')))
+                        inline[i].text = text
+            if '#competencia' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#competencia' in inline[i].text:
+                        text = inline[i].text.replace('#competencia', competencia)
+                        inline[i].text = text
+            if '#dia_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#dia_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#dia_pgto', data)
+                        inline[i].text = text
+            if '#hoje' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#hoje' in inline[i].text:
+                        text = inline[i].text.replace('#hoje', hoje)
+                        inline[i].text = text
+        pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
 
     def cincopgtos():
         modelo = os.path.relpath(
             rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa5.docx')
-        print('Procedimentos para CINCO pgtos')
+        pgto1 = docx.Document(modelo)
+        pagamento = list(somas)[0]
+        pagamento2 = list(somas)[1]
+        pagamento3 = list(somas)[2]
+        pagamento4 = list(somas)[3]
+        pagamento5 = list(somas)[4]
+        totalpgto = list(somas)[5]
+
+        # # Alterar Modelo e Salvar na pasta do mes correspondente
+        for parag in pgto1.paragraphs:
+            if '#tipo1_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#tipo1_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#tipo1_pgto', pagamento)
+                        inline[i].text = text
+            if '#valor' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#valor' in inline[i].text:
+                        text = inline[i].text.replace('#valor', str(somas[pagamento]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if '#extenso' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#extenso' in inline[i].text:
+                        text = inline[i].text.replace('#extenso',
+                                                      valor_por_extenso(str(somas[pagamento]).replace(',', '_').replace('.', ',').replace('_', '.')))
+                        inline[i].text = text
+            if '#competencia' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#competencia' in inline[i].text:
+                        text = inline[i].text.replace('#competencia', competencia)
+                        inline[i].text = text
+            if '#dia_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#dia_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#dia_pgto', data)
+                        inline[i].text = text
+            if '#hoje' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#hoje' in inline[i].text:
+                        text = inline[i].text.replace('#hoje', hoje)
+                        inline[i].text = text
+        pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
 
     def seispgtos():
         modelo = os.path.relpath(
             rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa6.docx')
-        print('Procedimentos para SEIS pgtos')
+        pgto1 = docx.Document(modelo)
+        pagamento = list(somas)[0]
+        pagamento2 = list(somas)[1]
+        pagamento3 = list(somas)[2]
+        pagamento4 = list(somas)[3]
+        pagamento5 = list(somas)[4]
+        pagamento6 = list(somas)[5]
+        totalpgto = list(somas)[6]
+
+        # # Alterar Modelo e Salvar na pasta do mes correspondente
+        for parag in pgto1.paragraphs:
+            if '#tipo1_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#tipo1_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#tipo1_pgto', pagamento)
+                        inline[i].text = text
+            if '#valor' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#valor' in inline[i].text:
+                        text = inline[i].text.replace('#valor', str(somas[pagamento]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if '#extenso' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#extenso' in inline[i].text:
+                        text = inline[i].text.replace('#extenso',
+                                                      valor_por_extenso(str(somas[pagamento]).replace(',', '_').replace('.', ',').replace('_', '.')))
+                        inline[i].text = text
+            if '#competencia' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#competencia' in inline[i].text:
+                        text = inline[i].text.replace('#competencia', competencia)
+                        inline[i].text = text
+            if '#dia_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#dia_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#dia_pgto', data)
+                        inline[i].text = text
+            if '#hoje' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#hoje' in inline[i].text:
+                        text = inline[i].text.replace('#hoje', hoje)
+                        inline[i].text = text
+        pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
 
     def setepgtos():
         modelo = os.path.relpath(
-            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa.docx')
-        print('Procedimentos para SETE pgtos')
+            rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa7.docx')
+        pgto1 = docx.Document(modelo)
+        pagamento = list(somas)[0]
+        pagamento2 = list(somas)[1]
+        pagamento3 = list(somas)[2]
+        pagamento4 = list(somas)[3]
+        pagamento5 = list(somas)[4]
+        pagamento6 = list(somas)[5]
+        pagamento7 = list(somas)[6]
+        totalpgto = list(somas)[7]
+
+        # # Alterar Modelo e Salvar na pasta do mes correspondente
+        for parag in pgto1.paragraphs:
+            if '#tipo1_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#tipo1_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#tipo1_pgto', pagamento)
+                        inline[i].text = text
+            if '#valor' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#valor' in inline[i].text:
+                        text = inline[i].text.replace('#valor', str(somas[pagamento]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                        inline[i].text = text
+            if '#extenso' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#extenso' in inline[i].text:
+                        text = inline[i].text.replace('#extenso',
+                                                      valor_por_extenso(str(somas[pagamento]).replace(',', '_').replace('.', ',').replace('_', '.')))
+                        inline[i].text = text
+            if '#competencia' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#competencia' in inline[i].text:
+                        text = inline[i].text.replace('#competencia', competencia)
+                        inline[i].text = text
+            if '#dia_pgto' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#dia_pgto' in inline[i].text:
+                        text = inline[i].text.replace('#dia_pgto', data)
+                        inline[i].text = text
+            if '#hoje' in parag.text:
+                inline = parag.runs
+                # Loop added to work with runs (strings with same style)
+                for i in range(len(inline)):
+                    if '#hoje' in inline[i].text:
+                        text = inline[i].text.replace('#hoje', hoje)
+                        inline[i].text = text
+        pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
 
     qtidades = {
         1: umpgto,

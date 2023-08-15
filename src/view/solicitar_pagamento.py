@@ -17,7 +17,9 @@ class MainApplication(tk.Tk):
         self.iconphoto(False, self.img)
         self.notebook = ttk.Notebook(self)
         self.Frame1 = Pgto(self.notebook)
+        self.Frame2 = PgtoPorAqr(self.notebook)
         self.notebook.add(self.Frame1, text='Gerar Pedido Pgto')
+        self.notebook.add(self.Frame2, text='Gerar Pedido Por Arquivo')
         self.notebook.pack()
 
 
@@ -195,7 +197,15 @@ class Pgto(ttk.Frame):
             self.entryvalor10.get(),self.entryvalor11.get(), self.entryvalor12.get(), self.entryvalor13.get(),
             self.entryvalor14.get(),self.entryvalor15.get(), self.data.get())])
         self.botao.grid(column=1, row=28, padx=515, pady=1, sticky=W)
-        # self.botao.bind('<Button-1>', PgtoFin.altera(PgtoFin(ttk.Frame),'10'))
+
+
+class PgtoPorAqr(ttk.Frame):
+    def __init__(self, container):
+        super().__init__()
+        self.labelnome = ttk.Label(self, width=20, text="Escolha o arquivo")
+        self.labelnome.grid(column=1, row=1, padx=25, pady=1, sticky=W)
+        self.botao = ttk.Button(self, text="Gerar Pedido",command=lambda: [])
+        self.botao.grid(column=1, row=28, padx=430, pady=1, sticky=W)
 
 
 if __name__ == '__main__':
