@@ -31,7 +31,7 @@ from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
 from src.models.listas import municipios
 import smtplib
-from src.models.dados_servd import em_rem, em_ti, em_if, k1, host, port, rede
+from src.models.dados_servd import em_rem, em_ti, em_if, k1, host, port, rede, em_fin
 import tkinter.filedialog
 from tkinter import messagebox
 import tkinter.filedialog
@@ -5498,6 +5498,61 @@ def gerar_capa_email(tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tip
     qtidades[quantidade_de_pgtos](somas, data)
 
 
+def email_pgto(arquivo: str, somas: dict, data: str):
+    mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
+              '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
+    dia, mes, ano = data.split('/')
+    pasta_pgto = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Pedidos de pagamento'
+    tam = len(somas)
+    k = list(somas)
+    frase = ''
+    for x in range(tam):
+        frase += f'{k[x]} - R$ {str(somas[k[x]]).replace(",", "_").replace(".", ",").replace("_", ".")}.<br>'
+    # send e-mails
+    email_remetente = em_rem
+    senha = k1
+    # set up smtp connection
+    s = smtplib.SMTP(host=host, port=port)
+    s.starttls()
+    s.login(email_remetente, senha)
+
+    # enviar e-mail de boas vindas
+    msg = MIMEMultipart('alternative')
+    msg['From'] = email_remetente
+    msg['To'] = em_fin
+    msg['Subject'] = f'Pagamento Itaú - {data}'
+    arquivo = arquivo
+    arquivo2 = pasta_pgto + f'\\Itau {data[:2]}.pdf'
+    text = MIMEText(f'''Oi, Marcelo!<br><br>
+    Segue pagamento agendado no Itaú para {data}.<br><br>
+    {frase}<br>
+    Atenciosamente,<br>
+    <img src="cid:image1">''', 'html')
+
+    # set up the parameters of the message
+    msg.attach(text)
+    image = MIMEImage(
+        open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\assinatura.png',
+             'rb').read())
+    image.add_header('Content-ID', '<image1>')
+    msg.attach(image)
+    # attach pdf file
+    part = MIMEBase('application', "octet-stream")
+    part.set_payload(open(arquivo, "rb").read())
+    encoders.encode_base64(part)
+    part.add_header('Content-Disposition', 'attachment',
+                    filename=f'Pagamento Itaú {data.replace("/",".")}.pdf')
+    msg.attach(part)
+    part2 = MIMEBase('application', "octet-stream")
+    part2.set_payload(open(arquivo2, "rb").read())
+    encoders.encode_base64(part2)
+    part2.add_header('Content-Disposition', 'attachment',
+                    filename=f'Agendamento Pgto Itau {data.replace("/",".")}.pdf')
+    msg.attach(part2)
+    s.sendmail(email_remetente, em_fin, msg.as_string())
+    del msg
+
+
 def umpgto(somas, data):
     mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
               '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
@@ -5553,10 +5608,36 @@ def umpgto(somas, data):
                 if '#hoje' in inline[i].text:
                     text = inline[i].text.replace('#hoje', hoje)
                     inline[i].text = text
-    pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
-    docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx',
-                     pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf')
-    os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+    n = 0
+    if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf'):
+        n += 1
+        if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+            n += 1
+            if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+                n += 1
+                pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+            else:
+                pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+        else:
+            pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                             pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+            os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+    else:
+        pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf', somas, data)
 
 
 def doispgtos(somas, data):
@@ -5668,11 +5749,36 @@ def doispgtos(somas, data):
                 if 'tipo1' in inline[i].text:
                     text = inline[i].text.replace('tipo1', pagamento)
                     inline[i].text = text
-
-    pgto2.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
-    docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx',
-                     pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf')
-    os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+    n = 0
+    if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf'):
+        n += 1
+        if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+            n += 1
+            if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+                n += 1
+                pgto2.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+            else:
+                pgto2.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+        else:
+            pgto2.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                             pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+            os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+    else:
+        pgto2.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf', somas, data)
 
 
 def trespgtos(somas, data):
@@ -5798,10 +5904,36 @@ def trespgtos(somas, data):
                 if 'tipo1' in inline[i].text:
                     text = inline[i].text.replace('tipo1', pagamento)
                     inline[i].text = text
-    pgto3.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
-    docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx',
-                     pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.pdf')
-    os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
+    n = 0
+    if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf'):
+        n += 1
+        if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+            n += 1
+            if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+                n += 1
+                pgto3.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+            else:
+                pgto3.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+        else:
+            pgto3.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                             pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+            os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+    else:
+        pgto3.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf', somas, data)
 
 
 def quatropgtos(somas, data):
@@ -5813,7 +5945,7 @@ def quatropgtos(somas, data):
     pasta_pgto = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Pedidos de pagamento'
     modelo = os.path.relpath(
         rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa4.docx')
-    pgto1 = docx.Document(modelo)
+    pgto4 = docx.Document(modelo)
     pagamento = list(somas)[0]
     pagamento2 = list(somas)[1]
     pagamento3 = list(somas)[2]
@@ -5821,7 +5953,7 @@ def quatropgtos(somas, data):
     totalpgto = list(somas)[4]
 
     # # Alterar Modelo e Salvar na pasta do mes correspondente
-    for parag in pgto1.paragraphs:
+    for parag in pgto4.paragraphs:
         if '#tipo1_pgto' in parag.text:
             inline = parag.runs
             # Loop added to work with runs (strings with same style)
@@ -5865,10 +5997,36 @@ def quatropgtos(somas, data):
                 if '#hoje' in inline[i].text:
                     text = inline[i].text.replace('#hoje', hoje)
                     inline[i].text = text
-    pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
-    docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx',
-                     pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.pdf')
-    os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
+    n = 0
+    if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf'):
+        n += 1
+        if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+            n += 1
+            if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+                n += 1
+                pgto4.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+            else:
+                pgto4.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+        else:
+            pgto4.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                             pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+            os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+    else:
+        pgto4.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf', somas, data)
 
 
 def cincopgtos(somas, data):
@@ -5880,7 +6038,7 @@ def cincopgtos(somas, data):
     pasta_pgto = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Pedidos de pagamento'
     modelo = os.path.relpath(
         rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa5.docx')
-    pgto1 = docx.Document(modelo)
+    pgto5 = docx.Document(modelo)
     pagamento = list(somas)[0]
     pagamento2 = list(somas)[1]
     pagamento3 = list(somas)[2]
@@ -5889,7 +6047,7 @@ def cincopgtos(somas, data):
     totalpgto = list(somas)[5]
 
     # # Alterar Modelo e Salvar na pasta do mes correspondente
-    for parag in pgto1.paragraphs:
+    for parag in pgto5.paragraphs:
         if '#tipo1_pgto' in parag.text:
             inline = parag.runs
             # Loop added to work with runs (strings with same style)
@@ -5933,10 +6091,36 @@ def cincopgtos(somas, data):
                 if '#hoje' in inline[i].text:
                     text = inline[i].text.replace('#hoje', hoje)
                     inline[i].text = text
-    pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
-    docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx',
-                     pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.pdf')
-    os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
+    n = 0
+    if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf'):
+        n += 1
+        if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+            n += 1
+            if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+                n += 1
+                pgto5.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+            else:
+                pgto5.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+        else:
+            pgto5.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                             pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+            os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+    else:
+        pgto5.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf', somas, data)
 
 
 def seispgtos(somas, data):
@@ -5948,7 +6132,7 @@ def seispgtos(somas, data):
     pasta_pgto = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Pedidos de pagamento'
     modelo = os.path.relpath(
         rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa6.docx')
-    pgto1 = docx.Document(modelo)
+    pgto6 = docx.Document(modelo)
     pagamento = list(somas)[0]
     pagamento2 = list(somas)[1]
     pagamento3 = list(somas)[2]
@@ -5958,7 +6142,7 @@ def seispgtos(somas, data):
     totalpgto = list(somas)[6]
 
     # # Alterar Modelo e Salvar na pasta do mes correspondente
-    for parag in pgto1.paragraphs:
+    for parag in pgto6.paragraphs:
         if '#tipo1_pgto' in parag.text:
             inline = parag.runs
             # Loop added to work with runs (strings with same style)
@@ -6002,10 +6186,36 @@ def seispgtos(somas, data):
                 if '#hoje' in inline[i].text:
                     text = inline[i].text.replace('#hoje', hoje)
                     inline[i].text = text
-    pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
-    docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx',
-                     pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.pdf')
-    os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
+    n = 0
+    if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf'):
+        n += 1
+        if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+            n += 1
+            if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+                n += 1
+                pgto6.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+            else:
+                pgto6.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+        else:
+            pgto6.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                             pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+            os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+    else:
+        pgto6.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf', somas, data)
 
 
 def setepgtos(somas, data):
@@ -6017,7 +6227,7 @@ def setepgtos(somas, data):
     pasta_pgto = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Pedidos de pagamento'
     modelo = os.path.relpath(
         rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\solicitpgto_modelocapa7.docx')
-    pgto1 = docx.Document(modelo)
+    pgto7 = docx.Document(modelo)
     pagamento = list(somas)[0]
     pagamento2 = list(somas)[1]
     pagamento3 = list(somas)[2]
@@ -6028,7 +6238,7 @@ def setepgtos(somas, data):
     totalpgto = list(somas)[7]
 
     # # Alterar Modelo e Salvar na pasta do mes correspondente
-    for parag in pgto1.paragraphs:
+    for parag in pgto7.paragraphs:
         if '#tipo1_pgto' in parag.text:
             inline = parag.runs
             # Loop added to work with runs (strings with same style)
@@ -6072,10 +6282,36 @@ def setepgtos(somas, data):
                 if '#hoje' in inline[i].text:
                     text = inline[i].text.replace('#hoje', hoje)
                     inline[i].text = text
-    pgto1.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
-    docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx',
-                     pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.pdf')
-    os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")}.docx')
+    n = 0
+    if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf'):
+        n += 1
+        if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+            n += 1
+            if os.path.exists(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf'):
+                n += 1
+                pgto7.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+            else:
+                pgto7.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                                 pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+                os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+                email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+        else:
+            pgto7.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx',
+                             pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf')
+            os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.docx')
+            email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/", ".")} - {n}.pdf', somas, data)
+    else:
+        pgto7.save(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        docx2pdf.convert(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx',
+                         pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf')
+        os.remove(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.docx')
+        email_pgto(pasta_pgto + f'\\Pedido de Pagamento - {str(data).replace("/",".")}.pdf', somas, data)
 
 
 def gerar_pedido_pgto_por_arquivo(data: str, caminho_arq1: str, caminho_arq2='', caminho_arq3='', caminho_arq4=''):
