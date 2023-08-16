@@ -160,7 +160,11 @@ class CertUnico(ttk.Frame):
         self.primsocrra = tk.Checkbutton(self.canvframe, text='PS Aquático', variable=self.psa)
         self.primsocrra.grid(column=1, row=207, padx=500, pady=4, sticky=W)
         self.botaocadastrar = ttk.Button(self.canvframe, width=20, text="Emitir certificados",
-                                         command=lambda: [])
+                                         command=lambda: [emitir_certificados(self.pst.get(), self.psa.get(),
+                                                                 self.entrynome.get(),
+                                                                 self.entrycert.get(),
+                                                                 self.horas.get(),
+                                                                 [self.entrynomepart.get()])])
         self.botaocadastrar.grid(column=1, row=208, padx=500, pady=1, sticky=W)
 
 

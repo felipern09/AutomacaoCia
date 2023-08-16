@@ -4784,6 +4784,9 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str):
 
 
 def emitir_certificados(pst: int, psa: int, nome: str, data: str, horas: int, participantes: list):
+    mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
+              '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
+    dia, mes, ano = data.split('/')
     if pst != 0:
         nome = 'Primeiros Socorros - Terrestre'
         modelo = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\certificados\Treinamento.docx')
@@ -4806,70 +4809,58 @@ def emitir_certificados(pst: int, psa: int, nome: str, data: str, horas: int, pa
                     '15': 'quinze'}
         return horasext[str(hr)]
 
-    # sessions = sessionmaker(bind=engine)
-    # session = sessions()
-    # pesq = session.query(Colaborador).filter_by(desligamento=None).all()
-    # pesq2 = session.query(Colaborador).filter_by(desligamento='None').all()
-    # nomes = []
-    # dicion = {}
-    # for p in pesq:
-    #     nomes.append(str(p.nome).upper())
-    # for p2 in pesq2:
-    #     nomes.append(str(p2.nome).upper())
-    #     nomes.sort()
-    # #  Emitir certificado
-    #     for pessoa in nomes:
     for item in participantes:
-        #         dicion[pessoa] = SequenceMatcher(None, item, pessoa).ratio()
-        # pess = [i for i in dicion if dicion[i] == max(dicion.values())][0]
         doc = docx.Document(modelo)
         for parag in doc.paragraphs:
             if '#nome' in parag.text:
                 inline = parag.runs
-                # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#nome' in inline[i].text:
                         text = inline[i].text.replace('#nome', item.title())
                         inline[i].text = text
             if '#treinamento' in parag.text:
                 inline = parag.runs
-                # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#treinamento' in inline[i].text:
                         text = inline[i].text.replace('#treinamento', nome.title())
                         inline[i].text = text
             if '#data' in parag.text:
                 inline = parag.runs
-                # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#data' in inline[i].text:
                         text = inline[i].text.replace('#data', data)
                         inline[i].text = text
             if '#duracao' in parag.text:
                 inline = parag.runs
-                # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#duracao' in inline[i].text:
                         text = inline[i].text.replace('#duracao', str(horas))
                         inline[i].text = text
             if '#hrsexten' in parag.text:
                 inline = parag.runs
-                # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#hrsexten' in inline[i].text:
                         text = inline[i].text.replace('#hrsexten', exthoras(horas))
                         inline[i].text = text
             if '#extens' in parag.text:
                 inline = parag.runs
-                # Loop added to work with runs (strings with same style)
                 for i in range(len(inline)):
                     if '#extens' in inline[i].text:
                         text = inline[i].text.replace('#extens', extenso(data))
                         inline[i].text = text
-        caminho = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\certificados')
-        doc.save(caminho + f'\\{item} - {nome} {data.replace("/",".")}.docx')
-        convert(caminho + f'\\{item} - {nome} {data.replace("/",".")}.docx', caminho + f'\\{item} - {nome} {data.replace("/",".")}.pdf')
-        os.remove(caminho + f'\\{item} - {nome} {data.replace("/",".")}.docx')
+        caminho = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\13 - Treinamentos\{ano}\{mes} - {mesext[mes]}\{nome}\Certificados'
+        if os.path.exists(caminho):
+            doc.save(caminho + f'\\{item} - {nome}.docx')
+            convert(caminho + f'\\{item} - {nome}.docx', caminho + f'\\{item} - {nome}.pdf')
+            os.remove(caminho + f'\\{item} - {nome}.docx')
+        else:
+            os.makedirs(caminho)
+            os.makedirs(caminho.replace('Certificados', 'Lista de presença'))
+            os.makedirs(caminho.replace('Certificados', 'Material'))
+            doc.save(caminho + f'\\{item} - {nome}.docx')
+            convert(caminho + f'\\{item} - {nome}.docx', caminho + f'\\{item} - {nome}.pdf')
+            os.remove(caminho + f'\\{item} - {nome}.docx')
+
     tkinter.messagebox.showinfo(
         title='Certificados ok!',
         message='Certificados gerados com sucesso!'
@@ -5001,29 +4992,25 @@ def gerar_recibo_uniformes(local, nome, cargo, cpf, genero, tamanho1, tamanho2='
     tkinter.messagebox.showinfo(title='Recibo ok!', message='Recibo impresso com sucesso!')
 
 
-def confirmar_pagamento(tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9,
-                        tipo10,tipo11, tipo12, tipo13, tipo14, tipo15, entryvalor1,
-                        valor2,valor3, valor4, valor5,
-                        valor6,valor7, valor8, valor9,
-                        valor10,valor11, valor12, valor13,
-                        valor14,valor15, data):
-    tps = [tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9, tipo10, tipo11, tipo12, tipo13, tipo14, tipo15]
+def confirmar_pagamento(tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9, tipo10,tipo11, tipo12, tipo13,
+                        tipo14, tipo15, valor1, valor2,valor3, valor4, valor5, valor6,valor7, valor8, valor9, valor10,
+                        valor11, valor12, valor13, valor14,valor15, data):
+    tps = [tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8,
+           tipo9, tipo10, tipo11, tipo12, tipo13, tipo14, tipo15]
     tp = [x for x in tps if x != '']
     tipos_unicos = sorted(list(set(filter(None, tp))))
-
+    listatipos = ''
+    for item in tipos_unicos:
+        listatipos += f'{item} '
     msg_box = tkinter.messagebox.askquestion('Confirma pagamento',
                                              'Tem certeza que deseja enviar o pagamento ao financeiro?\n'
                                              f'Data: {data}\n'
-                                             f'Tipos: {tipos_unicos}\n',
+                                             f'Tipos: {listatipos}\n',
                                              icon='warning')
     if msg_box == 'yes':
-        gerar_capa_email(tipo1,
-            tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9,
-            tipo10,tipo11, tipo12, tipo13, tipo14, tipo15, entryvalor1,
-            valor2,valor3, valor4, valor5,
-            valor6,valor7, valor8, valor9,
-            valor10,valor11, valor12, valor13,
-            valor14,valor15, data)
+        gerar_capa_email(tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9, tipo10,tipo11, tipo12, tipo13,
+                         tipo14, tipo15, valor1, valor2, valor3, valor4, valor5, valor6, valor7, valor8, valor9,
+                         valor10, valor11, valor12, valor13, valor14, valor15, data)
         tkinter.messagebox.showinfo('Pagamento enviado!', 'Pagamento enviado ao financeiro com sucesso!')
     else:
         tkinter.messagebox.showinfo('Editar dados', 'Pagamento não enviado. Edite os dados e tente novamente.')
@@ -5050,9 +5037,10 @@ def escrever_valor_por_extenso(total):
     return extenso
 
 
-def gerar_planilha_pgto_itau(nome1, nome2, nome3, nome4, nome5, nome6, nome7, nome8, nome9, nome10, nome11, nome12, nome13, nome14, nome15,
-                             tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9, tipo10, tipo11, tipo12, tipo13, tipo14, tipo15,
-                             val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, val14, val15, data):
+def gerar_planilha_pgto_itau(nome1, nome2, nome3, nome4, nome5, nome6, nome7, nome8, nome9, nome10, nome11, nome12,
+                             nome13, nome14, nome15, tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9,
+                             tipo10, tipo11, tipo12, tipo13, tipo14, tipo15, val1, val2, val3, val4, val5, val6, val7,
+                             val8, val9, val10, val11, val12, val13, val14, val15, data):
     mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
               '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
     if val1 != '':
@@ -5319,15 +5307,16 @@ def valor_por_extenso(number_p):
     else:
         text2 = ''
 
-    if (number_p1 > 0 and number_p2 > 0):
+    if number_p1 > 0 and number_p2 > 0:
         result = text1 + ' e ' + text2
     else:
         result = text1 + text2
     return result
 
 
-def gerar_capa_email(tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9, tipo10, tipo11, tipo12, tipo13, tipo14, tipo15,
-                     val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13, val14, val15, data):
+def gerar_capa_email(tipo1, tipo2, tipo3, tipo4, tipo5, tipo6, tipo7, tipo8, tipo9, tipo10, tipo11, tipo12, tipo13,
+                     tipo14, tipo15, val1, val2, val3, val4, val5, val6, val7, val8, val9, val10, val11, val12, val13,
+                     val14, val15, data):
     somas = {}
     if val1 != '':
         valor1 = float(val1.replace(',','.'))
@@ -6440,3 +6429,4 @@ def gerar_pedido_pgto_por_arquivo(data: str, caminho_arq1: str, caminho_arq2='',
         7: setepgtos
     }
     qtidades[quantidade_de_pgtos](somas, data)
+    tkinter.messagebox.showinfo('Pagamento enviado!', 'Pagamento enviado ao financeiro com sucesso!')

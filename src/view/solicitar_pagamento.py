@@ -222,7 +222,7 @@ class PgtoPorAqr(ttk.Frame):
         self.labeldata.grid(column=1, row=27, padx=25, pady=20, sticky=W)
         self.data = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month, day=self.hoje.day, locale='pt_BR')
         self.data.grid(column=1, row=27, padx=190, pady=20, sticky=W)
-        self.botao = ttk.Button(self, text="Gerar Pedido",command=lambda: [
+        self.botao = ttk.Button(self, text="Gerar pedido e enviar e-mail",command=lambda: [
             gerar_pedido_pgto_por_arquivo(self.data.get(), self.caminho1.get(), self.caminho2.get(),
                                           self.caminho3.get(), self.caminho4.get())])
         self.botao.grid(column=1, row=28, padx=300, pady=20, sticky=W)
