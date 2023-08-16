@@ -3,7 +3,8 @@ from tkcalendar import DateEntry
 from datetime import datetime
 import tkinter.filedialog
 from src.controler.funcoes import cadastro_funcionario, salvar_docs_funcionarios, enviar_emails_funcionario, \
-    cadastro_estagiario, cadastrar_autonomo, validar_pis, desligar_pessoa, enviar_emails_contratacao
+    cadastro_estagiario, cadastrar_autonomo, validar_pis, desligar_pessoa, enviar_emails_contratacao, \
+    apenas_registrar_funcionario, apenas_registrar_estagiario
 from openpyxl import load_workbook as l_w
 from src.models.listas import horarios, cargos, departamentos, tipodecontrato
 from tkinter import ttk
@@ -187,6 +188,23 @@ class CadastrarFunc(ttk.Frame):
                                                                         self.combodepto.get(), self.combocargo.get(),
                                                                         self.entrysal.get(), self.entryadmiss.get())])
         self.botaoemailcontrat.grid(column=1, row=11, padx=320, pady=1, sticky=W)
+        self.botaoapenascadast = ttk.Button(self, text="Apenas Registrar no DB",
+                                        command=lambda: [apenas_registrar_funcionario(self.caminho.get(), self.edicao.get(),
+                                                                               self.feitonde.get(),
+                                                                               self.combonome.get(),
+                                                                               self.entrymatr.get(),
+                                                                               self.entryadmiss.get(),
+                                                                               self.combohor.get(),
+                                                                               self.entrysal.get(),
+                                                                               self.combocargo.get(),
+                                                                               self.combodepto.get(),
+                                                                               self.combocontr.get(),
+                                                                               self.hrs.get(),
+                                                                               self.hrm.get(),
+                                                                               self.agencia.get(),
+                                                                               self.conta.get(),
+                                                                               self.digito.get())])
+        self.botaoapenascadast.grid(column=1, row=30, padx=10, pady=1, sticky=W)
 
     def selecionar_funcionario(self):
         try:
@@ -287,6 +305,19 @@ class CadastrarEst(ttk.Frame):
         self.botaocarregest = ttk.Button(self, text="Carregar planilha",
                                          command=lambda: [carregarest(self.caminhoest.get())])
         self.botaocarregest.grid(column=1, row=4, padx=350, pady=25, sticky=W)
+        self.botaoapenascadast = ttk.Button(self, text="Apenas Registrar no DB",
+                                        command=lambda: [apenas_registrar_estagiario(
+                                                    self.solicitarest.get(), self.caminhoest.get(),
+                                                    self.edicaoest.get(), self.feitondeest.get(),
+                                                    self.combonomest.get(),
+                                                    self.entrymatrest.get(), self.entryadmissest.get(),
+                                                    '', self.combodeptoest.get(),
+                                                    '', '', '',
+                                                    self.agenciaest.get(),
+                                                    self.contaest.get(),
+                                                    self.digitoest.get())])
+        self.botaoapenascadast.grid(column=1, row=30, padx=10, pady=1, sticky=W)
+
 
     def selecionarest(self):
         try:

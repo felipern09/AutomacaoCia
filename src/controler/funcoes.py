@@ -31,6 +31,7 @@ from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
 from src.models.listas import municipios
 import smtplib
+import sqlite3
 from src.models.dados_servd import em_rem, em_ti, em_if, k1, host, port, rede, em_fin
 import tkinter.filedialog
 from tkinter import messagebox
@@ -1527,6 +1528,89 @@ def salvar_planilha_soma_final(compet: int):
     print('Hrs Complementares \n', complementares)
 
 
+def apenas_registrar_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
+                             horario='', salario='', cargo='', depto='', tipo_contr='',
+                             hrsem='', hrmens='', agencia='', conta='', digito=''):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
+    if caminho == '' or nome == '' or matricula == '' or admissao == '' or horario == '' or salario == '' or \
+            cargo == '' or depto == '' or tipo_contr == '' or hrsem == '' or hrmens == '':
+        tkinter.messagebox.showinfo(
+            title='Erro de preenchimento',
+            message='Preencha todos os campos antes de cadastrar o funcionário!'
+        )
+    else:
+        wb = l_w(caminho, read_only=False)
+        sh = wb['Respostas ao formulário 1']
+        num, name = nome.strip().split(' - ')
+        linha = int(num)
+
+        # search for the highest compatibility between the city filled in the form and the cities in the lists to
+        # define codmunnas value
+        est = str(sh[f'AJ{linha}'].value)
+        cidade = str(sh[f'L{linha}'].value).title()
+        lista = []
+        dicion = {}
+        for cid in municipios[est]:
+            dicion[SequenceMatcher(None, cidade, cid).ratio()] = cid
+            lista.append(SequenceMatcher(None, cidade, cid).ratio())
+        codmunnas = municipios[str(sh[f'AJ{linha}'].value).upper().strip()][dicion[max(lista)]]
+
+        # search for the highest compatibility between the city filled in the form and the cities in the lists to
+        # define codmunend value
+        est = str(sh[f'T{linha}'].value)
+        cidade = str(sh[f'S{linha}'].value).title()
+        listaend = []
+        dicionend = {}
+        for cid in municipios[est]:
+            dicionend[SequenceMatcher(None, cidade, cid).ratio()] = cid
+            listaend.append(SequenceMatcher(None, cidade, cid).ratio())
+        codmunend = municipios[str(sh[f'T{linha}'].value).upper().strip()][dicionend[max(listaend)]]
+
+        lotacao = {'UNIDADE PARK SUL - QUALQUER DEPARTAMENTO': '0013', 'KIDS': '0010', 'MUSCULAÇÃO': '0007',
+                   'ESPORTES E LUTAS': '0008', 'CROSSFIT': '0012', 'GINÁSTICA': '0006', 'GESTANTES': '0008',
+                   'RECEPÇÃO': '0003',
+                   'FINANCEIRO': '0001', 'TI': '0001', 'MARKETING': '0001', 'MANUTENÇÃO': '0004'}
+        if linha:
+            try:
+                pess = Colaborador(matricula=matricula, nome=name.upper(), admiss=admissao,
+                                   nascimento=str(sh[f'D{linha}'].value),
+                                   pis=str(int(sh[f'Y{linha}'].value)).zfill(11),
+                                   cpf=str(int(sh[f'V{linha}'].value)).zfill(11),
+                                   rg=str(int(sh[f'W{linha}'].value)),
+                                   emissor=str(sh[f'X{linha}'].value), email=str(sh[f'B{linha}'].value),
+                                   genero=str(sh[f'E{linha}'].value),
+                                   estado_civil=str(sh[f'F{linha}'].value), cor=str(sh[f'G{linha}'].value),
+                                   instru=str(sh[f'J{linha}'].value),
+                                   nacional=str(sh[f'K{linha}'].value),
+                                   cod_municipionas=codmunnas,
+                                   cid_nas=str(sh[f'L{linha}'].value), uf_nas=str(sh[f'AJ{linha}'].value),
+                                   pai=str(sh[f'M{linha}'].value).upper(),
+                                   mae=str(sh[f'N{linha}'].value).upper(), endereco=str(sh[f'O{linha}'].value),
+                                   num=str(int(sh[f'P{linha}'].value)),
+                                   bairro=str(sh[f'Q{linha}'].value), cep=str(int(sh[f'R{linha}'].value)),
+                                   cidade=str(sh[f'S{linha}'].value),
+                                   uf=str(sh[f'T{linha}'].value),
+                                   cod_municipioend=codmunend,
+                                   tel=str(int(sh[f'U{linha}'].value)),
+                                   tit_eleit=str(sh[f'Z{linha}'].value), zona_eleit=str(sh[f'AA{linha}'].value),
+                                   sec_eleit=str(sh[f'AB{linha}'].value),
+                                   ctps=str(int(sh[f'AC{linha}'].value)),
+                                   serie_ctps=str(sh[f'AD{linha}'].value),
+                                   uf_ctps=str(sh[f'AE{linha}'].value),
+                                   emiss_ctps=str(sh[f'AF{linha}'].value), depto=depto,
+                                   cargo=cargo,
+                                   horario=horario, salario=salario, tipo_contr=tipo_contr, hr_sem=hrsem,
+                                   hr_mens=hrmens,
+                                   ag=agencia, conta=conta, cdigito=digito
+                                   )
+                session.add(pess)
+                session.commit()
+                tkinter.messagebox.showinfo(title='Cadastro ok!', message='Cadastro efetuado com sucesso!')
+            except Exception:
+                tkinter.messagebox.showinfo(title='Erro', message='Funcionário já cadastrado no DB!')
+
+
 def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
                          horario='', salario='', cargo='', depto='', tipo_contr='',
                          hrsem='', hrmens='', agencia='', conta='', digito=''):
@@ -2693,8 +2777,75 @@ def enviar_emails_contratacao(caminho: str, nome: str, departamento: str, cargo:
         s.quit()
         tkinter.messagebox.showinfo(
             title='E-mails ok!',
-            message='E-mails enviados com sucesso'
+            message='E-mails enviados com sucesso!'
         )
+
+
+def apenas_registrar_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
+                        cargo='', depto='', tipo_contr='Horista',
+                        hrsem='25', hrmens='100', agencia='', conta='', digito=''):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
+    pa.FAILSAFE = False
+    salario = 5.10
+    if nome == '':
+        tkinter.messagebox.showinfo(
+            title='Erro de preenchimento',
+            message='Preencha todos os campos antes de cadastrar o estagiário!'
+        )
+    else:
+        wb = l_w(caminho)
+        sh = wb['Respostas ao formulário 1']
+        num, name = nome.strip().split(' - ')
+        linha = int(num)
+        lotacao = {'UNIDADE PARK SUL - QUALQUER DEPARTAMENTO': '0013', 'KIDS': '0010', 'MUSCULAÇÃO': '0007',
+                   'ESPORTES E LUTAS': '0008', 'CROSSFIT': '0012', 'GINÁSTICA': '0006', 'GESTANTES': '0008',
+                   'RECEPÇÃO': '0003',
+                   'FINANCEIRO': '0001', 'TI': '0001', 'MARKETING': '0001', 'MANUTENÇÃO': '0004'}
+        if str(sh[f'E{linha}'].value) == 'Masculino':
+            cargo = 'ESTAGIARIO'
+        else:
+            cargo = 'ESTAGIARIA'
+        try:
+            estag_cadastrado = Colaborador(
+                matricula=matricula, nome=name.upper(), admiss=admissao,
+                nascimento=str(sh[f'D{linha}'].value),
+                cpf=str(sh[f'V{linha}'].value).replace('.', '').replace('-', '').zfill(11),
+                rg=str(int(sh[f'W{linha}'].value)),
+                emissor='SSP/DF', email=str(sh[f'B{linha}'].value),
+                genero=str(sh[f'E{linha}'].value),
+                estado_civil=str(sh[f'F{linha}'].value), cor='9',
+                instru='08 - Educação Superior Incompleta',
+                nacional='Brasileiro(a)',
+                pai=str(sh[f'M{linha}'].value).upper(),
+                mae=str(sh[f'N{linha}'].value).upper(), endereco=str(sh[f'O{linha}'].value),
+                num='1',
+                bairro=str(sh[f'Q{linha}'].value),
+                cep=str(sh[f'R{linha}'].value).replace('.', '').replace('-', ''),
+                cidade='Brasília', cid_nas='Brasília - DF',
+                uf='DF',
+                cod_municipioend=municipios['DF']['Brasília'],
+                tel=str(sh[f'U{linha}'].value).replace('(', '').replace(')', '').replace('.', '').replace('-',
+                                                                                                          ''),
+                depto=depto, cargo=cargo,
+                horario=str(sh[f'AI{linha}'].value), salario=salario, tipo_contr=tipo_contr,
+                hr_sem='25', hr_mens='100',
+                est_semestre=str(sh[f'AS{linha}'].value),
+                est_turno=str(sh[f'AT{linha}'].value),
+                est_prev_conclu=str(sh[f'AU{linha}'].value),
+                est_faculdade=str(sh[f'AV{linha}'].value),
+                est_endfacul='End',
+                est_numendfacul='1',
+                est_bairroendfacul='Bairro',
+                ag=agencia, conta=conta, cdigito=digito
+
+            )
+            session.add(estag_cadastrado)
+            session.commit()
+            tkinter.messagebox.showinfo(title='Cadastro ok!', message='Estagiário cadastrado com sucesso!')
+        except Exception:
+            tkinter.messagebox.showinfo(title='Erro', message='Estagiário já cadastrado no DB!')
+
 
 
 def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
