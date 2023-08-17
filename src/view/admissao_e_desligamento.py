@@ -4,7 +4,7 @@ from datetime import datetime
 import tkinter.filedialog
 from src.controler.funcoes import cadastro_funcionario, salvar_docs_funcionarios, enviar_emails_funcionario, \
     cadastro_estagiario, cadastrar_autonomo, validar_pis, desligar_pessoa, enviar_emails_contratacao, \
-    apenas_registrar_funcionario, apenas_registrar_estagiario
+    apenas_registrar_funcionario, apenas_registrar_estagiario, updatedb
 from openpyxl import load_workbook as l_w
 from src.models.listas import horarios, cargos, departamentos, tipodecontrato
 from tkinter import ttk
@@ -479,22 +479,161 @@ class AtualizaBanco(ttk.Frame):
         self.labelnom = ttk.Label(self, text='Escolha o colaborador a ser atualizado: ')
         self.labelnom.grid(column=1, row=1, padx=10, pady=5, sticky=W)
         self.combnom = ttk.Combobox(self, values=self.ativos, width=30)
-        self.combnom.grid(column=2, row=1, padx=2, pady=5, sticky=W)
+        self.combnom.grid(column=1, row=1, padx=230, pady=5, sticky=W)
         # add label to choose wich data the user want to update
         self.labelescol = ttk.Label(self, text='Escolha a informação que deseja atualizar:')
         self.labelescol.grid(column=1, row=2, padx=10, pady=15, sticky=W)
+
+        def aparecenome(event):
+            try:
+                self.labelcargo.grid_forget()
+                self.entrycargo.grid_forget()
+                self.vcargo = StringVar(value='')
+            except AttributeError:
+                pass
+            try:
+                self.labeldepart.grid_forget()
+                self.entrydepart.grid_forget()
+                self.vdepto = StringVar(value='')
+            except AttributeError:
+                pass
+            try:
+                self.labelag.grid_forget()
+                self.entryag.grid_forget()
+                self.labelconta.grid_forget()
+                self.entryconta.grid_forget()
+                self.labeldigito.grid_forget()
+                self.entrydigito.grid_forget()
+                self.vagencia = StringVar(value='')
+                self.vconta = StringVar(value='')
+                self.vdigito = StringVar(value='')
+            except AttributeError:
+                pass
+            self.labelnome = ttk.Label(self, width=20, text="Novo nome:")
+            self.labelnome.grid(column=1, row=5, padx=15, pady=5, sticky=W)
+            self.entrynome = ttk.Entry(self, width=40, textvariable=self.vnome)
+            self.entrynome.grid(column=1, row=6, padx=15, pady=5, sticky=W)
+
+        def aparececargo(event):
+            try:
+                self.labelnome.grid_forget()
+                self.entrynome.grid_forget()
+                self.vnome = StringVar(value='')
+            except AttributeError:
+                pass
+            try:
+                self.labeldepart.grid_forget()
+                self.entrydepart.grid_forget()
+                self.vdepto = StringVar(value='')
+            except AttributeError:
+                pass
+            try:
+                self.labelag.grid_forget()
+                self.entryag.grid_forget()
+                self.labelconta.grid_forget()
+                self.entryconta.grid_forget()
+                self.labeldigito.grid_forget()
+                self.entrydigito.grid_forget()
+                self.vagencia = StringVar(value='')
+                self.vconta = StringVar(value='')
+                self.vdigito = StringVar(value='')
+            except AttributeError:
+                pass
+            self.labelcargo = ttk.Label(self, width=20, text="Novo cargo:")
+            self.labelcargo.grid(column=1, row=5, padx=15, pady=5, sticky=W)
+            self.entrycargo = ttk.Entry(self, width=40, textvariable=self.vcargo)
+            self.entrycargo.grid(column=1, row=6, padx=15, pady=5, sticky=W)
+
+        def aparecedepto(event):
+            try:
+                self.labelcargo.grid_forget()
+                self.entrycargo.grid_forget()
+                self.vcargo = StringVar(value='')
+            except AttributeError:
+                pass
+            try:
+                self.labelnome.grid_forget()
+                self.entrynome.grid_forget()
+                self.vnome = StringVar(value='')
+            except AttributeError:
+                pass
+            try:
+                self.labelag.grid_forget()
+                self.entryag.grid_forget()
+                self.labelconta.grid_forget()
+                self.entryconta.grid_forget()
+                self.labeldigito.grid_forget()
+                self.entrydigito.grid_forget()
+                self.vagencia = StringVar(value='')
+                self.vconta = StringVar(value='')
+                self.vdigito = StringVar(value='')
+            except AttributeError:
+                pass
+            self.labeldepart = ttk.Label(self, width=20, text="Novo departamento:")
+            self.labeldepart.grid(column=1, row=5, padx=15, pady=5, sticky=W)
+            self.entrydepart = ttk.Entry(self, width=40, textvariable=self.vdepto)
+            self.entrydepart.grid(column=1, row=6, padx=15, pady=5, sticky=W)
+
+        def aparececonta(event):
+            try:
+                self.labelcargo.grid_forget()
+                self.entrycargo.grid_forget()
+                self.vcargo = StringVar(value='')
+            except AttributeError:
+                pass
+            try:
+                self.labeldepart.grid_forget()
+                self.entrydepart.grid_forget()
+                self.vdepto = StringVar(value='')
+            except AttributeError:
+                pass
+            try:
+                self.labelnome.grid_forget()
+                self.entrynome.grid_forget()
+                self.vnome = StringVar(value='')
+            except AttributeError:
+                pass
+            self.labelag = ttk.Label(self, width=20, text="Nova Agência:")
+            self.labelag.grid(column=1, row=5, padx=15, pady=5, sticky=W)
+            self.entryag = ttk.Entry(self, width=20, textvariable=self.vagencia)
+            self.entryag.grid(column=1, row=6, padx=15, pady=5, sticky=W)
+            self.labelconta = ttk.Label(self, width=20, text="Nova Conta:")
+            self.labelconta.grid(column=1, row=7, padx=15, pady=5, sticky=W)
+            self.entryconta = ttk.Entry(self, width=20, textvariable=self.vconta)
+            self.entryconta.grid(column=1, row=8, padx=15, pady=5, sticky=W)
+            self.labeldigito = ttk.Label(self, width=20, text="Novo Dígito:")
+            self.labeldigito.grid(column=1, row=9, padx=15, pady=5, sticky=W)
+            self.entrydigito = ttk.Entry(self, width=20, textvariable=self.vdigito)
+            self.entrydigito.grid(column=1, row=10, padx=15, pady=5, sticky=W)
+
         # radio buttons
+        self.vnome = StringVar(value='')
+        self.vdepto = StringVar(value='')
+        self.vcargo = StringVar(value='')
+        self.vagencia = StringVar(value='')
+        self.vconta = StringVar(value='')
+        self.vdigito = StringVar(value='')
         self.tipo = IntVar()
         self.nom = ttk.Radiobutton(self, text='Nome', variable=self.tipo, value=1)
         self.nom.grid(pady=5, padx=15, column=1, row=3, sticky=W)
+        self.nom.bind('<Button-1>', aparecenome)
         self.crg = ttk.Radiobutton(self, text='Cargo', variable=self.tipo, value=2)
-        self.crg.grid(pady=5, padx=10, column=2, row=3, sticky=W)
+        self.crg.grid(pady=5, padx=90, column=1, row=3, sticky=W)
+        self.crg.bind('<Button-1>', aparececargo)
         self.dept = ttk.Radiobutton(self, text='Departamento', variable=self.tipo, value=3)
         self.dept.grid(pady=5, padx=15, column=1, row=4, sticky=W)
+        self.dept.bind('<Button-1>', aparecedepto)
         self.conta = ttk.Radiobutton(self, text='Conta Bancária', variable=self.tipo, value=4)
-        self.conta.grid(pady=5, padx=10, column=2, row=4, sticky=W)
-        self.bttatualizar = ttk.Button(self, text='Atualizar cadastro', command=lambda: [])
-        self.bttatualizar.grid(pady=5, padx=90, column=2, row=10, sticky=W)
+        self.conta.grid(pady=5, padx=130, column=1, row=4, sticky=W)
+        self.conta.bind('<Button-1>', aparececonta)
+        self.bttatualizar = ttk.Button(self, text='Atualizar cadastro', command=lambda: [updatedb(self.combnom.get(),
+                                                                                                  self.vnome.get(),
+                                                                                                  self.vcargo.get(),
+                                                                                                  self.vdepto.get(),
+                                                                                                  self.vagencia.get(),
+                                                                                                  self.vconta.get(),
+                                                                                                  self.vdigito.get())])
+        self.bttatualizar.grid(pady=5, padx=350, column=1, row=30, sticky=W)
 
 
 if __name__ == '__main__':

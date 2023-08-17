@@ -32,7 +32,7 @@ from sqlalchemy.orm import sessionmaker
 from src.models.listas import municipios
 import smtplib
 import sqlite3
-from src.models.dados_servd import em_rem, em_ti, em_if, k1, host, port, rede, em_fin
+from src.models.dados_servd import em_rem, em_ti, em_if, k1, host, port, rede, em_fin, em_lgpd
 import tkinter.filedialog
 from tkinter import messagebox
 import tkinter.filedialog
@@ -1695,7 +1695,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
                         'i'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(20)
                     pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.cpf)
-                    t.sleep(1), pa.press('tab', 3), pa.write(pessoa.genero), pa.press('tab'), pa.write(pessoa.cor)
+                    t.sleep(1), pa.press('tab', 3), pa.write(pessoa.genero[0]), pa.press('tab'), pa.write(pessoa.cor)
                     t.sleep(1), pa.press('tab', 2), pa.write(pessoa.instru)
                     t.sleep(1), pa.press('tab'), pa.write(pessoa.estado_civil)
                     if str(pessoa.estado_civil) == '2 - Casado(a)':
@@ -1876,7 +1876,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
                         'i'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(60)
                     pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.cpf)
-                    t.sleep(1), pa.press('tab', 3), pa.write(pessoa.genero), pa.press('tab'), pa.write(pessoa.cor)
+                    t.sleep(1), pa.press('tab', 3), pa.write(pessoa.genero[0]), pa.press('tab'), pa.write(pessoa.cor)
                     t.sleep(1), pa.press('tab', 2), pa.write(pessoa.instru)
                     t.sleep(1), pa.press('tab'), pa.write(pessoa.estado_civil)
                     if str(pessoa.estado_civil) == '2 - Casado(a)':
@@ -2022,7 +2022,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
                         'a'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(15)
                     pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.cpf)
-                    pa.press('tab', 3), pa.write(pessoa.genero), pa.press('tab'), pa.write(pessoa.cor)
+                    pa.press('tab', 3), pa.write(pessoa.genero[0]), pa.press('tab'), pa.write(pessoa.cor)
                     pa.press('tab', 2), pa.write(pessoa.instru)
                     pa.press('tab'), pa.write(pessoa.estado_civil)
                     if str(pessoa.estado_civil) == '2 - Casado(a)':
@@ -2142,7 +2142,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
                             'a'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(20)
                         pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.cpf)
-                        t.sleep(1), pa.press('tab', 3), pa.write(pessoa.genero), pa.press('tab'), pa.write(pessoa.cor)
+                        t.sleep(1), pa.press('tab', 3), pa.write(pessoa.genero[0]), pa.press('tab'), pa.write(pessoa.cor)
                         t.sleep(1), pa.press('tab', 2), pa.write(pessoa.instru)
                         t.sleep(1), pa.press('tab'), pa.write(pessoa.estado_civil)
                         if str(pessoa.estado_civil) == '2 - Casado(a)':
@@ -2416,7 +2416,6 @@ def enviar_emails_funcionario(matricula):
         s = smtplib.SMTP(host=host, port=port)
         s.starttls()
         s.login(email_remetente, senha)
-
         # send e-mail to employee with a pdf file so he/she can go to bank to open an account
         msg = MIMEMultipart('alternative')
         msg['From'] = email_remetente
@@ -3862,6 +3861,58 @@ def validar_pis(local, nome):
             title='Ok!',
             message='PIS ok!'
         )
+
+
+def updatedb(pessoa, nome, cargo, departamento, agencia, conta, digito):
+    sessions = sessionmaker(bind=engine)
+    session = sessions()
+
+    def alteranome():
+        pess = session.query(Colaborador).filter_by(nome=pessoa).first()
+        pess.nome = nome
+        session.commit()
+        tkinter.messagebox.showinfo(title='Alteração efetuada!',
+                                    message=f'{pessoa} teve seu NOME alterado para: {nome}.')
+
+    def alteracargo():
+        pess = session.query(Colaborador).filter_by(nome=pessoa).first()
+        pess.cargo = cargo
+        session.commit()
+        tkinter.messagebox.showinfo(title='Alteração efetuada!',
+                                    message=f'{pessoa} teve seu CARGO alterado para: {cargo}.')
+
+    def alteradepto():
+        pess = session.query(Colaborador).filter_by(nome=pessoa).first()
+        pess.depto = departamento
+        session.commit()
+        tkinter.messagebox.showinfo(title='Alteração efetuada!',
+                                    message=f'{pessoa} teve seu DEPTO alterado para: {departamento}.')
+
+    def alteracc():
+        pess = session.query(Colaborador).filter_by(nome=pessoa).first()
+        pess.ag = agencia
+        pess.conta = conta
+        pess.cdigito = digito
+        session.commit()
+        tkinter.messagebox.showinfo(title='Alteração efetuada!',
+                                    message=f'{pessoa} teve seus dados bancários alterados para:\nAg: {agencia}\nConta: {conta}\nDígito: {digito}')
+
+    if pessoa == '':
+        tkinter.messagebox.showinfo(title='Alteração não efetuada!', message='Escolha uma pessoa para editar dados!')
+    else:
+        if nome == '' and cargo == '' and departamento == '' and agencia == '' and conta == '' and digito == '':
+            tkinter.messagebox.showinfo(title='Alteração não efetuada!',
+                                        message='Escolha pelo menos uma opção para editar dados!')
+        else:
+            todosargs = locals()
+            todosargs = {k: v for k, v in todosargs.items() if v}
+            altera = {
+                'nome': alteranome,
+                'cargo': alteracargo,
+                'departamento': alteradepto,
+                'agencia': alteracc
+            }
+            altera[list(todosargs)[5]]()
 
 
 def send_email(matriculas):
@@ -5844,7 +5895,7 @@ def doispgtos(somas, data):
             # Loop added to work with runs (strings with same style)
             for i in range(len(inline)):
                 if 'valorum' in inline[i].text:
-                    text = inline[i].text.replace('valorum', str(somas[totalpgto]).replace(',', '_').replace('.', ',').replace('_', '.'))
+                    text = inline[i].text.replace('valorum', str(somas[pagamento]).replace(',', '_').replace('.', ',').replace('_', '.'))
                     inline[i].text = text
         if '#extenso' in parag.text:
             inline = parag.runs

@@ -54,7 +54,7 @@
       <recent name="C:\Users\Felipe\PycharmProjects\PersonalTrainer" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.admissao_e_desligamento">
+  <component name="RunManager" selected="Python.cadastrar_bancoColaborador">
     <configuration name="admissao_e_desligamento" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -162,10 +162,10 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.admissao_e_desligamento" />
         <item itemvalue="Python.cadastrar_bancoColaborador" />
-        <item itemvalue="Python.certificados" />
+        <item itemvalue="Python.admissao_e_desligamento" />
         <item itemvalue="Python.solicitar_pagamento" />
+        <item itemvalue="Python.certificados" />
         <item itemvalue="Python.ponto" />
       </list>
     </recent_temporary>
