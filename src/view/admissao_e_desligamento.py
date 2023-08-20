@@ -183,13 +183,13 @@ class CadastrarFunc(ttk.Frame):
                                           command=lambda: [enviar_emails_funcionario(self.entrymatr.get())])
         self.botaoenviaemail.grid(column=1, row=30, padx=320, pady=1, sticky=W)
         self.botaoemailcontrat = ttk.Button(self, width=20, text="E-mail contratação",
-                                          command=lambda: [
+                                            command=lambda: [
                                               enviar_emails_contratacao(self.caminho.get(), self.combonome.get(),
                                                                         self.combodepto.get(), self.combocargo.get(),
                                                                         self.entrysal.get(), self.entryadmiss.get())])
         self.botaoemailcontrat.grid(column=1, row=11, padx=320, pady=1, sticky=W)
         self.botaoapenascadast = ttk.Button(self, text="Apenas Registrar no DB",
-                                        command=lambda: [apenas_registrar_funcionario(self.caminho.get(), self.edicao.get(),
+                                            command=lambda: [apenas_registrar_funcionario(self.caminho.get(), self.edicao.get(),
                                                                                self.feitonde.get(),
                                                                                self.combonome.get(),
                                                                                self.entrymatr.get(),
@@ -317,7 +317,6 @@ class CadastrarEst(ttk.Frame):
                                                     self.contaest.get(),
                                                     self.digitoest.get())])
         self.botaoapenascadast.grid(column=1, row=30, padx=10, pady=1, sticky=W)
-
 
     def selecionarest(self):
         try:

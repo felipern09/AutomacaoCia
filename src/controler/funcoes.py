@@ -31,13 +31,13 @@ from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
 from src.models.listas import municipios
 import smtplib
-import sqlite3
-from src.models.dados_servd import em_rem, em_ti, em_if, k1, host, port, rede, em_fin, em_lgpd
+from src.models.dados_servd import em_rem, em_ti, em_if, k1, host, port, rede, em_fin, em_lgpd, pasta_dexion,\
+    pasta_estag, pasta_func
+from zipfile import ZipFile
 import tkinter.filedialog
 from tkinter import messagebox
 import tkinter.filedialog
 import time as t
-from typing import List, Dict, Tuple, Type
 import urllib
 from urllib import parse
 import win32com.client as client
@@ -531,6 +531,13 @@ def consultar_horas_complementares(comp: int) -> dict:
 
 
 def salvar_planilha_grade_horaria(dic: dict, comp: int):
+    hj = dt.today()
+    mes = str(comp).zfill(2)
+    ano = hj.year
+    mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
+              '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
+    pasta_pgto = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Grades e Comissões'
+
     grd = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Grade.xlsx')
     grade = l_w(grd, read_only=False)
     plan1 = grade['Planilha1']
@@ -1271,7 +1278,7 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
     plan1['J2'].value = 'Substituiu'
     plan1['M1'].fill = comple
     plan1['N1'].value = 'Horas Complementares'
-    grade.save(f'Grade {fechamento.month}-{fechamento.year}.xlsx')
+    grade.save(pasta_pgto + f'\\Grade {fechamento.month}-{fechamento.year}.xlsx')
 
 
 def somar_aulas_de_segunda(nome: str, depto: str) -> float:
@@ -1373,6 +1380,16 @@ def somar_aulas_de_domingo(nome: str, depto: str) -> float:
 
 
 def salvar_planilha_soma_final(compet: int):
+    hj = dt.today()
+    mes = str(compet).zfill(2)
+    ano = hj.year
+    mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
+              '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
+    pasta_pgto = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Grades e Comissões'
+    try:
+        os.makedirs(pasta_pgto)
+    except FileExistsError:
+        pass
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     folhadehoje = Folha(compet, list(listar_aulas_ativas()), listar_departamentos_ativos())
@@ -1409,13 +1426,13 @@ def salvar_planilha_soma_final(compet: int):
                     x += 1
     # folha['F1'].value = 'Total Bruto - Professores'
     # folha['G1'].value = locale.currency(totaldafolha(folhadehoje), grouping=True)
-    plan.save(f'Somafinal mes {compet}.xlsx')
+    plan.save(pasta_pgto + f'\\Somafinal mes {compet}.xlsx')
     salvar_planilha_grade_horaria(somafinal, compet)
     substitutos = {}
     complementares = {}
     feriasl = {}
     desligadosl = {}
-    planilha = l_w(f'Grade {compet}-2023.xlsx')
+    planilha = l_w(pasta_pgto + f'\\Grade {compet}-2023.xlsx')
     aba = planilha['Planilha1']
     for row in aba.iter_cols(min_row=3, min_col=3, max_row=115, max_col=35):
         for cell in row:
@@ -1472,7 +1489,7 @@ def salvar_planilha_soma_final(compet: int):
                     hrs += aba.cell(column=m, row=cell.row).value
                 complementares[aba.cell(column=2, row=cell.row).value] = {depart: round(hrs, 2)}
 
-    planilha2 = l_w(f'Somafinal mes {compet}.xlsx', read_only=False)
+    planilha2 = l_w(pasta_pgto + f'\\Somafinal mes {compet}.xlsx', read_only=False)
     aba2 = planilha2['Planilha1']
     for pessoa in feriasl:
         for depart in feriasl[pessoa]:
@@ -1509,19 +1526,20 @@ def salvar_planilha_soma_final(compet: int):
                 pass
         adjusted_width = max_length + 1
         aba2.column_dimensions[column].width = adjusted_width
-    planilha2.save(f'Somafinal mes {compet}.xlsx')
-    tkinter.messagebox.showinfo(
-        title='Grade ok!',
-        message=f'Grade do mês {compet} salva com sucesso!'
-    )
-    planilha3 = l_w(f'Grade {compet}-2023.xlsx', read_only=False)
+    planilha2.save(pasta_pgto + f'\\Somafinal mes {compet}.xlsx')
+    planilha3 = l_w(pasta_pgto + f'\\Grade {compet}-2023.xlsx', read_only=False)
     aba3 = planilha3['Planilha1']
     for row in aba3.iter_cols(min_row=3, min_col=3, max_row=120, max_col=35):
         for cell in row:
             if cell.value == 0:
                 cell.value = ''
 
-    planilha3.save(f'Grade {compet}-2023.xlsx')
+    planilha3.save(pasta_pgto + f'\\Grade {compet}-2023.xlsx')
+    tkinter.messagebox.showinfo(
+        title='Grade ok!',
+        message=f'Grade do mês {compet} salva com sucesso!'
+    )
+
     print('Férias \n', feriasl)
     print('Desligados \n', desligadosl)
     print('Substitutos \n', substitutos)
@@ -6632,3 +6650,29 @@ def gerar_pedido_pgto_por_arquivo(data: str, caminho_arq1: str, caminho_arq2='',
     }
     qtidades[quantidade_de_pgtos](somas, data)
     tkinter.messagebox.showinfo('Pagamento enviado!', 'Pagamento enviado ao financeiro com sucesso!')
+
+
+def salvar_holerites():
+    caminho = pasta_dexion
+    for filename in os.listdir(caminho):
+        f = os.path.join(caminho, filename)
+        if os.path.isfile(f) and filename.endswith('.zip'):
+            cam, competencia, data_pgto, matricula = f.split(',')
+            mes, ano = competencia.split('-')
+            matricula = matricula.replace(').zip', '')
+            matricula = int(matricula)
+            sessions = sessionmaker(bind=engine)
+            session = sessions()
+            pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
+            if pessoa.cargo == 'ESTAGIARIO' or pessoa.cargo == 'ESTAGIARIA':
+                pasta_funcional = pasta_estag + f'\\{pessoa.nome}'
+            else:
+                pasta_funcional = pasta_func + f'\\{pessoa.nome}'
+            try:
+                os.makedirs(pasta_funcional + f'\\Holerites\\{ano}\\{mes}')
+            except FileExistsError:
+                pass
+            try:
+                ZipFile(f, 'r').extractall(path=pasta_funcional + f'\\Holerites\\{ano}\\{mes}')
+            except FileNotFoundError:
+                pass
