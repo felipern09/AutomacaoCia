@@ -307,13 +307,30 @@ def somar_aulas_da_grade(diasem: str, inic: datetime.datetime, fim: datetime.dat
     return round(soma, 2)
 
 
-def listar_aulas_ativas() -> list:
+def listar_aulas_ativas(compet) -> list:
     """
     List all classes with 'Active' status.
     :return: List of active classes.
     """
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
+    sessionscol = sessionmaker(bind=engine)
+    sessioncol = sessionscol()
+    competencia = dt(day=10, month=compet, year=dt.today().year)
+    inicio = dt(day=21, month=(competencia - relativedelta(months=1)).month,
+                year=(competencia - relativedelta(months=1)).year)
+
+    aulasativasdb = session.query(Aulas).filter_by(status='Ativa').all()
+    for aulat in aulasativasdb:
+        pessoa = sessioncol.query(Colaborador).filter_by(nome=aulat.professor).order_by(Colaborador.matricula.desc()).first()
+        if pessoa:
+            if pessoa.desligamento is not None:
+                if dt.strptime(pessoa.desligamento, '%d/%m/%Y') > inicio:
+                    pass
+                else:
+                    aulat.status = 'Inativa'
+                    session.commit()
+
     aulasativasdb = session.query(Aulas).filter_by(status='Ativa').all()
     aula = []
     for i, a in enumerate(aulasativasdb):
@@ -1392,13 +1409,13 @@ def salvar_planilha_soma_final(compet: int):
         pass
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
-    folhadehoje = Folha(compet, list(listar_aulas_ativas()), listar_departamentos_ativos())
+    folhadehoje = Folha(compet, list(listar_aulas_ativas(compet)), listar_departamentos_ativos())
     somaaulas = {}
     for i in listar_professores_ativos():
         somaaulas[i] = {}
         for d in listar_departamentos_ativos():
             somaaulas[i][d] = {}
-    for aulas in listar_aulas_ativas():
+    for aulas in listar_aulas_ativas(compet):
         somaaulas[aulas.professor][aulas.departamento][aulas.nome + f' ({aulas.valor})'] = round(
             somar_horas_professor(folhadehoje, aulas.professor, aulas.departamento, aulas.nome, compet), 2)
         dictchav = list(somaaulas.keys())
@@ -3119,7 +3136,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
             msg = MIMEMultipart('alternative')
             arquivo = pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf'
             text = MIMEText(
-                f'''Olá!<br><br>nSegue pedido de TCE do(a) estagiário(a) {cadastro["nome"]}.
+                f'''Olá!<br><br>Segue pedido de TCE do(a) estagiário(a) {cadastro["nome"]}.
                 <br><br>Atenciosamente,<br><img src="cid:image1">''',
                 'html')
             msg.attach(text)
@@ -6664,15 +6681,138 @@ def salvar_holerites():
             sessions = sessionmaker(bind=engine)
             session = sessions()
             pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
-            if pessoa.cargo == 'ESTAGIARIO' or pessoa.cargo == 'ESTAGIARIA':
-                pasta_funcional = pasta_estag + f'\\{pessoa.nome}'
-            else:
-                pasta_funcional = pasta_func + f'\\{pessoa.nome}'
-            try:
-                os.makedirs(pasta_funcional + f'\\Holerites\\{ano}\\{mes}')
-            except FileExistsError:
-                pass
-            try:
-                ZipFile(f, 'r').extractall(path=pasta_funcional + f'\\Holerites\\{ano}\\{mes}')
-            except FileNotFoundError:
-                pass
+            if pessoa:
+                if pessoa.cargo == 'ESTAGIARIO' or pessoa.cargo == 'ESTAGIARIA':
+                    pasta_funcional = pasta_estag + f'\\{str(pessoa.nome).strip()}'
+                else:
+                    pasta_funcional = pasta_func + f'\\{str(pessoa.nome).strip()}'
+                try:
+                    os.makedirs(pasta_funcional + f'\\Holerites\\{ano}\\{mes}')
+                except:
+                    pass
+                try:
+                    ZipFile(f, 'r').extractall(path=pasta_funcional + f'\\Holerites\\{ano}\\{mes}')
+                except FileNotFoundError:
+                    pass
+    tkinter.messagebox.showinfo('Contracheques Salvos!', 'Contracheques salvos com sucesso!')
+
+
+def lancar_ferias(nome, depto, inicio, fim):
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
+    sessionscol = sessionmaker(bind=engine)
+    sessioncol = sessionscol()
+    pessoa = sessioncol.query(Colaborador).filter_by(nome=nome).first()
+    matricula = pessoa.matricula
+
+    fer = Ferias(professor=nome, matrprof=matricula, departamento=depto, inicio=inicio, fim=fim)
+    session.add(fer)
+    session.commit()
+    tkinter.messagebox.showinfo('Férias ok!', 'Férias lançadas com sucesso!')
+
+
+def lancar_atestado(nome, depto, data):
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
+    sessionscol = sessionmaker(bind=engine)
+    sessioncol = sessionscol()
+
+    professor = sessioncol.query(Colaborador).filter_by(nome=nome).first()
+    matricula = professor.matricula
+
+    atest = Atestado(professor=nome, matrprof=matricula, departamento=depto, data=data)
+    session.add(atest)
+    session.commit()
+    tkinter.messagebox.showinfo('Atestado salvo!', 'Atestado salvo com sucesso!')
+
+
+def lancar_desligamento(nome, depto, data):
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
+
+    sessionscol = sessionmaker(bind=engine)
+    sessioncol = sessionscol()
+
+    professor = sessioncol.query(Colaborador).filter_by(nome=nome).first()
+    matricula = professor.matricula
+
+    deslig = Desligados(professor=nome, matrprof=matricula, departamento=depto, datadesligamento=data)
+    session.add(deslig)
+    session.commit()
+    # se desligamento antes do iniício da folha: tornar inativas as aulas da pessoa
+    tkinter.messagebox.showinfo('Desligamento ok!', 'Desligamento lançado com sucesso!')
+
+
+def lancar_substit(substituido, substituto, departamento, aula, data, horas):
+    sessionscol = sessionmaker(bind=engine)
+    sessioncol = sessionscol()
+    profsubstituido = sessioncol.query(Colaborador).filter_by(nome=substituido).first()
+    matrsubsido = profsubstituido.matricula
+    profsubstituto = sessioncol.query(Colaborador).filter_by(nome=substituto).first()
+    matrsubstuto = profsubstituto.matricula
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
+    subs = Substituicao(professorsubst=substituido, matrprof=matrsubsido, substituto=substituto,
+                        matrsubstituto=matrsubstuto, departamento=departamento, aula=aula, data=data,
+                        horas=horas)
+    session.add(subs)
+    session.commit()
+    tkinter.messagebox.showinfo('Substituição ok!', 'Substituição lançada com sucesso!')
+
+
+def lancar_hrscomple(nome, departamento, aula, data, horas):
+    sessionscol = sessionmaker(bind=engine)
+    sessioncol = sessionscol()
+    pessoa = sessioncol.query(Colaborador).filter_by(nome=nome).first()
+    matricula = pessoa.matricula
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
+    hrcomp = Hrcomplement(professor=nome, matrprof=matricula, departamento=departamento, horas=horas, aula=aula, data=data)
+    session.add(hrcomp)
+    session.commit()
+    tkinter.messagebox.showinfo('Horas Salvas!', 'Horas complementares salvas com sucesso!')
+
+
+def lancar_faltas(nome, depto, data, hrs):
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
+    sessionscol = sessionmaker(bind=engine)
+    sessioncol = sessionscol()
+    pessoa = sessioncol.query(Colaborador).filter_by(nome=nome).first()
+    matricula = pessoa.matricula
+
+    falt = Faltas(professor=nome, matrprof=matricula, departamento=depto, data=data, horas=hrs)
+    session.add(falt)
+    session.commit()
+    tkinter.messagebox.showinfo('Falta Salva!', 'Falta salva com sucesso!')
+
+
+def lancar_novaaula(nomeprof, depto, nomeaula, diasemana, inicio, fim, valor):
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
+    inicio = inicio + ':00'
+    fim = fim + ':00'
+    sessionscol = sessionmaker(bind=engine)
+    sessioncol = sessionscol()
+    pessoa = sessioncol.query(Colaborador).filter_by(nome=nomeprof).first()
+    matricula = pessoa.matricula
+    hj = dt.today()
+    aula = Aulas(nome=nomeaula, professor=nomeprof, departamento=depto, diadasemana=diasemana, inicio=inicio,
+                 fim=fim, valor=valor, status='Ativa', iniciograde=dt.strftime(hj, '%d/%m/%Y'), matrprof=matricula)
+    session.add(aula)
+    session.commit()
+    tkinter.messagebox.showinfo('Aula Salva!', 'Aula lançada com sucesso!')
+
+
+def lancar_escala(nome, departamento, aula, data, horas):
+    sessionscol = sessionmaker(bind=engine)
+    sessioncol = sessionscol()
+    pessoa = sessioncol.query(Colaborador).filter_by(nome=nome).first()
+    matricula = pessoa.matricula
+    sessions = sessionmaker(bind=enginefolha)
+    session = sessions()
+    esc = Escala(professor=nome, matrprof=matricula, departamento=departamento, horas=horas, aula=aula, data=data)
+    session.add(esc)
+    session.commit()
+    tkinter.messagebox.showinfo('Escala Salva!', 'Escala salva com sucesso!')
+

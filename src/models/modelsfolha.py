@@ -68,6 +68,7 @@ class Substituicao(Base):
     data = Column(String, nullable=False)
     horas = Column(String, nullable=False)
 
+
 class Desligados(Base):
     __tablename__ = 'desligados'
     numero = Column(Integer, primary_key=True)
