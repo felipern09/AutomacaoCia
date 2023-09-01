@@ -4,7 +4,7 @@
 #  relatorio de atrasos -> atraves do relatorio geral salvo em xlsx gerar comparatvo de horários registrados
 # com horarios de cadastro e informar se houve atraso superior a 10 min para cada registro
 # cadastro de funcionário no programa secullum
-from src.controler.funcoes import gerar_relatorios_ponto_pdf
+from src.controler.funcoes import gerar_relatorios_ponto_pdf, cadastrar_no_ponto
 import tkinter as tk
 from tkcalendar import DateEntry
 from datetime import datetime
@@ -13,6 +13,8 @@ from openpyxl import load_workbook as l_w
 import tkinter.filedialog
 from tkinter import ttk
 from tkinter import *
+from src.models.models import Colaborador, engine
+from sqlalchemy.orm import sessionmaker
 
 # Under development.
 
@@ -22,7 +24,7 @@ class MainApplication(tk.Tk):
         super().__init__()
 
         self.title("Relatórios de Ponto - Cia BSB")
-        self.geometry('332x180')
+        self.geometry('432x280')
         self.img = PhotoImage(file='../models/static/imgs/Icone.png')
         self.iconphoto(False, self.img)
         self.columnconfigure(0, weight=5)
@@ -31,16 +33,18 @@ class MainApplication(tk.Tk):
             child.grid_configure(padx=1, pady=3)
         self.notebook = ttk.Notebook(self)
 
-        self.Frame1 = Frame1(self.notebook)
-        self.Frame2 = Frame2(self.notebook)
+        self.Frame1 = GerarRelatorio(self.notebook)
+        self.Frame2 = ConferirAtrasos(self.notebook)
+        self.Frame3 = CadastrarNoRelogio(self.notebook)
 
         self.notebook.add(self.Frame1, text='Gerar relação de pontos')
         self.notebook.add(self.Frame2, text='Gerar conferência de horários')
+        self.notebook.add(self.Frame3, text='Cadastrar no Relógio')
 
         self.notebook.pack()
 
 
-class Frame1(ttk.Frame):
+class GerarRelatorio(ttk.Frame):
     def __init__(self, container):
         super().__init__()
 
@@ -73,19 +77,12 @@ class Frame1(ttk.Frame):
         self.estag = IntVar()
         self.editar = ttk.Checkbutton(self, text='Apenas estagiários.', variable=self.estag)
         self.editar.grid(column=1, row=26, padx=26, pady=1, sticky=W)
-
-        def carregarfunc(local):
-            planwb = l_w(local)
-            plansh = planwb['Respostas ao formulário 1']
-            lista = []
-            for x, pessoa in enumerate(plansh):
-                lista.append(f'{x + 1} - {pessoa[2].value}')
-
         self.botaocadastrar = ttk.Button(self, width=20, text="Gerar Relatórios",
                                          command=lambda: [
                                              gerar_relatorios_ponto_pdf(self.caminho.get(),
                                                                         self.entryinicial.get(),
-                                                                        self.entryfinal.get())
+                                                                        self.entryfinal.get(),
+                                                                        self.estag.get())
                                          ])
         self.botaocadastrar.grid(column=1, row=28, padx=165, pady=1, sticky=W)
 
@@ -97,7 +94,7 @@ class Frame1(ttk.Frame):
             pass
 
 
-class Frame2(ttk.Frame):
+class ConferirAtrasos(ttk.Frame):
     def __init__(self, container):
         super().__init__()
         self.hoje = datetime.today()
@@ -147,6 +144,67 @@ class Frame2(ttk.Frame):
             self.caminho.set(str(caminhoplan))
         except ValueError:
             pass
+
+
+class CadastrarNoRelogio(ttk.Frame):
+    def __init__(self, container):
+        super().__init__()
+        sessions = sessionmaker(bind=engine)
+        session = sessions()
+        self.grupo = []
+        pessoas = session.query(Colaborador).filter_by(desligamento=None).all()
+        for pess in pessoas:
+            if pess.nome != '':
+                self.grupo.append(pess.nome)
+        self.nomes = list(sorted(set(filter(None, self.grupo))))
+        self.hoje = datetime.today()
+        self.geral = StringVar()
+        self.caminho = StringVar()
+        self.labelescolh = ttk.Label(self, width=90, text='Abra o programa Gerenciado iDx Class e escolha o nome do colaborador')
+        self.labelescolh.grid(column=1, row=1, padx=25, pady=1, sticky=W)
+        self.nome = StringVar()
+        self.horario = StringVar()
+        self.cargo = StringVar()
+        self.departamento = StringVar()
+        self.tipocontr = StringVar()
+        self.nomesplan = []
+        # definir data inicial
+        self.labelinicial = ttk.Label(self, width=20, text="Nome:")
+        self.labelinicial.grid(column=1, row=12, padx=25, pady=5, sticky=W)
+        self.combonome = ttk.Combobox(self, width=45, values=self.nomes)
+        self.combonome.grid(column=1, row=12, padx=80, pady=5, sticky=W)
+        self.labelmatricula = ttk.Label(self, width=20, text="Matrícula: ")
+        self.labelmatricula.grid(column=1, row=13, padx=25, pady=5, sticky=W)
+        self.labelpis = ttk.Label(self, width=20, text="Pis: ")
+        self.labelpis.grid(column=1, row=14, padx=25, pady=5, sticky=W)
+        self.labelchk = ttk.Label(self, width=20, text="")
+        self.labelchk.grid(column=1, row=15, padx=25, pady=5, sticky=W)
+        self.entrymatr = ttk.Entry(self, width=30)
+
+        def mostrar_pis_mat(event):
+            nome = event.widget.get()
+            pessoa = session.query(Colaborador).filter_by(nome=nome).order_by(Colaborador.matricula.desc()).first()
+            if 'ESTAG' in pessoa.cargo:
+                self.labelmatricula.config(text=f"Matrícula: {pessoa.matricula}")
+            else:
+                self.labelmatricula.config(text=f"Matrícula: {pessoa.matricula}")
+                self.labelpis.config(text=f"Pis: {pessoa.pis}")
+
+        self.combonome.bind("<<ComboboxSelected>>", mostrar_pis_mat)
+        # checkbutton para indicar onde foi feito
+
+        def chkbt():
+            self.labelchk.config(text='Matricula no ponto: ')
+            self.entrymatr.grid_configure(column=1, row=14, padx=25, pady=5, sticky=W)
+
+        self.alterarmtr = IntVar()
+        self.alterar = ttk.Checkbutton(self, text='Alterar Matr ponto', variable=self.alterarmtr, command=chkbt)
+        self.alterar.grid(column=1, row=26, padx=226, pady=1, sticky=W)
+        self.botaocadastrar = ttk.Button(self, text="Cadastrar no Ponto",
+                                         command=lambda: [cadastrar_no_ponto(self.combonome.get(),
+                                                                             self.alterarmtr.get(),
+                                                                             self.entrymatr.get())])
+        self.botaocadastrar.grid(column=1, row=28, padx=255, pady=8, sticky=W)
 
 
 # implementar pesquisa do funcionário direto no banco em vez da planilha base

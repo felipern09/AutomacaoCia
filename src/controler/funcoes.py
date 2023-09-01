@@ -27,6 +27,7 @@ import pyperclip as pp
 from PIL import ImageGrab
 from src.models.modelsfolha import Aula, Folha, Aulas, Faltas, Ferias, Hrcomplement, Atestado, Desligados, \
     Escala, Substituicao, enginefolha
+from src.models.modelsponto import engineponto, BasePonto
 from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
 from src.models.listas import municipios
@@ -4767,7 +4768,7 @@ def cadastrar_funcionario_no_secullum():
         x += 1
 
 
-def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str):
+def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str, estag: int):
     """
     Generates working time reports in .pdf trought analysis of file .AFD.
     :param arquivo: path of .AFD file.
@@ -4782,7 +4783,7 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str):
     out = open(arq, 'w')
     out.writelines(novalinha)
     out.close()
-    arquivo = rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\AFD.txt'
+    arquivo = arq
 
     # define excel plans to work with
     base = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\zzBase.xlsx')
@@ -4808,20 +4809,31 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str):
     planmat = {}
     planfunc = {}
     plandept = {}
+    planemail = {}
 
-    x = 2
-    while x <= len(sh['B']):
-        planbase.update(
-            {str(sh[f'B{x}'].value).replace('.', '').replace('-', ''): str(sh[f'C{x}'].value).title().strip()})
-        planmat.update(
-            {str(sh[f'B{x}'].value).replace('.', '').replace('-', ''): str(sh[f'A{x}'].value).title().strip()})
-        planfunc.update({str(sh[f'B{x}'].value).replace('.', '').replace('-', ''): str(sh[f'D{x}'].value).strip()})
-        plandept.update(
-            {str(sh[f'B{x}'].value).replace('.', '').replace('-', ''): str(sh[f'E{x}'].value).title().strip()})
-        x += 1
+    sessions = sessionmaker(engineponto)
+    session = sessions()
+    if estag == 1:
+        nomes = session.query(BasePonto).filter_by(cargo='ESTAGIARIA').all()
+        nomes2 = session.query(BasePonto).filter_by(cargo='ESTAGIARIO').all()
+        nomes = nomes + nomes2
+    else:
+        nomes = session.query(BasePonto).all()
+
+    for pessoa in nomes:
+        planbase.update({pessoa.matrponto: pessoa.nome})
+        planmat.update({pessoa.matrponto: pessoa.matricula})
+        planfunc.update({pessoa.matrponto: pessoa.cargo})
+        plandept.update({pessoa.matrponto: pessoa.departamento})
+        planemail.update({pessoa.matrponto: pessoa.email})
+
+    planbase.update({'21058461070': 'Teste Administrador'})
+    planmat.update({'21058461070': '456'})
+    planfunc.update({'21058461070': 'Gerente RH'})
+    plandept.update({'21058461070': 'RH'})
+    planemail.update({'21058461070': 'felipe.rodrigues@ciaathletica.com.br'})
 
     geral = pd.read_csv(arquivo, sep=' ', header=None, encoding='iso8859-1')
-    geral = geral[geral[0].str.len() <= 34]
     geral.dropna(axis=1, inplace=True)
     geral = geral.rename(columns={0: 'Dados'})
 
@@ -4839,7 +4851,6 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str):
                             columns=['Data', 'Entrada 1', 'Saída 1', 'Entrada 2', 'Saída 2', 'Entrada 3', 'Saída 3'])
         base = base.set_index('Data')
         geral = pd.read_csv(arquivo, sep=' ', header=None, encoding='iso8859-1')
-        geral = geral[geral[0].str.len() <= 34]
         geral.dropna(axis=1, inplace=True)
         geral = geral.rename(columns={0: 'Dados'})
         # dividir ultimos 11 caracteres em outra col
@@ -4883,45 +4894,47 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str):
         geral1 = geral1.rename(
             columns={0: 'Data', 1: 'Entrada 1', 2: 'Saída 1', 3: 'Entrada 2', 4: 'Saída 2', 5: 'Entrada 3',
                      6: 'Saída 3'})
+        try:
+            geral1['Entrada 1a'] = geral1['Entrada 1'].apply(lambda z: pd.to_timedelta(str(z)))
+            geral1['Saída 1a'] = geral1['Saída 1'].apply(lambda z: pd.to_timedelta(str(z)))
+            geral1['Tot1'] = geral1['Saída 1a'] - geral1['Entrada 1a']
+            total_horas = round(geral1['Tot1'].sum().total_seconds() / 3600, 2)
 
-        geral1['Entrada 1a'] = geral1['Entrada 1'].apply(lambda z: pd.to_timedelta(str(z)))
-        geral1['Saída 1a'] = geral1['Saída 1'].apply(lambda z: pd.to_timedelta(str(z)))
-        geral1['Tot1'] = geral1['Saída 1a'] - geral1['Entrada 1a']
-        total_horas = round(geral1['Tot1'].sum().total_seconds() / 3600, 2)
+            if geral1.shape[1] > 6:
+                if geral1.shape[1] < 10:
+                    geral1['Entrada 2a'] = geral1['Entrada 2'].apply(lambda z: pd.to_timedelta(str(z)))
+                    geral1['Saída 2a'] = geral1['Saída 2'].apply(lambda z: pd.to_timedelta(str(z)))
+                    geral1['Tot2'] = geral1['Saída 2a'] - geral1['Entrada 2a']
+                    geral1['Soma'] = geral1['Tot1'] + geral1['Tot2']
+                    total_horas = round(geral1['Soma'].sum().total_seconds() / 3600, 2)
+                    geral1 = geral1.drop('Entrada 2a', axis=1)
+                    geral1 = geral1.drop('Saída 2a', axis=1)
+                    geral1 = geral1.drop('Tot2', axis=1)
+                    geral1 = geral1.drop('Soma', axis=1)
 
-        if geral1.shape[1] > 6:
-            if geral1.shape[1] < 10:
+            if geral1.shape[1] > 8:
                 geral1['Entrada 2a'] = geral1['Entrada 2'].apply(lambda z: pd.to_timedelta(str(z)))
                 geral1['Saída 2a'] = geral1['Saída 2'].apply(lambda z: pd.to_timedelta(str(z)))
+                geral1['Entrada 3a'] = geral1['Entrada 3'].apply(lambda z: pd.to_timedelta(str(z)))
+                geral1['Saída 3a'] = geral1['Saída 3'].apply(lambda z: pd.to_timedelta(str(z)))
+                geral1['Tot1'] = geral1['Saída 1a'] - geral1['Entrada 1a']
                 geral1['Tot2'] = geral1['Saída 2a'] - geral1['Entrada 2a']
-                geral1['Soma'] = geral1['Tot1'] + geral1['Tot2']
+                geral1['Tot3'] = geral1['Saída 3a'] - geral1['Entrada 3a']
+                geral1['Soma'] = geral1['Tot1'] + geral1['Tot2'] + geral1['Tot3']
                 total_horas = round(geral1['Soma'].sum().total_seconds() / 3600, 2)
                 geral1 = geral1.drop('Entrada 2a', axis=1)
                 geral1 = geral1.drop('Saída 2a', axis=1)
+                geral1 = geral1.drop('Entrada 3a', axis=1)
+                geral1 = geral1.drop('Saída 3a', axis=1)
                 geral1 = geral1.drop('Tot2', axis=1)
+                geral1 = geral1.drop('Tot3', axis=1)
                 geral1 = geral1.drop('Soma', axis=1)
 
-        if geral1.shape[1] > 8:
-            geral1['Entrada 2a'] = geral1['Entrada 2'].apply(lambda z: pd.to_timedelta(str(z)))
-            geral1['Saída 2a'] = geral1['Saída 2'].apply(lambda z: pd.to_timedelta(str(z)))
-            geral1['Entrada 3a'] = geral1['Entrada 3'].apply(lambda z: pd.to_timedelta(str(z)))
-            geral1['Saída 3a'] = geral1['Saída 3'].apply(lambda z: pd.to_timedelta(str(z)))
-            geral1['Tot1'] = geral1['Saída 1a'] - geral1['Entrada 1a']
-            geral1['Tot2'] = geral1['Saída 2a'] - geral1['Entrada 2a']
-            geral1['Tot3'] = geral1['Saída 3a'] - geral1['Entrada 3a']
-            geral1['Soma'] = geral1['Tot1'] + geral1['Tot2'] + geral1['Tot3']
-            total_horas = round(geral1['Soma'].sum().total_seconds() / 3600, 2)
-            geral1 = geral1.drop('Entrada 2a', axis=1)
-            geral1 = geral1.drop('Saída 2a', axis=1)
-            geral1 = geral1.drop('Entrada 3a', axis=1)
-            geral1 = geral1.drop('Saída 3a', axis=1)
-            geral1 = geral1.drop('Tot2', axis=1)
-            geral1 = geral1.drop('Tot3', axis=1)
-            geral1 = geral1.drop('Soma', axis=1)
-
-        geral1 = geral1.drop('Entrada 1a', axis=1)
-        geral1 = geral1.drop('Saída 1a', axis=1)
-        geral1 = geral1.drop('Tot1', axis=1)
+            geral1 = geral1.drop('Entrada 1a', axis=1)
+            geral1 = geral1.drop('Saída 1a', axis=1)
+            geral1 = geral1.drop('Tot1', axis=1)
+        except KeyError:
+            total_horas = 0
 
         geral = geral.set_index('Data')
         base = base.combine_first(geral)
@@ -4941,7 +4954,7 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str):
         ponto.tables[0].rows[4].cells[1].paragraphs[0].text = str(
             ponto.tables[0].rows[4].cells[1].paragraphs[0].text).replace('#cod', str(matricula))
         ponto.tables[0].rows[5].cells[1].paragraphs[0].text = str(
-            ponto.tables[0].rows[5].cells[1].paragraphs[0].text).replace('#mat', planmat[str(matricula)])
+            ponto.tables[0].rows[5].cells[1].paragraphs[0].text).replace('#mat', str(planmat[str(matricula)]))
         ponto.tables[0].rows[6].cells[1].paragraphs[0].text = str(
             ponto.tables[0].rows[6].cells[1].paragraphs[0].text).replace('#func', planfunc[str(matricula)])
         ponto.tables[0].rows[7].cells[1].paragraphs[0].text = str(
@@ -5007,8 +5020,7 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str):
             os.remove(
                 rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
         except FileNotFoundError:
-            os.mkdir(rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto')
-            os.mkdir(
+            os.makedirs(
                 rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}')
             ponto.save( rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
             docx2pdf.convert(
@@ -5018,6 +5030,52 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str):
                 rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
 
         # print(base)
+
+
+def cadastrar_no_ponto(nome, altera, matrpt=''):
+    sessions = sessionmaker(engine)
+    session = sessions()
+    sessionspt = sessionmaker(engineponto)
+    sessionpt = sessionspt()
+    pessoa = session.query(Colaborador).filter_by(nome=nome).order_by(Colaborador.matricula.desc()).first()
+    if altera == 0:
+        if 'ESTAG' in pessoa.cargo:
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/controlid.png'))), t.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/novofunc.png'))), t.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/adcusuario.png'))), t.sleep(0.5)
+            pa.write(pessoa.nome), pa.press('tab'), pa.write(str(pessoa.matricula)), t.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okponto.png'))), t.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okconfirmaponto.png')))
+            estag = BasePonto(nome=pessoa.nome, matricula=pessoa.matricula, pis=pessoa.pis,
+                              matrponto=pessoa.matricula, email=pessoa.email, cargo=pessoa.cargo,
+                              departamento=pessoa.depto)
+            sessionpt.add(estag)
+            sessionpt.commit()
+        else:
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/controlid.png'))), t.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/novofunc.png'))), t.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/adcusuario.png'))), t.sleep(0.5)
+            pa.write(pessoa.nome), pa.press('tab'), pa.write(str(pessoa.pis)), t.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okponto.png')))
+            func = BasePonto(nome=pessoa.nome, matricula=pessoa.matricula, pis=pessoa.pis,
+                              matrponto=pessoa.pis, email=pessoa.email, cargo=pessoa.cargo,
+                              departamento=pessoa.depto)
+            sessionpt.add(func)
+            sessionpt.commit()
+
+    else:
+        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/controlid.png'))), t.sleep(0.5)
+        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/novofunc.png'))), t.sleep(0.5)
+        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/adcusuario.png'))), t.sleep(0.5)
+        pa.write(pessoa.nome), pa.press('tab'), pa.write(str(matrpt)), t.sleep(0.5)
+        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okponto.png'))), t.sleep(0.5)
+        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okconfirmaponto.png')))
+        estag = BasePonto(nome=pessoa.nome, matricula=pessoa.matricula, pis=pessoa.pis,
+                          matrponto=matrpt, email=pessoa.email, cargo=pessoa.cargo,
+                          departamento=pessoa.depto)
+        sessionpt.add(estag)
+        sessionpt.commit()
+    tkinter.messagebox.showinfo(title='Cadastro no ponto ok!',message='Colaborador cadastrado com sucesso!')
 
 
 def emitir_certificados(pst: int, psa: int, nome: str, data: str, horas: int, participantes: list):

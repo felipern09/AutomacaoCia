@@ -191,16 +191,16 @@ class Substituicoes(ttk.Frame):
         self.aaulas = list(sorted(set(filter(None, self.grupoaulas))))
         # nome
         self.labelsubstituto = ttk.Label(self, width=20, text='Substituto:')
-        self.labelsubstituto.grid(column=1, row=1, padx=5, pady=2, sticky=W)
+        self.labelsubstituto.grid(column=1, row=3, padx=5, pady=2, sticky=W)
         # combo nomes
         self.combosubstituto = ttk.Combobox(self, width=45, values=self.nomes)
-        self.combosubstituto.grid(column=1, row=2, padx=25, pady=2, sticky=W)
+        self.combosubstituto.grid(column=1, row=4, padx=25, pady=2, sticky=W)
         # nome
         self.labelnome = ttk.Label(self, width=20, text='Substituído:')
-        self.labelnome.grid(column=1, row=3, padx=5, pady=2, sticky=W)
+        self.labelnome.grid(column=1, row=1, padx=5, pady=2, sticky=W)
         # combo nomes
         self.combonome = ttk.Combobox(self, width=45, values=self.nomes)
-        self.combonome.grid(column=1, row=4, padx=25, pady=2, sticky=W)
+        self.combonome.grid(column=1, row=2, padx=25, pady=2, sticky=W)
         # Depto
         self.labeldepto = ttk.Label(self, width=20, text='Departamento:')
         self.labeldepto.grid(column=1, row=5, padx=5, pady=2, sticky=W)
