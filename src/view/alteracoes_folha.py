@@ -1,7 +1,7 @@
 import datetime
 import tkinter as tk
 from src.controler.funcoes import lancar_ferias, lancar_atestado, lancar_desligamento, lancar_substit, \
-    lancar_hrscomple, lancar_faltas, lancar_escala, lancar_novaaula
+    lancar_hrscomple, lancar_faltas, lancar_escala, lancar_novaaula, salvar_banco_aulas
 from tkinter import ttk
 from tkinter import *
 from src.models.models import Colaborador, engine
@@ -520,6 +520,9 @@ class NovaAula(ttk.Frame):
                             self.combodias.get(), self.entryiniciohr.get(), self.entryfimhr.get(),
                             self.entryvalor.get())])
         self.botaogerar.grid(column=1, row=30, padx=190, pady=1, sticky=W)
+        self.botaosalvar = ttk.Button(self, width=20, text="Salvar Banco de Aulas", command=lambda: [
+            salvar_banco_aulas()])
+        self.botaosalvar.grid(column=1, row=30, padx=350, pady=1, sticky=W)
 
 
 if __name__ == '__main__':

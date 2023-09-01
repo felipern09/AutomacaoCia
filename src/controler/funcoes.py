@@ -5029,7 +5029,37 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str, estag: int):
             os.remove(
                 rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
 
-        # print(base)
+
+def salvar_banco_aulas():
+    sessions = sessionmaker(enginefolha)
+    session = sessions()
+    aula = session.query(Aulas).order_by(Aulas.professor).all()
+    wb = l_w(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Plan.xlsx')
+    sh = wb['Planilha1']
+    x = 2
+    for a in aula:
+        sh[f'A{x}'].value = a.numero
+        sh[f'B{x}'].value = a.professor
+        sh[f'C{x}'].value = a.nome
+        sh[f'D{x}'].value = a.departamento
+        sh[f'E{x}'].value = a.diadasemana
+        sh[f'F{x}'].value = a.inicio
+        sh[f'G{x}'].value = a.fim
+        sh[f'H{x}'].value = a.valor
+        sh[f'I{x}'].value = a.iniciograde
+        sh[f'J{x}'].value = a.matrprof
+        x += 1
+    sh[f'A1'].value = 'Número'
+    sh[f'B1'].value = 'Professor'
+    sh[f'C1'].value = 'Aula'
+    sh[f'D1'].value = 'Departamento'
+    sh[f'E1'].value = 'Dia'
+    sh[f'F1'].value = 'Início'
+    sh[f'G1'].value = 'Fim'
+    sh[f'H1'].value = 'Valor'
+    sh[f'I1'].value = 'Início Grade'
+    sh[f'J1'].value = 'Matrícula'
+    wb.save(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\CadastroAulas.xlsx')
 
 
 def cadastrar_no_ponto(nome, altera, matrpt=''):
