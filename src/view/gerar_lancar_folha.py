@@ -1,5 +1,5 @@
 import tkinter as tk
-from src.controler.funcoes import confirma_grade
+from src.controler.funcoes import confirma_grade, lancar_folha_no_dexion
 from tkinter import ttk
 from tkinter import *
 
@@ -47,7 +47,7 @@ class Frame2(ttk.Frame):
     def __init__(self, container):
         super().__init__()
         self.competencia = IntVar()
-        self.competencias = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        self.competencias = list(range(1, 13))
         # aparecer dropdown com nomes da plan
         self.labelcomp = ttk.Label(self, width=60, text="Escolha a competência da folha: ")
         self.labelcomp.grid(column=1, row=1, padx=25, pady=50, sticky=W)
@@ -55,7 +55,7 @@ class Frame2(ttk.Frame):
         self.combocomp.grid(column=1, row=1, padx=205, pady=50, sticky=W)
         # gerar folha da competencia selecionada
         self.botaolancar = ttk.Button(self, width=20, text="Lançar folha no Dexion",
-                                      command=lambda: [])
+                                      command=lambda: [lancar_folha_no_dexion(self.competencia.get())])
         self.botaolancar.grid(column=1, row=3, padx=190, pady=1, sticky=W)
 
 

@@ -105,8 +105,10 @@ def lancar_folha_no_dexion(competencia):
     :param competencia: Month reference to payroll calculate.
     :return: External aplication with payroll values registred.
     """
-    pa.hotkey('alt', 'tab'), pa.press('a'), t.sleep(2)
-    folhagrd = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\view\Somafinal mes {competencia}.xlsx')
+    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Dexion.png')))
+    pa.press('a'), t.sleep(2)
+    # folhagrd = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\view\Somafinal mes {competencia}.xlsx')
+    folhagrd = os.path.relpath("\\\\192.168.0.250\\rh\\01 - RH\\01 - Administração.Controles\\04 - Folha de Pgto\\2023\\08 - AGO\\Grades e Comissões\\Lancamentos.xlsx")
     wb = l_w(folhagrd, read_only=False)
 
     # lançamento de faltas
@@ -126,92 +128,98 @@ def lancar_folha_no_dexion(competencia):
     sh = wb['DeletarFerias']
     x = 2
     while x <= len(sh['A']):
-        rub = ['1006', '1007', '1010', '1011', '1012', '1037']
-        mat = str(sh[f'A{x}'].value)
-        pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(1), pa.press('d')
-        for r in rub:
-            pa.write(r), t.sleep(0.8), pa.press('enter'), t.sleep(0.5), pa.press('left'), t.sleep(0.5), pa.press(
-                'enter')
-        pa.press('enter', 2)
-        x += 1
+        if sh[f'A{x}'].value is not None:
+            rub = ['1006', '1007', '1010', '1011', '1012', '1037']
+            mat = str(sh[f'A{x}'].value)
+            pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(1), pa.press('d')
+            for r in rub:
+                pa.write(r), t.sleep(0.8), pa.press('enter'), t.sleep(0.5), pa.press('left'), t.sleep(0.5), pa.press(
+                    'enter')
+            pa.press('enter', 2)
+            x += 1
 
     # lançamento de horistas
     sh = wb['Horistas']
     x = 2
     while x <= len(sh['A']):
-        mat = str(sh[f'A{x}'].value)
-        rub = str(sh[f'C{x}'].value)
-        hr = str(sh[f'D{x}'].value)
-        obshr = str(sh[f'E{x}'].value)
-        pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(2.3)
-        try:
-            pa.center(pa.locateOnScreen('dsr.png'))
-            dsrlancado = True
-        except:
+        if sh[f'A{x}'].value is not None:
+            mat = str(sh[f'A{x}'].value)
+            rub = str(sh[f'C{x}'].value)
+            hr = str(sh[f'D{x}'].value)
+            obshr = str(sh[f'E{x}'].value)
+            pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(2.3)
             try:
-                pa.center(pa.locateOnScreen('dsr2.png'))
+                pa.center(pa.locateOnScreen('dsr.png'))
                 dsrlancado = True
             except:
-                dsrlancado = False
-        pa.press('a'), t.sleep(0.5), pa.write(rub)
-        pa.press('enter'), t.sleep(0.5), pa.write(hr), t.sleep(0.5), pa.press('enter', 2)
-        if dsrlancado:
-            pass
-        else:
-            if obshr != 'HORA AULA ESTÁGIO 5.10':
-                pa.press('i'), t.sleep(0.5), pa.write('27'), t.sleep(0.5)
-                pa.press('enter', 3), t.sleep(0.5)
-        pa.press('enter')
-        x += 1
+                try:
+                    pa.center(pa.locateOnScreen('dsr2.png'))
+                    dsrlancado = True
+                except:
+                    dsrlancado = False
+            pa.press('a'), t.sleep(0.5), pa.write(rub)
+            pa.press('enter'), t.sleep(0.5), pa.write(hr), t.sleep(0.5), pa.press('enter', 2)
+            if dsrlancado:
+                pass
+            else:
+                if obshr != 'HORA AULA ESTÁGIO 5.10':
+                    pa.press('i'), t.sleep(0.5), pa.write('27'), t.sleep(0.5)
+                    pa.press('enter', 3), t.sleep(0.5)
+            pa.press('enter')
+            x += 1
 
     # lançamento de comissões
     sh = wb['Comissoes']
     x = 2
     while x <= len(sh['A']):
-        mat = str(sh[f'A{x}'].value)
-        rub = str(sh[f'C{x}'].value)
-        hr = str(sh[f'D{x}'].value)
-        pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(0.5), pa.press('i'), t.sleep(0.5), pa.write(rub)
-        pa.press('enter'), t.sleep(0.5), pa.write(hr), t.sleep(0.5), pa.press('enter')
-        pa.press('enter'), t.sleep(0.5), pa.press('enter')
-        x += 1
+        if sh[f'A{x}'].value is not None:
+            mat = str(sh[f'A{x}'].value)
+            rub = str(sh[f'C{x}'].value)
+            hr = str(sh[f'D{x}'].value)
+            pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(0.5), pa.press('i'), t.sleep(0.5), pa.write(rub)
+            pa.press('enter'), t.sleep(0.5), pa.write(hr), t.sleep(0.5), pa.press('enter')
+            pa.press('enter'), t.sleep(0.5), pa.press('enter')
+            x += 1
 
     # # Lançamento de adiantamento
     sh = wb['Adiantamento']
     x = 2
     while x <= len(sh['A']):
-        mat = str(sh[f'A{x}'].value)
-        rub = '81'
-        hr = str(sh[f'D{x}'].value)
-        pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(0.5), pa.press('i'), t.sleep(0.5), pa.write(rub)
-        pa.press('enter'), t.sleep(0.5), pa.write(hr), t.sleep(0.5), pa.press('enter')
-        pa.press('enter'), t.sleep(0.5), pa.press('enter')
-        x += 1
+        if sh[f'A{x}'].value is not None:
+            mat = str(sh[f'A{x}'].value)
+            rub = '81'
+            hr = str(sh[f'D{x}'].value)
+            pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(0.5), pa.press('i'), t.sleep(0.5), pa.write(rub)
+            pa.press('enter'), t.sleep(0.5), pa.write(hr), t.sleep(0.5), pa.press('enter')
+            pa.press('enter'), t.sleep(0.5), pa.press('enter')
+            x += 1
 
     # lançamento de desconto de VT
     sh = wb['DescontoVT']
     x = 2
     while x <= len(sh['A']):
-        mat = str(sh[f'A{x}'].value)
-        rub = '80'
-        hr = str(sh[f'D{x}'].value)
-        pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(0.5), pa.press('i'), t.sleep(0.5), pa.write(rub)
-        pa.press('enter'), t.sleep(0.5), pa.press('enter')
-        pa.press('enter'), t.sleep(0.5), pa.press('enter')
-        x += 1
+        if sh[f'A{x}'].value is not None:
+            mat = str(sh[f'A{x}'].value)
+            rub = '80'
+            hr = str(sh[f'D{x}'].value)
+            pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(0.5), pa.press('i'), t.sleep(0.5), pa.write(rub)
+            pa.press('enter'), t.sleep(0.5), pa.press('enter')
+            pa.press('enter'), t.sleep(0.5), pa.press('enter')
+            x += 1
 
     # lançamento de plano de saúde
     sh = wb['Plano']
     x = 2
     while x <= len(sh['A']):
-        mat = str(sh[f'A{x}'].value)
-        rub = str(sh[f'C{x}'].value)
-        hr = str(sh[f'D{x}'].value)
-        sq = str(sh[f'E{x}'].value)
-        pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(0.5), pa.press('i'), t.sleep(0.5), pa.write(rub)
-        pa.press('enter'), t.sleep(0.5), pa.write(sq), t.sleep(0.5), pa.press('enter'), t.sleep(0.5), pa.write(hr)
-        pa.press('enter', 3), t.sleep(0.5),
-        x += 1
+        if sh[f'A{x}'].value is not None:
+            mat = str(sh[f'A{x}'].value)
+            rub = str(sh[f'C{x}'].value)
+            hr = str(sh[f'D{x}'].value)
+            sq = str(sh[f'E{x}'].value)
+            pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(0.5), pa.press('i'), t.sleep(0.5), pa.write(rub)
+            pa.press('enter'), t.sleep(0.5), pa.write(sq), t.sleep(0.5), pa.press('enter'), t.sleep(0.5), pa.write(hr)
+            pa.press('enter', 3), t.sleep(0.5),
+            x += 1
     tkinter.messagebox.showinfo(
         title='Folha ok!',
         message=f'Folha do mês {competencia} lançada no Dexion com sucesso!'
@@ -326,7 +334,7 @@ def listar_aulas_ativas(compet) -> list:
         pessoa = sessioncol.query(Colaborador).filter_by(nome=aulat.professor).order_by(Colaborador.matricula.desc()).first()
         if pessoa:
             if pessoa.desligamento is not None:
-                if dt.strptime(pessoa.desligamento, '%d/%m/%Y') > inicio:
+                if dt.strptime(pessoa.desligamento, '%d/%m/%Y') >= inicio:
                     pass
                 else:
                     aulat.status = 'Inativa'
@@ -571,7 +579,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
     inicio = dt(day=21, month=(competencia - relativedelta(months=1)).month,
                 year=(competencia - relativedelta(months=1)).year)
     fechamento = dt(day=20, month=competencia.month, year=competencia.year)
-    # primeira linha deve aparecer 'Folha' na coluna A1 e 'Julho' de '2023' na B1
     plan1['A1'].value = 'Folha'
     plan1['B1'].value = f'{fechamento.month} de {fechamento.year}'
 
@@ -1302,7 +1309,7 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
 def somar_aulas_de_segunda(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
-    aulasseg = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Segunda') \
+    aulasseg = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Segunda') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulasseg:
@@ -1316,7 +1323,7 @@ def somar_aulas_de_segunda(nome: str, depto: str) -> float:
 def somar_aulas_de_terca(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
-    aulaster = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Terça') \
+    aulaster = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Terça') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulaster:
@@ -1330,7 +1337,7 @@ def somar_aulas_de_terca(nome: str, depto: str) -> float:
 def somar_aulas_de_quarta(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
-    aulasqua = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Quarta') \
+    aulasqua = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Quarta') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulasqua:
@@ -1344,7 +1351,7 @@ def somar_aulas_de_quarta(nome: str, depto: str) -> float:
 def somar_aulas_de_quinta(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
-    aulasqui = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Quinta') \
+    aulasqui = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Quinta') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulasqui:
@@ -1358,7 +1365,7 @@ def somar_aulas_de_quinta(nome: str, depto: str) -> float:
 def somar_aulas_de_sexta(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
-    aulassex = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Sexta') \
+    aulassex = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Sexta') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulassex:
@@ -1372,7 +1379,7 @@ def somar_aulas_de_sexta(nome: str, depto: str) -> float:
 def somar_aulas_de_sabado(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
-    aulassab = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Sábado') \
+    aulassab = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Sábado') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulassab:
@@ -1386,7 +1393,7 @@ def somar_aulas_de_sabado(nome: str, depto: str) -> float:
 def somar_aulas_de_domingo(nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
-    aulasdom = session.query(Aulas).filter_by(professor=nome).filter_by(diadasemana='Domingo') \
+    aulasdom = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Domingo') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulasdom:
@@ -1431,7 +1438,7 @@ def salvar_planilha_soma_final(compet: int):
     folha['D1'].value = 'Horas'
     x = 2
     for i in somafinal:
-        matr = session.query(Aulas).filter_by(professor=str(i)).first()
+        matr = session.query(Aulas).filter_by(professor=str(i)).filter_by(status='Ativa').first()
         folha[f'A{x}'].value = int(matr.matrprof)
         folha[f'B{x}'].value = str(i)
         for sub in somafinal[i]:
@@ -5033,8 +5040,8 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str, estag: int):
 def salvar_banco_aulas():
     sessions = sessionmaker(enginefolha)
     session = sessions()
-    aula = session.query(Aulas).order_by(Aulas.professor).all()
-    wb = l_w(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Plan.xlsx')
+    aula = session.query(Aulas).filter_by(status='Ativa').order_by(Aulas.professor).all()
+    wb = l_w(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Plan.xlsx', read_only=False)
     sh = wb['Planilha1']
     x = 2
     for a in aula:
@@ -5051,15 +5058,25 @@ def salvar_banco_aulas():
         x += 1
     sh[f'A1'].value = 'Número'
     sh[f'B1'].value = 'Professor'
-    sh[f'C1'].value = 'Aula'
+    sh[f'C1'].value = 'Nome da Aula'
     sh[f'D1'].value = 'Departamento'
-    sh[f'E1'].value = 'Dia'
+    sh[f'E1'].value = 'Dia da semana'
     sh[f'F1'].value = 'Início'
     sh[f'G1'].value = 'Fim'
     sh[f'H1'].value = 'Valor'
     sh[f'I1'].value = 'Início Grade'
     sh[f'J1'].value = 'Matrícula'
     wb.save(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\CadastroAulas.xlsx')
+
+
+def inativar_aulas(aulas: list):
+    sessions = sessionmaker(enginefolha)
+    session = sessions()
+    for aula in aulas:
+        a = session.query(Aulas).filter_by(numero=aula).first()
+        a.status = 'Inativa'
+        session.commit()
+    tkinter.messagebox.showinfo(title='Aulas inativas!',message='Aulas inativas com sucesso!')
 
 
 def cadastrar_no_ponto(nome, altera, matrpt=''):

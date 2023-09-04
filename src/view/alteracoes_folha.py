@@ -1,7 +1,7 @@
 import datetime
 import tkinter as tk
 from src.controler.funcoes import lancar_ferias, lancar_atestado, lancar_desligamento, lancar_substit, \
-    lancar_hrscomple, lancar_faltas, lancar_escala, lancar_novaaula, salvar_banco_aulas
+    lancar_hrscomple, lancar_faltas, lancar_escala, lancar_novaaula, salvar_banco_aulas, inativar_aulas
 from tkinter import ttk
 from tkinter import *
 from src.models.models import Colaborador, engine
@@ -15,7 +15,7 @@ class MainApplication(tk.Tk):
         super().__init__()
 
         self.title("Cálculo de folha - Cia BSB")
-        self.geometry('500x300')
+        self.geometry('550x300')
         self.img = PhotoImage(file='../models/static/imgs/Icone.png')
         self.iconphoto(False, self.img)
         self.columnconfigure(0, weight=5)
@@ -32,6 +32,7 @@ class MainApplication(tk.Tk):
         self.Frame6 = Atestados(self.notebook)
         self.Frame7 = Escala(self.notebook)
         self.Frame8 = NovaAula(self.notebook)
+        self.Frame9 = InativarAula(self.notebook)
 
         self.notebook.add(self.Frame1, text='Hr Compl')
         self.notebook.add(self.Frame2, text='Faltas')
@@ -41,6 +42,7 @@ class MainApplication(tk.Tk):
         self.notebook.add(self.Frame6, text='Atestados')
         self.notebook.add(self.Frame7, text='Esacala')
         self.notebook.add(self.Frame8, text='Nova Aula')
+        self.notebook.add(self.Frame9, text='Inativar Aula')
         self.notebook.pack()
 
 
@@ -523,6 +525,69 @@ class NovaAula(ttk.Frame):
         self.botaosalvar = ttk.Button(self, width=20, text="Salvar Banco de Aulas", command=lambda: [
             salvar_banco_aulas()])
         self.botaosalvar.grid(column=1, row=30, padx=350, pady=1, sticky=W)
+
+
+class InativarAula(ttk.Frame):
+    def __init__(self, container):
+        super().__init__()
+        self.hoje = datetime.datetime.today()
+        sessions = sessionmaker(bind=engine)
+        session = sessions()
+        self.grupo = []
+        pessoas = session.query(Colaborador).filter_by(desligamento=None).all()
+        for pess in pessoas:
+            if pess.nome != '':
+                self.grupo.append(pess.nome)
+        self.nomes = list(sorted(set(filter(None, self.grupo))))
+        self.canvas = Canvas(self)
+        self.canvas.pack(side=LEFT, fill=BOTH, expand=1)
+        self.barraroll = ttk.Scrollbar(self, orient=VERTICAL, command=self.canvas.yview)
+        self.barraroll.pack(side=LEFT, fill=Y)
+        self.canvas.config(yscrollcommand=self.barraroll.set)
+        self.canvas.bind('<Configure>', lambda e: self.canvas.config(scrollregion=self.canvas.bbox('all')))
+        self.canvframe = Frame(self.canvas)
+        self.canvas.create_window((0, 0), window=self.canvframe, anchor='nw')
+        self.aulas_para_alterar = []
+
+        def seleciona_aula(event):
+            widget = event.widget
+            numero = int(str(widget.cget('text')).split(' ')[0])
+            if numero in self.aulas_para_alterar:
+                self.aulas_para_alterar.remove(numero)
+            else:
+                self.aulas_para_alterar.append(numero)
+            self.aulas_para_alterar.sort()
+
+        def mostrar_aulas(event):
+            nome = event.widget.get()
+            sessions = sessionmaker(enginefolha)
+            session = sessions()
+            aulas = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').all()
+            
+            for i, aula in enumerate(aulas):
+                item = f'{aula.numero} - {aula.departamento} - {aula.nome}: {aula.diadasemana} de {datetime.datetime.strftime(datetime.datetime.strptime(aula.inicio, "%H:%M:%S"), "%H:%M")} às {datetime.datetime.strftime(datetime.datetime.strptime(aula.fim, "%H:%M:%S"), "%H:%M")}'
+                var_name = f'var_{i}'
+                value = IntVar()
+                globals()[var_name] = value
+                self.item = tk.Checkbutton(self.canvframe, text=item, variable=globals()[var_name])
+
+                self.item.grid(column=1, row=i+3, padx=25, pady=2, sticky=W)
+                self.item.bind('<Button-1>', seleciona_aula)
+        # nome
+        self.labelnome = ttk.Label(self.canvframe, width=20, text='Nome:')
+        self.labelnome.grid(column=1, row=1, padx=5, pady=2, sticky=W)
+        # combo nomes
+        self.combonome = ttk.Combobox(self.canvframe, width=45, values=self.nomes)
+        self.combonome.grid(column=1, row=2, padx=25, pady=2, sticky=W)
+        self.combonome.bind('<<ComboboxSelected>>', mostrar_aulas)
+        # gerar folha da competencia selecionada
+        self.botaogerar = ttk.Button(self.canvframe, width=20, text="Inativar Aula", command=lambda: [
+            inativar_aulas(self.aulas_para_alterar)
+        ])
+        self.botaogerar.grid(column=1, row=190, padx=190, pady=1, sticky=W)
+        self.botaosalvar = ttk.Button(self.canvframe, width=20, text="Salvar Banco de Aulas", command=lambda: [
+            salvar_banco_aulas()])
+        self.botaosalvar.grid(column=1, row=190, padx=350, pady=1, sticky=W)
 
 
 if __name__ == '__main__':

@@ -32,7 +32,7 @@ class Certificados(ttk.Frame):
         super().__init__()
         self.hoje = datetime.today()
         self.horas = IntVar()
-        self.hrs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        self.hrs = list(range(1, 16))
         # lista de nomes de funcionários com checkbox
         sessions = sessionmaker(bind=engine)
         session = sessions()
@@ -52,9 +52,8 @@ class Certificados(ttk.Frame):
         self.barraroll.pack(side=LEFT, fill=Y)
         self.canvas.config(yscrollcommand=self.barraroll.set)
         self.canvas.bind('<Configure>', lambda e: self.canvas.config(scrollregion=self.canvas.bbox('all')))
-
         self.canvframe = Frame(self.canvas)
-        self.canvas.create_window((0,0), window=self.canvframe, anchor='nw')
+        self.canvas.create_window((0, 0), window=self.canvframe, anchor='nw')
 
         #   loop for pessoa.nome com pesq em db
         #       i, enumerate(lista de nomes)
