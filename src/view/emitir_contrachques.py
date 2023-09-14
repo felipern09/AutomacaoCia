@@ -1,10 +1,12 @@
 import datetime
 import tkinter as tk
-from src.controler.funcoes import salvar_holerites
+from src.controler.funcoes import salvar_holerites, incluir_grade_email_holerite
+import tkinter.filedialog
 from tkinter import ttk
 from tkinter import *
 from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
+from tkcalendar import DateEntry
 
 
 class MainApplication(tk.Tk):
@@ -12,7 +14,7 @@ class MainApplication(tk.Tk):
         super().__init__()
 
         self.title("Salvar e Enviar Contracheques")
-        self.geometry('361x250')
+        self.geometry('440x250')
         self.img = PhotoImage(file='../models/static/imgs/Icone.png')
         self.iconphoto(False, self.img)
         self.columnconfigure(0, weight=5)
@@ -21,23 +23,81 @@ class MainApplication(tk.Tk):
             child.grid_configure(padx=1, pady=3)
         self.notebook = ttk.Notebook(self)
         self.Frame1 = Salvar(self.notebook)
-        self.notebook.add(self.Frame1, text='Contracheques')
+        self.Frame2 = AnexarGrade(self.notebook)
+        self.Frame3 = EnviarEmail(self.notebook)
+        self.notebook.add(self.Frame1, text='Salvar Contracheques')
+        self.notebook.add(self.Frame2, text='Anexar Grades')
+        self.notebook.add(self.Frame3, text='Enviar por e-mail')
         self.notebook.pack()
 
 
 class Salvar(ttk.Frame):
     def __init__(self, container):
         super().__init__()
+        # descrição funçoes para usuraio
+        self.labeldescr = ttk.Label(self, width=100, text="A função de emissão de contracheque deve obedecer a "
+                                                          "seguinte sequência:")
+        self.labeldescr.grid(column=1, row=1, padx=10, pady=5, sticky=W)
+        self.labeldescr1 = ttk.Label(self, width=100,
+                                    text="1º - Gerar Contracheques no Dexion (procedimentos automat.)"
+                                         "\n2º - Salvar Contracheques Nas Pastas Pessoais"
+                                         "\n3º - Anexar Grades"
+                                         "\n4º - Enviar Contracheques Pelo Dexion")
+        self.labeldescr1.grid(column=1, row=2, padx=10, pady=8, sticky=W)
+        # aparecer dropdown com nomes da plan
+        self.labelcomp = ttk.Label(self, width=60, text="Salvar contracheques nas pastas pessoais.")
+        self.labelcomp.grid(column=1, row=10, padx=10, pady=5, sticky=W)
+        # gerar folha da competencia selecionada
+        self.botaogerar = ttk.Button(self, text="Salvar", command=lambda: [salvar_holerites()])
+        self.botaogerar.grid(column=1, row=11, padx=230, pady=1, sticky=W)
+
+
+class AnexarGrade(ttk.Frame):
+    def __init__(self, container):
+        super().__init__()
+        self.hoje = datetime.datetime.today()
+        self.comp = list(range(1, 13))
+        col2 = 120
+        # aparecer dropdown com nomes da plan
+        self.labelcomp = ttk.Label(self, width=60, text="Anexar grades aos arquivos '.zip' do dexion.")
+        self.labelcomp.grid(column=1, row=1, padx=10, pady=1, sticky=W)
+        # selecionar arquivo da grade
+        self.labelarq = ttk.Label(self, width=60, text="Arquivo da grade:")
+        self.labelarq.grid(column=1, row=2, padx=10, pady=2, sticky=W)
+        self.folha = StringVar()
+        self.btfolha = ttk.Button(self, text="Escolha a planilha", command=self.selecionar_folha)
+        self.btfolha.grid(column=1, row=2, padx=col2, pady=2, sticky=W)
+        # selecionar competencia
+        self.labelcompet = ttk.Label(self, width=40, text="Competência:")
+        self.labelcompet.grid(column=1, row=3, padx=10, pady=2, sticky=W)
+        self.competencia = ttk.Combobox(self, width=15, values=self.comp)
+        self.competencia.grid(column=1, row=3, padx=col2, pady=2, sticky=W)
+        # selecionar data do pagamento
+        self.labeldt = ttk.Label(self, width=60, text="Data do pgto:")
+        self.labeldt.grid(column=1, row=4, padx=10, pady=2, sticky=W)
+        self.pagamento = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month,
+                                     day=self.hoje.day, locale='pt_BR')
+        self.pagamento.grid(column=1, row=4, padx=col2, pady=2, sticky=W)
+
+        # gerar folha da competencia selecionada
+        self.botaogerar = ttk.Button(self, text="Anexar", command=lambda: [
+            incluir_grade_email_holerite(self.folha.get(), int(self.competencia.get()), self.pagamento.get())])
+        self.botaogerar.grid(column=1, row=11, padx=210, pady=1, sticky=W)
+
+    def selecionar_folha(self):
+        try:
+            caminhoplan = tkinter.filedialog.askopenfilename(title='Planilha Folha')
+            self.folha.set(str(caminhoplan))
+        except ValueError:
+            pass
+
+
+class EnviarEmail(ttk.Frame):
+    def __init__(self, container):
+        super().__init__()
         self.hoje = datetime.datetime.today()
         self.anos = list(range(2000, self.hoje.year+1))
         self.meses = list(range(1, 13))
-        # aparecer dropdown com nomes da plan
-        self.labelcomp = ttk.Label(self, width=60, text="Salvar contracheques nas pastas pessoais.")
-        self.labelcomp.grid(column=1, row=1, padx=10, pady=2, sticky=W)
-        # gerar folha da competencia selecionada
-        self.botaogerar = ttk.Button(self, text="Salvar",
-                                     command=lambda: [salvar_holerites()])
-        self.botaogerar.grid(column=1, row=2, padx=230, pady=1, sticky=W)
         sessions = sessionmaker(bind=engine)
         session = sessions()
         self.grupo = []
@@ -81,8 +141,7 @@ class Salvar(ttk.Frame):
         self.comboatemes.grid(column=1, row=7, padx=215, pady=2, sticky=W)
 
         # Enviar
-        self.botaolancar = ttk.Button(self, width=20, text="Enviar",
-                                      command=lambda: [])
+        self.botaolancar = ttk.Button(self, text="Enviar", command=lambda: [])
         self.botaolancar.grid(column=1, row=8, padx=190, pady=1, sticky=W)
 
 

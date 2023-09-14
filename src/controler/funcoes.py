@@ -24,7 +24,7 @@ import os
 import pandas as pd
 import pyautogui as pa
 import pyperclip as pp
-from PIL import ImageGrab
+from PIL import ImageGrab, Image
 from src.models.modelsfolha import Aula, Folha, Aulas, Faltas, Ferias, Hrcomplement, Atestado, Desligados, \
     Escala, Substituicao, enginefolha
 from src.models.modelsponto import engineponto, BasePonto
@@ -34,7 +34,6 @@ from src.models.listas import municipios
 import smtplib
 from src.models.dados_servd import em_rem, em_ti, em_if, k1, host, port, rede, em_fin, em_lgpd, pasta_dexion,\
     pasta_estag, pasta_func
-from zipfile import ZipFile
 import tkinter.filedialog
 from tkinter import messagebox
 import tkinter.filedialog
@@ -42,11 +41,12 @@ import time as t
 import urllib
 from urllib import parse
 import win32com.client as client
+import zipfile
+from zipfile import ZipFile
 
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
-# data = 7
 
 atestado = PatternFill(start_color='A9D08E',
                        end_color='A9D08E',
@@ -628,8 +628,8 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                     cross.append(i)
                     cross.sort()
 
-    plan1['A4'].value = 'Musculação'
-    novalinha = 5
+    plan1['A5'].value = 'Musculação'
+    novalinha = 6
     for i in musculacao:
         for row in plan1.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
             for cell in row:
@@ -1590,8 +1590,8 @@ def apenas_registrar_funcionario(caminho='', editar=0, ondestou=0, nome='', matr
 
         # search for the highest compatibility between the city filled in the form and the cities in the lists to
         # define codmunnas value
-        est = str(sh[f'AJ{linha}'].value)
-        cidade = str(sh[f'L{linha}'].value).title()
+        est = str(sh[f'AJ{linha}'].value).upper().strip()
+        cidade = str(sh[f'L{linha}'].value).title().strip()
         lista = []
         dicion = {}
         for cid in municipios[est]:
@@ -1601,8 +1601,8 @@ def apenas_registrar_funcionario(caminho='', editar=0, ondestou=0, nome='', matr
 
         # search for the highest compatibility between the city filled in the form and the cities in the lists to
         # define codmunend value
-        est = str(sh[f'T{linha}'].value)
-        cidade = str(sh[f'S{linha}'].value).title()
+        est = str(sh[f'T{linha}'].value).upper().strip()
+        cidade = str(sh[f'S{linha}'].value).title().strip()
         listaend = []
         dicionend = {}
         for cid in municipios[est]:
@@ -1673,8 +1673,8 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
 
         # search for the highest compatibility between the city filled in the form and the cities in the lists to
         # define codmunnas value
-        est = str(sh[f'AJ{linha}'].value)
-        cidade = str(sh[f'L{linha}'].value).title()
+        est = str(sh[f'AJ{linha}'].value).upper().strip()
+        cidade = str(sh[f'L{linha}'].value).title().strip()
         lista = []
         dicion = {}
         for cid in municipios[est]:
@@ -1684,8 +1684,8 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
 
         # search for the highest compatibility between the city filled in the form and the cities in the lists to
         # define codmunend value
-        est = str(sh[f'T{linha}'].value)
-        cidade = str(sh[f'S{linha}'].value).title()
+        est = str(sh[f'T{linha}'].value).upper().strip()
+        cidade = str(sh[f'S{linha}'].value).title().strip()
         listaend = []
         dicionend = {}
         for cid in municipios[est]:
@@ -3017,14 +3017,14 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 solicitacao.tables[0].rows[18].cells[0].paragraphs[0].text).replace('#cep', cadastro['cep']).replace(
                 '#bairro', cadastro['bairro'])
             solicitacao.tables[0].rows[19].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[19].cells[0].paragraphs[0].text).replace('#telefone', cadastro['tel'])
+                solicitacao.tables[0].rows[19].cells[0].paragraphs[0].text).replace('#telefone', str(cadastro['tel']).replace('.0', ''))
             solicitacao.tables[0].rows[20].cells[0].paragraphs[0].text = str(
                 solicitacao.tables[0].rows[20].cells[0].paragraphs[0].text).replace('#end_eletr', cadastro['email'])
             solicitacao.tables[0].rows[22].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[22].cells[0].paragraphs[0].text).replace('#semestre', cadastro['semestre'])
+                solicitacao.tables[0].rows[22].cells[0].paragraphs[0].text).replace('#semestre', str(cadastro['semestre']).replace('.0', ''))
             solicitacao.tables[0].rows[23].cells[0].paragraphs[0].text = str(
                 solicitacao.tables[0].rows[23].cells[0].paragraphs[0].text).replace('#turno', cadastro['turno']).replace(
-                '#ano_concl', cadastro['conclusao'])
+                '#ano_concl', str(cadastro['conclusao']).replace('.0', ''))
             solicitacao.tables[0].rows[24].cells[0].paragraphs[0].text = str(
                 solicitacao.tables[0].rows[24].cells[0].paragraphs[0].text).replace('#faculdade', cadastro['faculdade'])
             solicitacao.save(pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.docx')
@@ -6921,3 +6921,64 @@ def lancar_escala(nome, departamento, aula, data, horas):
     session.commit()
     tkinter.messagebox.showinfo('Escala Salva!', 'Escala salva com sucesso!')
 
+
+def incluir_grade_email_holerite(planfolha: str, comp: int, pgto: str):
+    competencia = str(comp).zfill(2) + '-' + str(dt.today().year)
+    pagamento = dt.strftime(dt.strptime(pgto, '%d/%m/%Y'), '%d-%m-%Y')
+    pst_dexion = r'\\192.168.0.234\Dexion\Logistica\000001\Folha'
+
+    nomes = []
+    pl = l_w(planfolha)
+    s = pl['Planilha1']
+    for row in s.iter_rows(min_row=5, min_col=2, max_row=126, max_col=2):
+        for cell in row:
+            nomes.append(str(cell.value).strip())
+            nomes = list(sorted(set(filter(None, nomes))))
+    excel = client.Dispatch('Excel.Application')
+    plan = excel.Workbooks.Open(planfolha)
+    folha = plan.Sheets['Planilha1']
+    excel.visible = 0
+    sessions = sessionmaker(engine)
+    session = sessions()
+    for nome in nomes:
+        pessoa = session.query(Colaborador).order_by(Colaborador.matricula.desc()).filter_by(nome=nome).first()
+        if pessoa:
+            matricula = pessoa.matricula
+        else:
+            matricula = ''
+        # salvar linhas e colunas bases das datas de folha
+        copyrange = folha.Range('A1:AI4')
+        copyrange.CopyPicture(Format=2)
+        ImageGrab.grabclipboard().save(pst_dexion + r"\Grade.png")
+        # descobrir a linha (ou linhas) que está o nome e incluir em lista
+        linhas = []
+        plan = l_w(planfolha)
+        sh = plan['Planilha1']
+        for row in sh.iter_rows(min_row=1, min_col=2, max_row=126, max_col=2):
+            for cell in row:
+                if cell.value == nome:
+                    linhas.append(sh.cell(row=cell.row, column=cell.column).row)
+        size = 81
+        for linha in linhas:
+            copyrange = folha.Range(f'A{linha}:AI{linha}')
+            copyrange.CopyPicture(Format=2)
+            ImageGrab.grabclipboard().save(pst_dexion + rf"\Grade {nome} {linha}.png")
+            image1 = Image.open(pst_dexion + r"\Grade.png")
+            image2 = Image.open(pst_dexion + rf"\Grade {nome} {linha}.png")
+            new_image = Image.new('RGB', (1772, 150), (250, 250, 250))
+            new_image.paste(image1, (0, 0))
+            new_image.paste(image2, (0, size))
+            new_image.save(pst_dexion + r"\Grade.png")
+            os.remove(pst_dexion + rf"\Grade {nome} {linha}.png")
+            size += 21
+        zip = zipfile.ZipFile(pst_dexion +
+                              rf'\Recibo de Pagamento (A - Mensal, {competencia}, {pagamento}, {str(matricula).zfill(6)}).zip',
+                              'a')
+        try:
+            zip.write(pst_dexion + r"\Grade.png", os.path.basename(pst_dexion + r"\Grade.png"))
+        except FileNotFoundError:
+            pass
+        zip.close()
+        os.remove(pst_dexion + r"\Grade.png")
+    excel.Quit()
+    tkinter.messagebox.showinfo('Sucesso!', 'Prints de grades adicionados aos arquivos ".zip" com sucesso!')

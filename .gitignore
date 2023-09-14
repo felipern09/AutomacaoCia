@@ -314,3 +314,5 @@ cython_debug/
 /src/models/static/files/solicitpgto_modelocapa7.docx
 /src/models/baseponto.db
 /src/models/static/files/Plan.xlsx
+/test/alterar_bancoPonto.py
+/src/models/static/files/~$CadastroAulas.xlsx

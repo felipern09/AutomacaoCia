@@ -563,14 +563,16 @@ class InativarAula(ttk.Frame):
             sessions = sessionmaker(enginefolha)
             session = sessions()
             aulas = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').all()
-            
+            try:
+                self.item.grid_remove()
+            except AttributeError:
+                pass
             for i, aula in enumerate(aulas):
-                item = f'{aula.numero} - {aula.departamento} - {aula.nome}: {aula.diadasemana} de {datetime.datetime.strftime(datetime.datetime.strptime(aula.inicio, "%H:%M:%S"), "%H:%M")} às {datetime.datetime.strftime(datetime.datetime.strptime(aula.fim, "%H:%M:%S"), "%H:%M")}'
+                texto = f'{aula.numero} - {aula.departamento} - {aula.nome}: {aula.diadasemana} de {datetime.datetime.strftime(datetime.datetime.strptime(aula.inicio, "%H:%M:%S"), "%H:%M")} às {datetime.datetime.strftime(datetime.datetime.strptime(aula.fim, "%H:%M:%S"), "%H:%M")}'
                 var_name = f'var_{i}'
                 value = IntVar()
                 globals()[var_name] = value
-                self.item = tk.Checkbutton(self.canvframe, text=item, variable=globals()[var_name])
-
+                self.item = tk.Checkbutton(self.canvframe, text=texto, variable=globals()[var_name])
                 self.item.grid(column=1, row=i+3, padx=25, pady=2, sticky=W)
                 self.item.bind('<Button-1>', seleciona_aula)
         # nome
