@@ -27,6 +27,7 @@ import pyperclip as pp
 from PIL import ImageGrab, Image
 from src.models.modelsfolha import Aula, Folha, Aulas, Faltas, Ferias, Hrcomplement, Atestado, Desligados, \
     Escala, Substituicao, enginefolha
+from src.models.modelsvt import enginevt, BaseVT
 from src.models.modelsponto import engineponto, BasePonto
 from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
@@ -107,7 +108,6 @@ def lancar_folha_no_dexion(competencia):
     """
     pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Dexion.png')))
     pa.press('a'), t.sleep(2)
-    # folhagrd = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\view\Somafinal mes {competencia}.xlsx')
     folhagrd = os.path.relpath("\\\\192.168.0.250\\rh\\01 - RH\\01 - Administração.Controles\\04 - Folha de Pgto\\2023\\08 - AGO\\Grades e Comissões\\Lancamentos.xlsx")
     wb = l_w(folhagrd, read_only=False)
 
@@ -6982,3 +6982,39 @@ def incluir_grade_email_holerite(planfolha: str, comp: int, pgto: str):
         os.remove(pst_dexion + r"\Grade.png")
     excel.Quit()
     tkinter.messagebox.showinfo('Sucesso!', 'Prints de grades adicionados aos arquivos ".zip" com sucesso!')
+
+
+def incluir_vt(nome: str, tipo: int):
+    if tipo == 1:
+        tp = 'BRB'
+    elif tipo == 2:
+        tp = 'Valecard'
+    else:
+        tp = 'Goiás'
+    sessions = sessionmaker(engine)
+    session = sessions()
+    p = session.query(Colaborador).filter_by(nome=nome).order_by(Colaborador.matricula.desc()).first()
+    matricula = p.matricula
+    sessionsvt = sessionmaker(enginevt)
+    sessionvt = sessionsvt()
+    pessoa = BaseVT(nome=nome, matricula=matricula, tipo_vt=tp)
+    sessionvt.add(pessoa)
+    sessionvt.commit()
+
+
+def retirar_vt(nome: str, tipo: int):
+    if tipo == 1:
+        tp = 'BRB'
+    elif tipo == 2:
+        tp = 'Valecard'
+    else:
+        tp = 'Goiás'
+    sessionsvt = sessionmaker(enginevt)
+    sessionvt = sessionsvt()
+    pessoa = sessionvt.query(BaseVT).filter_by(nome=nome).filter_by(tipo_vt=tp).first()
+    sessionvt.delete(pessoa)
+    sessionvt.commit()
+
+
+def gerar_vt(tipo: str):
+    print(tipo)
