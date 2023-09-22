@@ -106,7 +106,12 @@ def lancar_folha_no_dexion(competencia):
     :param competencia: Month reference to payroll calculate.
     :return: External aplication with payroll values registred.
     """
-    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Dexion.png')))
+    while 1 < 2:
+        if pa.locateOnScreen('../models/static/imgs/Dexion.png'):
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Dexion.png')))
+            break
+        else:
+            t.sleep(5)
     pa.press('a'), t.sleep(2)
     folhagrd = os.path.relpath("\\\\192.168.0.250\\rh\\01 - RH\\01 - Administração.Controles\\04 - Folha de Pgto\\2023\\08 - AGO\\Grades e Comissões\\Lancamentos.xlsx")
     wb = l_w(folhagrd, read_only=False)
@@ -1734,7 +1739,12 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     session.add(pess)
                     session.commit()
                     pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Dexion.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Dexion.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Dexion.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
                         'i'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(20)
                     pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.cpf)
@@ -1753,7 +1763,12 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         'tab')
                     t.sleep(1), pp.copy(pessoa.mae), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105')
                     # #clique em documentos
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Documentos.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Documentos.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Documentos.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('tab'), pa.write(str(pessoa.rg)), pa.press('tab'), pa.write(
                         pessoa.emissor), pa.press('tab', 3), pa.write(pessoa.cod_municipioend),
                     pa.press('tab'), pa.write(pessoa.pis), pa.press('enter')
@@ -1767,7 +1782,12 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press('tab')
 
                     # #clique em endereço
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Endereco.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Endereco.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Endereco.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
                         'tab'), pa.write(pessoa.num), pa.press('tab', 2)
                     pp.copy(pessoa.bairro), pa.hotkey('ctrl', 'v'), pa.press('tab'), pp.copy(pessoa.cidade), pa.hotkey(
@@ -1775,29 +1795,34 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pa.press('tab'), pa.write(pessoa.cep), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press(
                         'tab'), pa.write(str(pessoa.tel)), pa.press('tab', 2), pa.write(pessoa.email)
                     # #clique em dados contratuais
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Contratuais.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Contratuais.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Contratuais.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('tab'), pa.write(str(pessoa.admiss).replace('/', '')), t.sleep(1)
                     pa.press('tab', 10), pa.write('2')
                     # #clique em Contrato de Experiência
-                    try:
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Experiencia.png')))
-                    except pa.ImageNotFoundException:
-                        t.sleep(5)
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Experiencia.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Experiencia.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Experiencia.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('tab'), pa.write('45'), pa.press('tab'), pa.write('45'), pa.press(
                         'tab'), pa.press(
                         'space'), pa.press('tab', 2), pa.write('003')
                     pa.press('tab'), pa.write(str(pessoa.matricula))
                     # #clique em Outros
-                    try:
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
-                    except pa.ImageNotFoundException:
-                        t.sleep(5)
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
-                    t.sleep(2), pa.write('CARGO GERAL')
-                    # #clique em lupa de descrição de cargos
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Lupa.png')))
-                    t.sleep(2), pp.copy(pessoa.cargo), pa.hotkey('ctrl', 'v'), t.sleep(1.5), pa.press('enter', 2)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Outros.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(2), pa.write('CARGO GERAL'), t.sleep(1), pa.press('tab')
+                    t.sleep(2), pp.copy(pessoa.cargo), pa.hotkey('ctrl', 'v')
                     t.sleep(1), pa.press('tab'), pa.write(pessoa.salario), pa.press('tab')
                     if str(pessoa.tipo_contr) == 'Horista':
                         pa.press('1')
@@ -1807,10 +1832,20 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pa.write(str(pessoa.hr_mens))
                     pa.press('tab', 5), pa.write('00395419000190'), pa.press('tab', 2), pa.write('5')
                     # #clique em eventos trabalhistas
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/EVTrab.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/EVTrab.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/EVTrab.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     t.sleep(1)
                     # #clique em lotação
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Lotacoes.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Lotacoes.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Lotacoes.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('tab'), pa.press('tab'), pa.write('i'), pa.write(str(pessoa.admiss).replace('/', ''))
                     t.sleep(1), pa.press('enter'), t.sleep(1)
                     pp.copy(lotacao[f'{pessoa.depto}']), pa.hotkey('ctrl', 'v'), pa.press('enter'), pa.write('f')
@@ -1818,57 +1853,111 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pa.press('tab', 6), pa.write('i'), t.sleep(2), pa.press('tab'), pa.write(pessoa.horario)
                     t.sleep(3), pa.press('tab', 3), pa.press('enter'), t.sleep(3)
                     # #clique em cancelar novo registro de horario
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Cancelarhor.png'))), t.sleep(2.5)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Cancelarhor.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Cancelarhor.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(2.5)
                     # #clique em salvar lotação
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarlot.png'))), t.sleep(1)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Salvarlot.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarlot.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(1)
                     # #clique em fechar lotação
-                    try:
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png'))), t.sleep(1)
-                    except pa.ImageNotFoundException:
-                        t.sleep(4)
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Fecharlot.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(2)
                     # #clique em Compatibilidade
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade.png'))), t.sleep(1)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Compatibilidade.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(1)
                     # #clique em Compatibilidade de novo
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade2.png'))), t.sleep(1)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Compatibilidade2.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade2.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(1)
                     # #clique em CAGED
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/CAGED.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/CAGED.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/CAGED.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('tab', 2), pa.write('20'), pa.press('tab'), pa.write('1'), t.sleep(0.5)
                     # #clique em RAIS
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/RAIS.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/RAIS.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/RAIS.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab', 2), pa.write('2')
                     pa.press('tab'), pa.write('10')
                     # #clique em Salvar
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarcadastro.png'))), t.sleep(10)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Salvarcadastro.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarcadastro.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(10)
                     # #clique em fechar novo cadastro
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharnovo1.png'))), t.sleep(2)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Fecharnovo1.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharnovo1.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(2)
                     # #clique em fechar trabalhadores
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fechartrab1.png'))), t.sleep(0.5)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Fechartrab1.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fechartrab1.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(0.5)
                     try:
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestados'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Atestados'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Diversos'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Contratuais'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Férias'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Pontos'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Recibos'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Rescisão'.format(pessoa.nome))
                     except FileExistsError:
                         pass
                     tkinter.messagebox.showinfo(
@@ -1915,7 +2004,12 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     session.add(pess)
                     session.commit()
                     pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Dexion.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Dexion.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Dexion.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
                         'i'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(60)
                     pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.cpf)
@@ -1934,7 +2028,12 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         'tab')
                     t.sleep(1), pp.copy(pessoa.mae), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105')
                     # #clique em documentos
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Documentos.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Documentos.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Documentos.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('tab'), pa.write(str(pessoa.rg)), pa.press('tab'), pa.write(
                         pessoa.emissor), pa.press('tab', 3), pa.write(pessoa.cod_municipioend),
                     pa.press('tab'), pa.write(pessoa.pis), pa.press('enter')
@@ -1946,8 +2045,14 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                                                            '%d%m%Y'))
                     pa.press('tab', 5), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
                     pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press('tab')
+
                     # #clique em endereço
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Endereco.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Endereco.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Endereco.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
                         'tab'), pa.write(pessoa.num), pa.press('tab', 2)
                     pp.copy(pessoa.bairro), pa.hotkey('ctrl', 'v'), pa.press('tab'), pp.copy(pessoa.cidade), pa.hotkey(
@@ -1955,29 +2060,34 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pa.press('tab'), pa.write(pessoa.cep), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press(
                         'tab'), pa.write(str(pessoa.tel)), pa.press('tab', 2), pa.write(pessoa.email)
                     # #clique em dados contratuais
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Contratuais.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Contratuais.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Contratuais.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('tab'), pa.write(str(pessoa.admiss).replace('/', '')), t.sleep(1)
                     pa.press('tab', 10), pa.write('2')
                     # #clique em Contrato de Experiência
-                    try:
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Experiencia.png')))
-                    except pa.ImageNotFoundException:
-                        t.sleep(5)
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Experiencia.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Experiencia.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Experiencia.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('tab'), pa.write('45'), pa.press('tab'), pa.write('45'), pa.press(
                         'tab'), pa.press(
                         'space'), pa.press('tab', 2), pa.write('003')
                     pa.press('tab'), pa.write(str(pessoa.matricula))
                     # #clique em Outros
-                    try:
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
-                    except pa.ImageNotFoundException:
-                        t.sleep(5)
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
-                    t.sleep(2), pa.write('CARGO GERAL')
-                    # #clique em lupa de descrição de cargos
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Lupa.png')))
-                    t.sleep(2), pp.copy(pessoa.cargo), pa.hotkey('ctrl', 'v'), t.sleep(1.5), pa.press('enter', 2)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Outros.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(2), pa.write('CARGO GERAL'), t.sleep(1), pa.press('tab')
+                    t.sleep(2), pp.copy(pessoa.cargo), pa.hotkey('ctrl', 'v')
                     t.sleep(1), pa.press('tab'), pa.write(pessoa.salario), pa.press('tab')
                     if str(pessoa.tipo_contr) == 'Horista':
                         pa.press('1')
@@ -1987,10 +2097,20 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pa.write(str(pessoa.hr_mens))
                     pa.press('tab', 5), pa.write('00395419000190'), pa.press('tab', 2), pa.write('5')
                     # #clique em eventos trabalhistas
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/EVTrab.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/EVTrab.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/EVTrab.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     t.sleep(1)
                     # #clique em lotação
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Lotacoes.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Lotacoes.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Lotacoes.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('tab'), pa.press('tab'), pa.write('i'), pa.write(str(pessoa.admiss).replace('/', ''))
                     t.sleep(1), pa.press('enter'), t.sleep(1)
                     pp.copy(lotacao[f'{pessoa.depto}']), pa.hotkey('ctrl', 'v'), pa.press('enter'), pa.write('f')
@@ -1998,57 +2118,113 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     pa.press('tab', 6), pa.write('i'), t.sleep(2), pa.press('tab'), pa.write(pessoa.horario)
                     t.sleep(3), pa.press('tab', 3), pa.press('enter'), t.sleep(3)
                     # #clique em cancelar novo registro de horario
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Cancelarhor.png'))), t.sleep(2.5)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Cancelarhor.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Cancelarhor.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(2.5)
                     # #clique em salvar lotação
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarlot.png'))), t.sleep(1)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Salvarlot.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarlot.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(1)
                     # #clique em fechar lotação
-                    try:
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png'))), t.sleep(1)
-                    except pa.ImageNotFoundException:
-                        t.sleep(4)
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Fecharlot.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(2)
                     # #clique em Compatibilidade
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade.png'))), t.sleep(1)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Compatibilidade.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(1)
                     # #clique em Compatibilidade de novo
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade2.png'))), t.sleep(1)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Compatibilidade2.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade2.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(1)
                     # #clique em CAGED
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/CAGED.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/CAGED.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/CAGED.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('tab', 2), pa.write('20'), pa.press('tab'), pa.write('1'), t.sleep(0.5)
                     # #clique em RAIS
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/RAIS.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/RAIS.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/RAIS.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab', 2), pa.write('2')
                     pa.press('tab'), pa.write('10')
                     # #clique em Salvar
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarcadastro.png'))), t.sleep(10)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Salvarcadastro.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarcadastro.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(10)
                     # #clique em fechar novo cadastro
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharnovo1.png'))), t.sleep(2)
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Fecharnovo1.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharnovo1.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(2)
                     # #clique em fechar trabalhadores
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fechartrab1.png'))), t.sleep(0.5)
-
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestados'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome))
-                    os.makedirs(
-                        r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Fechartrab1.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fechartrab1.png')))
+                            break
+                        else:
+                            t.sleep(5)
+                    t.sleep(0.5)
+                    try:
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Atestados'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Diversos'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Contratuais'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Férias'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Pontos'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Recibos'.format(pessoa.nome))
+                        os.makedirs(
+                            r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Rescisão'.format(pessoa.nome))
+                    except FileExistsError:
+                        pass
                     tkinter.messagebox.showinfo(
                         title='Cadastro ok!',
                         message='Cadastro realizado com sucesso!'
@@ -2151,28 +2327,28 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
 
                     os.makedirs(
                         r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome))
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}'.format(pessoa.nome))
                     os.makedirs(
                         r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestados'.format(pessoa.nome))
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Atestados'.format(pessoa.nome))
                     os.makedirs(
                         r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome))
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Diversos'.format(pessoa.nome))
                     os.makedirs(
                         r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome))
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Contratuais'.format(pessoa.nome))
                     os.makedirs(
                         r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome))
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Férias'.format(pessoa.nome))
                     os.makedirs(
                         r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome))
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Pontos'.format(pessoa.nome))
                     os.makedirs(
                         r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome))
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Recibos'.format(pessoa.nome))
                     os.makedirs(
                         r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
-                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome))
+                        r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Rescisão'.format(pessoa.nome))
                     tkinter.messagebox.showinfo(title='Cadastro ok!',
                                                 message='Cadastro editado com sucesso!')
                 else:
@@ -2278,35 +2454,35 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
                             02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
                             02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Atestados'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Atestados'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
                             02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Diversos'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Diversos'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
                             02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Contratuais'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Contratuais'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
                             02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Férias'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Férias'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
                             02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Pontos'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Pontos'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
                             02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Recibos'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Recibos'.format(pessoa.nome))
                         os.makedirs(
                             r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\
                             02 - Funcionários, Departamentos e '
-                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\{}\Rescisão'.format(pessoa.nome))
+                            r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Rescisão'.format(pessoa.nome))
                         tkinter.messagebox.showinfo(
                             title='Cadastro ok!',
                             message='Cadastro editado com sucesso!'
@@ -3310,12 +3486,17 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                     pa.press('tab', 7), pa.write('n'), pa.press('tab'), pa.write('4')
                     pa.press('tab'), pa.write('Ed. Fisica')
                     pa.press('tab', 2), pa.write(str(int(str(pessoa.admiss).replace('/', '')) + 2).zfill(8))
+                    t.sleep(2)
                     # #clique em instituição de ensino
                     try:
                         pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/faculdade.png')))
-                    except pa.ImageNotFoundException:
-                        t.sleep(3)
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/faculdade.png')))
+                    except TypeError:
+                        t.sleep(6)
+                        try:
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/faculdade.png')))
+                        except TypeError:
+                            t.sleep(10)
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/faculdade.png')))
                     pa.press('tab'), pp.copy(pessoa.est_faculdade), pa.hotkey('ctrl', 'v')
                     pa.press('tab'), pp.copy(pessoa.est_endfacul), pa.hotkey('ctrl', 'v')
                     pa.press('tab'), pp.copy(pessoa.est_numendfacul), pa.hotkey('ctrl', 'v')
@@ -6997,7 +7178,7 @@ def incluir_vt(nome: str, tipo: int):
     matricula = p.matricula
     sessionsvt = sessionmaker(enginevt)
     sessionvt = sessionsvt()
-    pessoa = BaseVT(nome=nome, matricula=matricula, tipo_vt=tp)
+    pessoa = BaseVT(nome=nome,matricula=matricula,tipo_vt=tp)
     sessionvt.add(pessoa)
     sessionvt.commit()
 
