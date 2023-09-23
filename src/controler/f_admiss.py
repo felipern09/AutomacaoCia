@@ -14,6 +14,7 @@ import pyautogui as pa
 import pyperclip as pp
 from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.exc import IntegrityError
 from src.models.listas import municipios
 import smtplib
 from src.models.dados_servd import em_rem, em_ti, em_if, em_pnt, k1, host, port, rede
@@ -108,7 +109,7 @@ def apenas_registrar_funcionario(caminho='', editar=0, ondestou=0, nome='', matr
                 session.add(pess)
                 session.commit()
                 tkinter.messagebox.showinfo(title='Cadastro ok!', message='Cadastro efetuado com sucesso!')
-            except Exception:
+            except IntegrityError:
                 tkinter.messagebox.showinfo(title='Erro', message='Funcionário já cadastrado no DB!')
 
 
@@ -729,7 +730,7 @@ def enviar_emails_funcionario(matricula):
                 Qualquer dúvida, estou à disposição.<br><br>
                 Atenciosamente,<br>
                 <img src="cid:image1">''', 'html')
-            if pessoa.tipo_contr == 'Mensalista':
+            else:
                 text = MIMEText(f'''Olá, {str(pessoa.nome).title().split(" ")[0]}!<br><br>
                 Seja muito bem vindo a Companhia Athletica.<br>
                 Seu contrato está pronto para ser assinado.<br><br>
@@ -744,7 +745,7 @@ def enviar_emails_funcionario(matricula):
                 Atenciosamente,<br>
                 <img src="cid:image1">''', 'html')
 
-        if pessoa.genero == 'Feminino':
+        else:
             if pessoa.tipo_contr == 'Horista':
                 text = MIMEText(f'''Olá, {str(pessoa.nome).title().split(" ")[0]}!<br><br>
                 Seja muito bem vinda a Companhia Athletica.<br>
@@ -762,7 +763,7 @@ def enviar_emails_funcionario(matricula):
                 Qualquer dúvida, estou à disposição.<br><br>
                 Atenciosamente,<br>
                 <img src="cid:image1">''', 'html')
-            if pessoa.tipo_contr == 'Mensalista':
+            else:
                 text = MIMEText(f'''Olá, {str(pessoa.nome).title().split(" ")[0]}!<br><br>
                 Seja muito bem vinda a Companhia Athletica.<br>
                 Seu contrato está pronto para ser assinado.<br><br>
@@ -1144,7 +1145,7 @@ def apenas_registrar_estagiario(solicitar_contr=0, caminho='', editar=0, ondesto
             session.add(estag_cadastrado)
             session.commit()
             tkinter.messagebox.showinfo(title='Cadastro ok!', message='Estagiário cadastrado com sucesso!')
-        except Exception:
+        except IntegrityError:
             tkinter.messagebox.showinfo(title='Erro', message='Estagiário já cadastrado no DB!')
 
 
@@ -2495,5 +2496,3 @@ def desligar_pessoa(nome: str, data: str, tipo: int):
     pessoa.desligamento = data
     session.commit()
     tkinter.messagebox.showinfo(title='Desligamento ok!', message='Desligamento registrado com sucesso!')
-
-

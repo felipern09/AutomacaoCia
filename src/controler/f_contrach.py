@@ -98,8 +98,8 @@ def incluir_grade_email_holerite(planfolha: str, comp: int, pgto: str):
             os.remove(pst_dexion + rf"\Grade {nome} {linha}.png")
             size += 21
         zipf = zipfile.ZipFile(
-            pst_dexion + rf'\Recibo de Pagamento (A - Mensal, {competencia}, {pagamento}, {str(matricula).zfill(6)}).zip',
-            'a'
+          pst_dexion + rf'\Recibo de Pagamento (A - Mensal, {competencia}, {pagamento}, {str(matricula).zfill(6)}).zip',
+          'a'
         )
         try:
             zipf.write(pst_dexion + r"\Grade.png", os.path.basename(pst_dexion + r"\Grade.png"))

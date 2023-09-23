@@ -1392,10 +1392,10 @@ def gerar_pedido_pgto_por_arquivo(data: str, caminho_arq1: str, caminho_arq2='',
     """
     Generate document of payment from .xlsx files.
     :param data: Payment date
-    :param caminho_arq1: file path
-    :param caminho_arq2: file path
-    :param caminho_arq3: file path
-    :param caminho_arq4: file path
+    :param caminho_arq1: file path to arq 1
+    :param caminho_arq2: file path to arq 2
+    :param caminho_arq3: file path to arq 3
+    :param caminho_arq4: file path to arq 4
     """
     somas = {}
     sig = signature(gerar_pedido_pgto_por_arquivo)

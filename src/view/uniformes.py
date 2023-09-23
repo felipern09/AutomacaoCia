@@ -88,8 +88,8 @@ onde.grid(column=1, row=17, padx=25, pady=1, sticky=W)
 
 
 def mostravalores(event):
-    nome = event.widget.get()
-    num, name = nome.split(' - ')
+    nomeval = event.widget.get()
+    num, name = nomeval.split(' - ')
     linha = int(num)
     planwb = l_w(caminho.get())
     plansh = planwb['Nomes']

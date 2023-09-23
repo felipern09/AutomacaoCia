@@ -46,19 +46,19 @@ def gerar_excel_from_ponto_secullum() -> None:
     geral = geral[geral.Dia.notnull()]
 
     # Pegar index onde aparece 'Nome'
-    linhasNomes = geral.index[geral['Dia'].str.contains('Nome')]
+    linhasnomes = geral.index[geral['Dia'].str.contains('Nome')]
 
     # salvar plan com nome do funcionário pasta ponto (na pasta automação)
-    for linha in linhasNomes:
+    for linha in linhasnomes:
         geral = geral.rename(
             columns={'CARTÃO PONTO': 'Dia', 'Unnamed: 1': 0, 'Unnamed: 2': 1, 'Unnamed: 3': 2, 'Unnamed: 4': 3,
                      'Unnamed: 5': 4, 'Unnamed: 6': 5})
         geral = geral[geral.Dia.notnull()]
         geral = geral[geral['Dia'].str.contains(' - ') | geral['Dia'].str.contains('Nome')]
-        geral2 = geral.loc[linha:(linha + (linhasNomes[1] - linhasNomes[0] - 1))] \
+        geral2 = geral.loc[linha:(linha + (linhasnomes[1] - linhasnomes[0] - 1))] \
             .to_excel(f'../Ponto/xls/{geral[0][linha]}.xlsx')
 
-        # Verifica a hora certa na planilha zzBase.xlsx
+        # Verifica a hora exata na planilha zzBase.xlsx
         wb = l_w(f'../Ponto/xls/zzBase.xlsx')
         ws = wb.active
         for row in ws.rows:
@@ -297,7 +297,7 @@ def gerar_relatorios_de_atrasos_estagiarios():
                     os.remove(f'../Ponto/xls/Ponto Estágio - {matr}.xlsx')
         plan = l_w(f'../Ponto/xls/Ponto Estágio - {nome}.xlsx')
         splan = plan.active
-        # Verifica a hora certa na planilha zzBase.xlsx
+        # Verifica a hora exata na planilha zzBase.xlsx
         wb = l_w(f'../Ponto/xls/zzBase.xlsx')
         ws = wb.active
         for row in ws.rows:
@@ -820,7 +820,7 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str, estag: int):
         except FileNotFoundError:
             os.makedirs(
                 rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}')
-            ponto.save( rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
+            ponto.save(rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
             docx2pdf.convert(
                 rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx',
                 rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.pdf')
@@ -871,5 +871,5 @@ def cadastrar_no_ponto(nome, altera, matrpt=''):
                           departamento=pessoa.depto)
         sessionpt.add(estag)
         sessionpt.commit()
-    tkinter.messagebox.showinfo(title='Cadastro no ponto ok!',message='Colaborador cadastrado com sucesso!')
+    tkinter.messagebox.showinfo(title='Cadastro no ponto ok!', message='Colaborador cadastrado com sucesso!')
 

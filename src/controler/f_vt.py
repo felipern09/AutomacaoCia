@@ -21,7 +21,7 @@ def incluir_vt(nome: str, tipo: int):
     matricula = p.matricula
     sessionsvt = sessionmaker(enginevt)
     sessionvt = sessionsvt()
-    pessoa = BaseVT(nome=nome,matricula=matricula,tipo_vt=tp)
+    pessoa = BaseVT(nome=nome, matricula=matricula, tipo_vt=tp)
     sessionvt.add(pessoa)
     sessionvt.commit()
 

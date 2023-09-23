@@ -18,5 +18,4 @@ class BaseVT(Base):
     tipo_vt = Column(String, nullable=True)
 
 
-
 Base.metadata.create_all(enginevt)

@@ -135,5 +135,3 @@ def gerar_recibo_uniformes(local, nome, cargo, cpf, genero, tamanho1, tamanho2='
         entregues[f'G{x}'].value = '-'
         relatorio.save(local)
     tkinter.messagebox.showinfo(title='Recibo ok!', message='Recibo impresso com sucesso!')
-
-

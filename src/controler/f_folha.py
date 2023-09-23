@@ -1667,6 +1667,7 @@ def lancar_escala(nome, departamento, aula, data, horas):
     session.commit()
     tkinter.messagebox.showinfo('Escala Salva!', 'Escala salva com sucesso!')
 
+
 def salvar_banco_aulas():
     sessions = sessionmaker(enginefolha)
     session = sessions()
@@ -1707,4 +1708,3 @@ def inativar_aulas(aulas: list):
         a.status = 'Inativa'
         session.commit()
     tkinter.messagebox.showinfo(title='Aulas inativas!',message='Aulas inativas com sucesso!')
-

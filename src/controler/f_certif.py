@@ -26,10 +26,11 @@ def emitir_certificados(pst: int, psa: int, nome: str, data: str, horas: int, pa
             modelo = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\certificados\TreinamentoGeral.docx')
 
     def extenso(datacompleta: str):
-        dia, mes, ano = datacompleta.split('/')
-        mesext = {'01': 'janeiro', '02': 'fevereiro', '03': 'março', '04': 'abril', '05': 'maio', '06': 'junho',
-                  '07': 'julho', '08': 'agosto', '09': 'setembro', '10': 'outubro', '11': 'novembro', '12': 'dezembro'}
-        return f'{dia} de {mesext[mes]} de {ano}.'
+        diaex, mesex, anoex = datacompleta.split('/')
+        mesextens = {'01': 'janeiro', '02': 'fevereiro', '03': 'março', '04': 'abril', '05': 'maio', '06': 'junho',
+                     '07': 'julho', '08': 'agosto', '09': 'setembro', '10': 'outubro', '11': 'novembro',
+                     '12': 'dezembro'}
+        return f'{diaex} de {mesextens[mesex]} de {anoex}.'
 
     def exthoras(hr: int):
         horasext = {'1': 'uma', '2': 'duas', '3': 'três', '4': 'quatro', '5': 'cinco', '6': 'seis', '7': 'sete',
@@ -93,4 +94,3 @@ def emitir_certificados(pst: int, psa: int, nome: str, data: str, horas: int, pa
         title='Certificados ok!',
         message='Certificados gerados com sucesso!'
     )
-

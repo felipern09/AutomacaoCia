@@ -1,19 +1,6 @@
-import tkinter as tk
-from tkcalendar import DateEntry
-from datetime import datetime
-import tkinter.filedialog
 from src.controler.f_vt import incluir_vt, retirar_vt, gerar_vt
-from openpyxl import load_workbook as l_w
-from src.models.listas import horarios, cargos, departamentos, tipodecontrato
-from tkinter import ttk
-from tkinter import *
-from src.models.models import Colaborador, engine
-from sqlalchemy.orm import sessionmaker
 import tkinter as tk
-import tkinter.filedialog
-from tkcalendar import DateEntry
 from tkinter import ttk
-from datetime import datetime
 from tkinter import *
 from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker

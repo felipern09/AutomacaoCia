@@ -6,14 +6,17 @@
   <component name="ChangeListManager">
     <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controler/funcoes.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/admissao_e_desligamento.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/admissao_e_desligamento.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/alteracoes_folha.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/alteracoes_folha.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/certificados.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/certificados.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/emitir_contrachques.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/emitir_contrachques.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/gerar_lancar_folha.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/gerar_lancar_folha.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/ponto.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/ponto.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/solicitar_pagamento.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/solicitar_pagamento.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controler/f_admiss.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_admiss.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controler/f_certif.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_certif.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controler/f_contatos.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_contatos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controler/f_contrach.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_contrach.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controler/f_desempenho.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_desempenho.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controler/f_folha.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_folha.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controler/f_pagamento.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_pagamento.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controler/f_ponto.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_ponto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controler/f_uniformes.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_uniformes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controler/f_vt.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_vt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/models/modelsvt.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/modelsvt.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/view/solicitar_vt.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/solicitar_vt.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/view/uniformes.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/uniformes.py" afterDir="false" />
     </list>
