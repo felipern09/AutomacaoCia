@@ -2,7 +2,7 @@ import tkinter as tk
 from tkcalendar import DateEntry
 from datetime import datetime
 import tkinter.filedialog
-from src.controler.funcoes import incluir_vt, retirar_vt, gerar_vt
+from src.controler.f_vt import incluir_vt, retirar_vt, gerar_vt
 from openpyxl import load_workbook as l_w
 from src.models.listas import horarios, cargos, departamentos, tipodecontrato
 from tkinter import ttk

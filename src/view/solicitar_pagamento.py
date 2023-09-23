@@ -6,7 +6,7 @@ from datetime import datetime
 from tkinter import *
 from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
-from src.controler.funcoes import confirmar_pagamento, gerar_planilha_pgto_itau, gerar_pedido_pgto_por_arquivo
+from src.controler.f_pagamento import confirmar_pagamento, gerar_planilha_pgto_itau, gerar_pedido_pgto_por_arquivo
 
 
 class MainApplication(tk.Tk):

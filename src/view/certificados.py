@@ -1,5 +1,5 @@
 from datetime import datetime
-from src.controler.funcoes import emitir_certificados
+from src.controler.f_certif import emitir_certificados
 import tkinter as tk
 from tkcalendar import DateEntry
 from tkinter import ttk

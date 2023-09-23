@@ -2,7 +2,7 @@ import tkinter as tk
 from tkcalendar import DateEntry
 from datetime import datetime
 import tkinter.filedialog
-from src.controler.funcoes import cadastro_funcionario, salvar_docs_funcionarios, enviar_emails_funcionario, \
+from src.controler.f_admiss import cadastro_funcionario, salvar_docs_funcionarios, enviar_emails_funcionario, \
     cadastro_estagiario, cadastrar_autonomo, validar_pis, desligar_pessoa, enviar_emails_contratacao, \
     apenas_registrar_funcionario, apenas_registrar_estagiario, updatedb
 from openpyxl import load_workbook as l_w

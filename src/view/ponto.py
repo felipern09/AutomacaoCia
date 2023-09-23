@@ -4,7 +4,7 @@
 #  relatorio de atrasos -> atraves do relatorio geral salvo em xlsx gerar comparatvo de horários registrados
 # com horarios de cadastro e informar se houve atraso superior a 10 min para cada registro
 # cadastro de funcionário no programa secullum
-from src.controler.funcoes import gerar_relatorios_ponto_pdf, cadastrar_no_ponto
+from src.controler.f_ponto import gerar_relatorios_ponto_pdf, cadastrar_no_ponto
 import tkinter as tk
 from tkcalendar import DateEntry
 from datetime import datetime

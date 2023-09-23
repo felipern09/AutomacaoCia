@@ -1,5 +1,5 @@
 from openpyxl import load_workbook as l_w
-from src.controler.funcoes import gerar_recibo_uniformes
+from src.controler.f_uniformes import gerar_recibo_uniformes
 import tkinter.filedialog
 from tkinter import ttk
 from tkinter import *

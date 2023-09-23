@@ -1,6 +1,6 @@
 import datetime
 import tkinter as tk
-from src.controler.funcoes import lancar_ferias, lancar_atestado, lancar_desligamento, lancar_substit, \
+from src.controler.f_folha import lancar_ferias, lancar_atestado, lancar_desligamento, lancar_substit, \
     lancar_hrscomple, lancar_faltas, lancar_escala, lancar_novaaula, salvar_banco_aulas, inativar_aulas
 from tkinter import ttk
 from tkinter import *

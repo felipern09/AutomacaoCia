@@ -1,6 +1,6 @@
 import datetime
 import tkinter as tk
-from src.controler.funcoes import salvar_holerites, incluir_grade_email_holerite
+from src.controler.f_contrach import salvar_holerites, incluir_grade_email_holerite
 import tkinter.filedialog
 from tkinter import ttk
 from tkinter import *

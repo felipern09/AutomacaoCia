@@ -1,5 +1,5 @@
 import tkinter as tk
-from src.controler.funcoes import confirma_grade, lancar_folha_no_dexion
+from src.controler.f_folha import confirma_grade, lancar_folha_no_dexion
 from tkinter import ttk
 from tkinter import *
 
