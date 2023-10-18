@@ -7,18 +7,7 @@
     <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/controler/f_admiss.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_admiss.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controler/f_certif.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_certif.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controler/f_contatos.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_contatos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controler/f_contrach.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_contrach.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controler/f_desempenho.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_desempenho.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/controler/f_folha.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_folha.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controler/f_pagamento.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_pagamento.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controler/f_ponto.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_ponto.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controler/f_uniformes.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_uniformes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/controler/f_vt.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_vt.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/models/modelsvt.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/models/modelsvt.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/solicitar_vt.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/solicitar_vt.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/uniformes.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/uniformes.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,7 +54,7 @@
       <recent name="C:\Users\Felipe\PycharmProjects\PersonalTrainer" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.alteracoes_folha">
+  <component name="RunManager" selected="Python.testes_diversos">
     <configuration name="admissao_e_desligamento" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -129,7 +118,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="solicitar_vt" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="gerar_lancar_folha" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -141,7 +130,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/view/solicitar_vt.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/view/gerar_lancar_folha.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -173,11 +162,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.testes_diversos" />
+        <item itemvalue="Python.gerar_lancar_folha" />
         <item itemvalue="Python.alteracoes_folha" />
         <item itemvalue="Python.admissao_e_desligamento" />
         <item itemvalue="Python.cadastrar_bancoColaborador" />
-        <item itemvalue="Python.testes_diversos" />
-        <item itemvalue="Python.solicitar_vt" />
       </list>
     </recent_temporary>
   </component>

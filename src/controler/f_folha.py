@@ -86,7 +86,7 @@ def lancar_folha_no_dexion(competencia):
         else:
             t.sleep(5)
     pa.press('a'), t.sleep(2)
-    folhagrd = os.path.relpath("\\\\192.168.0.250\\rh\\01 - RH\\01 - Administração.Controles\\04 - Folha de Pgto\\2023\\08 - AGO\\Grades e Comissões\\Lancamentos.xlsx")
+    folhagrd = os.path.abspath("\\\\192.168.0.250\\rh\\01 - RH\\01 - Administração.Controles\\04 - Folha de Pgto\\2023\\09 - SET\\Grades e Comissões\\Lancamentos.xlsx")
     wb = l_w(folhagrd, read_only=False)
 
     # lançamento de faltas

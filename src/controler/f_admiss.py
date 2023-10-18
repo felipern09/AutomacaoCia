@@ -17,7 +17,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 from src.models.listas import municipios
 import smtplib
-from src.models.dados_servd import em_rem, em_ti, em_if, em_pnt, k1, host, port, rede
+from src.models.dados_servd import em_rem, em_ti, em_if, em_pnt, k1, host, port, rede, lidermusc, liderkids, lidernat, \
+    lidercross, lidergin, gerentevend, gerenterh, gerentemanut, gerentetec
 import tkinter.filedialog
 from tkinter import messagebox
 import tkinter.filedialog
@@ -258,7 +259,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     else:
                         t.sleep(5)
                 pa.press('tab'), pa.write(str(pessoa.admiss).replace('/', '')), t.sleep(1)
-                pa.press('tab', 10), pa.write('2')
+                pa.press('tab', 8), pa.write('2')
                 # #clique em Contrato de Experiência
                 while 1 < 2:
                     if pa.locateOnScreen('../models/static/imgs/Experiencia.png'):
@@ -268,7 +269,7 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                         t.sleep(5)
                 pa.press('tab'), pa.write('45'), pa.press('tab'), pa.write('45'), pa.press(
                     'tab'), pa.press(
-                    'space'), pa.press('tab', 2), pa.write('003')
+                    'space'), pa.press('tab', 6), pa.write('003')
                 pa.press('tab'), pa.write(str(pessoa.matricula))
                 # #clique em Outros
                 while 1 < 2:
@@ -563,6 +564,40 @@ def salvar_docs_funcionarios(matricula):
             message='Não existe funcionário cadastrado com essa matrícula!'
         )
     else:
+        try:
+            os.makedirs(
+                r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}'.format(pessoa.nome))
+            os.makedirs(
+                r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Atestados'.format(
+                    pessoa.nome))
+            os.makedirs(
+                r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Diversos'.format(
+                    pessoa.nome))
+            os.makedirs(
+                r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Contratuais'.format(
+                    pessoa.nome))
+            os.makedirs(
+                r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Férias'.format(
+                    pessoa.nome))
+            os.makedirs(
+                r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Pontos'.format(
+                    pessoa.nome))
+            os.makedirs(
+                r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Recibos'.format(
+                    pessoa.nome))
+            os.makedirs(
+                r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
+                r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Rescisão'.format(
+                    pessoa.nome))
+        except FileExistsError:
+            pass
         pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Dexion.png')))
         p_pessoa = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
                    r'\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}'.format(pessoa.nome)
@@ -869,17 +904,16 @@ def enviar_emails_contratacao(caminho: str, nome: str, departamento: str, cargo:
             pass
 
         lotacao = {
-            'Unidade Park Sul - Qualquer Departamento': ['0013', 'Thais Feitosa', 'thais.morais@ciaathletica.com.br',
-                                                         'Líder Park Sul'],
-            'Kids': ['0010', 'Cindy Stefanie', 'cindy.neves@ciaathletica.com.br', 'Líder Kids'],
-            'Musculação': ['0007', 'Thaís Feitosa', 'thais.morais@ciaathletica.com.br', 'Líder Musculação'],
-            'Esportes e Lutas': ['0008', 'Morgana Rossini', 'morganalourenco@yahoo.com.br', 'Líder Natação'],
-            'Crossfit': ['0012', 'Guilherme Salles', 'gmoreirasalles@gmail.com', 'Líder Crossfit'],
-            'Ginástica': ['0006', 'Morgana Rossini', 'morganalourenco@yahoo.com.br', 'Líder Ginástica'],
-            'Gestantes': ['0006', 'Filipe Feijó', 'filipe.feijo@ciaathletica.com.br', 'Líder Ginástica'],
-            'Recepção': ['0003', 'Paulo Renato', 'paulo.simoes@ciaathletica.com.br', 'Gerente Vendas'],
-            'Administrativo': ['0001', 'Felipe Rodrigues', 'felipe.rodrigues@ciaathletica.com.br', 'Gerente RH'],
-            'Manutenção': ['0004', 'José Aparecido', 'aparecido.grota@ciaathletica.com.br', 'Gerente Manutenção'],
+            'Unidade Park Sul - Qualquer Departamento': ['0013', 'Thais Feitosa', lidermusc, 'Líder Park Sul'],
+            'Kids': ['0010', 'Daniela Oliveira', liderkids, 'Líder Kids'],
+            'Musculação': ['0007', 'Thaís Feitosa', lidermusc, 'Líder Musculação'],
+            'Esportes E Lutas': ['0008', 'Morgana Rossini', lidernat, 'Líder Natação'],
+            'Crossfit': ['0012', 'Guilherme Salles', lidercross, 'Líder Crossfit'],
+            'Ginástica': ['0006', 'Morgana Rossini', lidergin, 'Líder Ginástica'],
+            'Gestantes': ['0006', 'Filipe Feijó', gerentetec, 'Gerente Técnico'],
+            'Recepção': ['0003', 'Paulo Renato', gerentevend, 'Gerente Vendas'],
+            'Administrativo': ['0001', 'Felipe Rodrigues', gerenterh, 'Gerente RH'],
+            'Manutenção': ['0004', 'José Aparecido', gerentemanut, 'Gerente Manutenção'],
         }
 
         abert_c = docx.Document(p_abconta)
@@ -1169,18 +1203,16 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
             num, name = nome.strip().split(' - ')
             linha = int(num)
             lotacao = {
-                'Unidade Park Sul - qualquer departamento': ['0013', 'Thais Feitosa',
-                                                             'thais.morais@ciaathletica.com.br',
-                                                             'Líder Park Sul'],
-                'Kids': ['0010', 'Cindy Stefanie', 'cindy.neves@ciaathletica.com.br', 'Líder Kids'],
-                'Musculação': ['0007', 'Thais Feitosa', 'thais.morais@ciaathletica.com.br', 'Líder Musculação'],
-                'Esportes e Lutas': ['0008', 'Morgana Rossini', 'morganalourenco@yahoo.com.br', 'Líder Natação'],
-                'Crossfit': ['0012', 'Guilherme Salles', 'gmoreirasalles@gmail.com', 'Líder Crossfit'],
-                'Ginástica': ['0006', 'Morgana Rossini', 'morganalourenco@yahoo.com.br', 'Líder Ginástica'],
-                'Gestantes': ['0006', 'Filipe Feijó', 'filipe.feijo@ciaathletica.com.br', 'Gerente Técnico'],
-                'Recepção': ['0003', 'Paulo Renato', 'paulo.simoes@ciaathletica.com.br', 'Gerente Vendas'],
-                'Administrativo': ['0001', 'Felipe Rodrigues', 'felipe.rodrigues@ciaathletica.com.br', 'Gerente RH'],
-                'Manutenção': ['0004', 'José Aparecido', 'aparecido.grota@ciaathletica.com.br', 'Gerente Manutenção'],
+                'Unidade Park Sul - Qualquer Departamento': ['0013', 'Thais Feitosa', lidermusc, 'Líder Park Sul'],
+                'Kids': ['0010', 'Daniela Oliveira', liderkids, 'Líder Kids'],
+                'Musculação': ['0007', 'Thaís Feitosa', lidermusc, 'Líder Musculação'],
+                'Esportes E Lutas': ['0008', 'Morgana Rossini', lidernat, 'Líder Natação'],
+                'Crossfit': ['0012', 'Guilherme Salles', lidercross, 'Líder Crossfit'],
+                'Ginástica': ['0006', 'Morgana Rossini', lidergin, 'Líder Ginástica'],
+                'Gestantes': ['0006', 'Filipe Feijó', gerentetec, 'Gerente Técnico'],
+                'Recepção': ['0003', 'Paulo Renato', gerentevend, 'Gerente Vendas'],
+                'Administrativo': ['0001', 'Felipe Rodrigues', gerenterh, 'Gerente RH'],
+                'Manutenção': ['0004', 'José Aparecido', gerentemanut, 'Gerente Manutenção'],
             }
             cadastro = {'nome': str(sh[f"C{linha}"].value).title().strip(), 'nasc_ed': sh[f"D{linha}"].value,
                         'genero': str(sh[f"E{linha}"].value), 'est_civ': str(sh[f"F{linha}"].value),
@@ -1853,23 +1885,17 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                     num, name = nome.strip().split(' - ')
                     linha = int(num)
                     lotacao = {
-                        'Unidade Park Sul - qualquer departamento': ['0013', 'Thais Feitosa',
-                                                                     'thais.morais@ciaathletica.com.br',
+                        'Unidade Park Sul - Qualquer Departamento': ['0013', 'Thais Feitosa', lidermusc,
                                                                      'Líder Park Sul'],
-                        'Kids': ['0010', 'Cindy Stefanie', 'cindy.neves@ciaathletica.com.br', 'Líder Kids'],
-                        'Musculação': ['0007', 'Aline Kanyó', 'aline.kanyo@soucia.com.br', 'Líder Musculação'],
-                        'Esportes e Lutas': ['0008', 'Morgana Rossini', 'morganalourenco@yahoo.com.br',
-                                             'Líder Natação'],
-                        'Crossfit': ['0012', 'Guilherme Salles', 'gmoreirasalles@gmail.com', 'Líder Crossfit'],
-                        'Ginástica': ['0006', 'Hugo Albuquerque', 'hugo.albuquerque@ciaathletica.com.br',
-                                      'Líder Ginástica'],
-                        'Gestantes': ['0006', 'Hugo Albuquerque', 'hugo.albuquerque@ciaathletica.com.br',
-                                      'Líder Ginástica'],
-                        'Recepção': ['0003', 'Paulo Renato', 'paulo.simoes@ciaathletica.com.br', 'Gerente Vendas'],
-                        'Administrativo': ['0001', 'Felipe Rodrigues', 'felipe.rodrigues@ciaathletica.com.br',
-                                           'Gerente RH'],
-                        'Manutenção': ['0004', 'José Aparecido', 'aparecido.grota@ciaathletica.com.br',
-                                       'Gerente Manutenção'],
+                        'Kids': ['0010', 'Daniela Oliveira', liderkids, 'Líder Kids'],
+                        'Musculação': ['0007', 'Thaís Feitosa', lidermusc, 'Líder Musculação'],
+                        'Esportes E Lutas': ['0008', 'Morgana Rossini', lidernat, 'Líder Natação'],
+                        'Crossfit': ['0012', 'Guilherme Salles', lidercross, 'Líder Crossfit'],
+                        'Ginástica': ['0006', 'Morgana Rossini', lidergin, 'Líder Ginástica'],
+                        'Gestantes': ['0006', 'Filipe Feijó', gerentetec, 'Gerente Técnico'],
+                        'Recepção': ['0003', 'Paulo Renato', gerentevend, 'Gerente Vendas'],
+                        'Administrativo': ['0001', 'Felipe Rodrigues', gerenterh, 'Gerente RH'],
+                        'Manutenção': ['0004', 'José Aparecido', gerentemanut, 'Gerente Manutenção'],
                     }
                 else:
                     # Editando o cadastro em Casa
