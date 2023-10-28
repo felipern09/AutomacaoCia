@@ -425,6 +425,12 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                             pessoa.nome))
                 except FileExistsError:
                     pass
+                while 1 < 2:
+                    if pa.locateOnScreen('../models/static/imgs/pyt.png'):
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png')))
+                        break
+                    else:
+                        t.sleep(5)
                 tkinter.messagebox.showinfo(title='Cadastro ok!', message='Cadastro realizado com sucesso!')
         else:
             num, name = nome.strip().split(' - ')
@@ -552,7 +558,13 @@ def cadastro_funcionario(caminho='', editar=0, ondestou=0, nome='', matricula=''
                     r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e '
                     r'Férias\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Rescisão'.format(
                         pessoa.nome))
-                tkinter.messagebox.showinfo(title='Cadastro ok!', message='Cadastro editado com sucesso!')
+                while 1 < 2:
+                    if pa.locateOnScreen('../models/static/imgs/pyt.png'):
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png')))
+                        break
+                    else:
+                        t.sleep(5)
+                tkinter.messagebox.showinfo(title='Cadastro ok!', message='Cadastro realizado com sucesso!')
 
 
 def salvar_docs_funcionarios(matricula):
@@ -711,8 +723,13 @@ def salvar_docs_funcionarios(matricula):
         recibos.save(p_contr + '\\Recibos.docx')
         docx2pdf.convert(p_contr + '\\Recibos.docx', p_contr + '\\Recibos.pdf')
         os.remove(p_contr + '\\Recibos.docx')
-
         os.rename(p_pessoa, p_pessoa.replace(r'\1 - Ainda nao iniciaram', ''))
+        while 1 < 2:
+            if pa.locateOnScreen('../models/static/imgs/pyt.png'):
+                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png')))
+                break
+            else:
+                t.sleep(5)
         tkinter.messagebox.showinfo(
             title='Documentos ok!',
             message='Documentos salvos com sucesso!'
@@ -1615,25 +1632,23 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 pa.press('tab', 2), pa.write(str(int(str(pessoa.admiss).replace('/', '')) + 2).zfill(8))
                 t.sleep(2)
                 # #clique em instituição de ensino
-                try:
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/faculdade.png')))
-                except TypeError:
-                    t.sleep(6)
-                    try:
+                while 1 < 2:
+                    if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/faculdade.png'))):
                         pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/faculdade.png')))
-                    except TypeError:
-                        t.sleep(10)
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/faculdade.png')))
+                        break
+                    else:
+                        t.sleep(5)
                 pa.press('tab'), pp.copy(pessoa.est_faculdade), pa.hotkey('ctrl', 'v')
                 pa.press('tab'), pp.copy(pessoa.est_endfacul), pa.hotkey('ctrl', 'v')
                 pa.press('tab'), pp.copy(pessoa.est_numendfacul), pa.hotkey('ctrl', 'v')
                 pa.press('tab'), pp.copy(pessoa.est_bairroendfacul), pa.hotkey('ctrl', 'v')
                 # #clique em Outros
-                try:
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
-                except pa.ImageNotFoundException:
-                    t.sleep(5)
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
+                while 1 < 2:
+                    if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png'))):
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
+                        break
+                    else:
+                        t.sleep(5)
                 t.sleep(2), pa.write('CARGO GERAL')
                 pa.press('tab'), pa.write(pessoa.cargo)
                 t.sleep(1), pa.press('tab'), pa.write(pessoa.salario), pa.press('tab')
@@ -1655,11 +1670,12 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                 # #clique em salvar lotação
                 pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarbtn.png'))), t.sleep(1)
                 # #clique em fechar lotação
-                try:
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png'))), t.sleep(1)
-                except pa.ImageNotFoundException:
-                    t.sleep(4)
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png')))
+                while 1 < 2:
+                    if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png'))):
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png')))
+                        break
+                    else:
+                        t.sleep(5)
                 # #clique em Compatibilidade
                 pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade3.png'))), t.sleep(1)
                 # #clique em Compatibilidade de novo
@@ -1675,6 +1691,12 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                           f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
                           f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
                           f'00 - ATIVOS\\0 - Estagiários\\{pessoa.nome}')
+                while 1 < 2:
+                    if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png'))):
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png')))
+                        break
+                    else:
+                        t.sleep(5)
                 tkinter.messagebox.showinfo(
                     title='Cadastro ok!',
                     message='Cadastro realizado com sucesso!'
@@ -1837,11 +1859,12 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                     pa.press('tab'), pp.copy(pessoa.est_numendfacul), pa.hotkey('ctrl', 'v')
                     pa.press('tab'), pp.copy(pessoa.est_bairroendfacul), pa.hotkey('ctrl', 'v')
                     # #clique em Outros
-                    try:
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
-                    except pa.ImageNotFoundException:
-                        t.sleep(5)
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
+                    while 1 < 2:
+                        if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png'))):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     t.sleep(2), pa.write('CARGO GERAL')
                     pa.press('tab'), pa.write(pessoa.cargo)
                     t.sleep(1), pa.press('tab'), pa.write(pessoa.salario), pa.press('tab')
@@ -1862,6 +1885,12 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                     pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharnovo1.png'))), t.sleep(2)
                     # #clique em fechar trabalhadores
                     pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fechartrab1.png'))), t.sleep(0.5)
+                    while 1 < 2:
+                        if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png'))):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     tkinter.messagebox.showinfo(
                         title='Cadastro ok!',
                         message='Cadastro editado com sucesso!'
@@ -1939,11 +1968,12 @@ def cadastrar_autonomo(caminhoaut, nomeaut, matriculaaut, admissaoaut, cargoaut,
     pa.press('tab'), pa.write(str(pessoa.admiss).replace('/', '')), t.sleep(1)
     pa.press('tab'), pa.write('7')
     # #clique em Outros
-    try:
-        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
-    except pa.ImageNotFoundException:
-        t.sleep(5)
-        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
+    while 1 < 2:
+        if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png'))):
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
+            break
+        else:
+            t.sleep(5)
     t.sleep(2), pa.write('CARGO GERAL')
     pa.press('tab'), pa.write(pessoa.cargo)
     # #clique em eventos trabalhistas
@@ -1957,11 +1987,12 @@ def cadastrar_autonomo(caminhoaut, nomeaut, matriculaaut, admissaoaut, cargoaut,
     # #clique em salvar lotação
     pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarbtn.png'))), t.sleep(1)
     # #clique em fechar lotação
-    try:
-        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png'))), t.sleep(1)
-    except pa.ImageNotFoundException:
-        t.sleep(4)
-        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png')))
+    while 1 < 2:
+        if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png'))):
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png')))
+            break
+        else:
+            t.sleep(5)
     # #clique em Compatibilidade
     pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade3.png'))), t.sleep(1)
     # #clique em Compatibilidade de novo
@@ -1973,6 +2004,12 @@ def cadastrar_autonomo(caminhoaut, nomeaut, matriculaaut, admissaoaut, cargoaut,
     pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharnovo1.png'))), t.sleep(2)
     # #clique em fechar trabalhadores
     pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fechartrab1.png'))), t.sleep(0.5)
+    while 1 < 2:
+        if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png'))):
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png')))
+            break
+        else:
+            t.sleep(5)
     tkinter.messagebox.showinfo(
         title='Cadastro ok!',
         message='Cadastro realizado com sucesso!'
