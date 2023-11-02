@@ -86,7 +86,12 @@ def lancar_folha_no_dexion(competencia):
         else:
             t.sleep(5)
     pa.press('a'), t.sleep(2)
-    folhagrd = os.path.abspath("\\\\192.168.0.250\\rh\\01 - RH\\01 - Administração.Controles\\04 - Folha de Pgto\\2023\\09 - SET\\Grades e Comissões\\Lancamentos.xlsx")
+    hj = dt.today()
+    mes = str(competencia).zfill(2)
+    ano = hj.year
+    mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
+              '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
+    folhagrd = os.path.abspath(rf"\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Grades e Comissões\Lancamentos.xlsx")
     wb = l_w(folhagrd, read_only=False)
 
     # lançamento de faltas
@@ -127,11 +132,11 @@ def lancar_folha_no_dexion(competencia):
             obshr = str(sh[f'E{x}'].value)
             pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(2.3)
             try:
-                pa.center(pa.locateOnScreen('dsr.png'))
+                pa.center(pa.locateOnScreen(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\dsr.png'))
                 dsrlancado = True
             except:
                 try:
-                    pa.center(pa.locateOnScreen('dsr2.png'))
+                    pa.center(pa.locateOnScreen(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\dsr2.png'))
                     dsrlancado = True
                 except:
                     dsrlancado = False
@@ -324,6 +329,7 @@ def listar_aulas_ativas(compet) -> list:
         aula[i] = Aula(a.nome, a.professor, a.departamento, a.diadasemana, a.inicio, a.fim, a.valor, a.iniciograde,
                        a.fimgrade)
         yield aula[i]
+    session.close()
     return aula
 
 
@@ -339,6 +345,7 @@ def listar_departamentos_ativos() -> list:
     for i, a in enumerate(aulasativasdb):
         departamentos.append(a.departamento)
         departamentos = list(set(departamentos))
+    session.close()
     return departamentos
 
 
@@ -354,6 +361,7 @@ def listar_professores_ativos() -> list:
     for i, a in enumerate(aulasativasdb):
         professores.append(a.professor)
         professores = list(set(professores))
+    session.close()
     return professores
 
 
@@ -403,6 +411,7 @@ def consultar_faltas(comp) -> dict:
             else:
                 d2 = {f.professor: {f.data: {f.departamento: f.horas}}}
                 dic = {**dic, **d2}
+    session.close()
     return dic
 
 
@@ -422,6 +431,7 @@ def consultar_ferias(comp) -> dict:
             else:
                 d2 = {f.professor: {f.departamento: {f.inicio: f.fim}}}
                 dic = {**dic, **d2}
+    session.close()
     return dic
 
 
@@ -441,6 +451,7 @@ def consultar_atestados(comp) -> dict:
             else:
                 d2 = {a.professor: {a.data: a.departamento}}
                 dic = {**dic, **d2}
+    session.close()
     return dic
 
 
@@ -473,6 +484,7 @@ def consultar_substituicoes(comp: int) -> dict:
             else:
                 d2 = {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
                 dic = {**dic, **d2}
+    session.close()
     return dic
 
 
@@ -492,6 +504,7 @@ def consultar_desligamentos(comp: int) -> dict:
             else:
                 d2 = {d.professor: {d.departamento: d.datadesligamento}}
                 dic = {**dic, **d2}
+    session.close()
     return dic
 
 
@@ -511,6 +524,7 @@ def consultar_escalas(comp: int) -> dict:
             else:
                 d2 = {e.professor: {e.data: {e.departamento: e.horas}}}
                 dic = {**dic, **d2}
+    session.close()
     return dic
 
 
@@ -530,6 +544,7 @@ def consultar_horas_complementares(comp: int) -> dict:
             else:
                 d2 = {h.professor: {h.data: {h.departamento: h.horas}}}
                 dic = {**dic, **d2}
+    session.close()
     return dic
 
 
@@ -661,18 +676,17 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                 # se desligado de tudo, alterar status das aulas para inativas
                 for nome in dslg:
                     for depart in dslg[nome]:
-                        for dia in dslg[nome][depart]:
-                            if depart == 'Musculação' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
-                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
-                                    if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(
-                                            str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]),
-                                                                          month=int(str(plan1.cell(column=cell.column,
-                                                                                                   row=cell.row + 1).value).split(
-                                                                                  '/')[1]),
-                                                                          year=dt.today().year) <= fechamento:
-                                        plan1.cell(column=cell.column, row=novalinha).value = 0
-                                        plan1.cell(column=cell.column, row=novalinha).fill = deslig
-                                        plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
+                        if depart == 'Musculação' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(
+                                        str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]),
+                                                                      month=int(str(plan1.cell(column=cell.column,
+                                                                                               row=cell.row + 1).value).split(
+                                                                              '/')[1]),
+                                                                      year=dt.today().year) <= fechamento:
+                                    plan1.cell(column=cell.column, row=novalinha).value = 0
+                                    plan1.cell(column=cell.column, row=novalinha).fill = deslig
+                                    plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
 
                 # aplica talterações de férias
                 # # {f.professor: {f.departamento: {f.inicio: f.fim}}}
@@ -789,18 +803,17 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                 # se desligado de tudo, alterar status das aulas para inativas
                 for nome in dslg:
                     for depart in dslg[nome]:
-                        for dia in dslg[nome][depart]:
-                            if depart == 'Ginástica' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
-                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
-                                    if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(
-                                            str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]),
-                                                                          month=int(str(plan1.cell(column=cell.column,
-                                                                                                   row=cell.row + 1).value).split(
-                                                                                  '/')[1]),
-                                                                          year=dt.today().year) <= fechamento:
-                                        plan1.cell(column=cell.column, row=novalinha).value = 0
-                                        plan1.cell(column=cell.column, row=novalinha).fill = deslig
-                                        plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
+                        if depart == 'Ginástica' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(
+                                        str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]),
+                                                                      month=int(str(plan1.cell(column=cell.column,
+                                                                                               row=cell.row + 1).value).split(
+                                                                              '/')[1]),
+                                                                      year=dt.today().year) <= fechamento:
+                                    plan1.cell(column=cell.column, row=novalinha).value = 0
+                                    plan1.cell(column=cell.column, row=novalinha).fill = deslig
+                                    plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
 
                 # aplica talterações de férias
                 # # {f.professor: {f.departamento: {f.inicio: f.fim}}}
@@ -1046,18 +1059,17 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                 # se desligado de tudo, alterar status das aulas para inativas
                 for nome in dslg:
                     for depart in dslg[nome]:
-                        for dia in dslg[nome][depart]:
-                            if depart == 'Esportes' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
-                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
-                                    if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(
-                                            str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]),
-                                                                          month=int(str(plan1.cell(column=cell.column,
-                                                                                                   row=cell.row + 1).value).split(
-                                                                                  '/')[1]),
-                                                                          year=dt.today().year) <= fechamento:
-                                        plan1.cell(column=cell.column, row=novalinha).value = 0
-                                        plan1.cell(column=cell.column, row=novalinha).fill = deslig
-                                        plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
+                        if depart == 'Esportes' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(
+                                        str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]),
+                                                                      month=int(str(plan1.cell(column=cell.column,
+                                                                                               row=cell.row + 1).value).split(
+                                                                              '/')[1]),
+                                                                      year=dt.today().year) <= fechamento:
+                                    plan1.cell(column=cell.column, row=novalinha).value = 0
+                                    plan1.cell(column=cell.column, row=novalinha).fill = deslig
+                                    plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
 
                 # aplica talterações de férias
                 # {f.professor: {f.departamento: {f.inicio: f.fim}}}
@@ -1175,18 +1187,17 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                 # se desligado de tudo, alterar status das aulas para inativas
                 for nome in dslg:
                     for depart in dslg[nome]:
-                        for dia in dslg[nome][depart]:
-                            if depart == 'Cross Cia' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
-                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
-                                    if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(
-                                            str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]),
-                                                                          month=int(str(plan1.cell(column=cell.column,
-                                                                                                   row=cell.row + 1).value).split(
-                                                                                  '/')[1]),
-                                                                          year=dt.today().year) <= fechamento:
-                                        plan1.cell(column=cell.column, row=novalinha).value = 0
-                                        plan1.cell(column=cell.column, row=novalinha).fill = deslig
-                                        plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
+                        if depart == 'Cross Cia' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(
+                                        str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]),
+                                                                      month=int(str(plan1.cell(column=cell.column,
+                                                                                               row=cell.row + 1).value).split(
+                                                                              '/')[1]),
+                                                                      year=dt.today().year) <= fechamento:
+                                    plan1.cell(column=cell.column, row=novalinha).value = 0
+                                    plan1.cell(column=cell.column, row=novalinha).fill = deslig
+                                    plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
 
                 # aplica talterações de férias
                 # # {f.professor: {f.departamento: {f.inicio: f.fim}}}
@@ -1294,6 +1305,7 @@ def somar_aulas_de_segunda(nome: str, depto: str) -> float:
         somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
         somadia = round(somadia, 2)
         somas += somadia
+    session.close()
     return somas
 
 
@@ -1308,6 +1320,7 @@ def somar_aulas_de_terca(nome: str, depto: str) -> float:
         somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
         somadia = round(somadia, 2)
         somas += somadia
+    session.close()
     return somas
 
 
@@ -1322,6 +1335,7 @@ def somar_aulas_de_quarta(nome: str, depto: str) -> float:
         somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
         somadia = round(somadia, 2)
         somas += somadia
+    session.close()
     return somas
 
 
@@ -1336,6 +1350,7 @@ def somar_aulas_de_quinta(nome: str, depto: str) -> float:
         somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
         somadia = round(somadia, 2)
         somas += somadia
+    session.close()
     return somas
 
 
@@ -1350,6 +1365,7 @@ def somar_aulas_de_sexta(nome: str, depto: str) -> float:
         somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
         somadia = round(somadia, 2)
         somas += somadia
+    session.close()
     return somas
 
 
@@ -1364,6 +1380,7 @@ def somar_aulas_de_sabado(nome: str, depto: str) -> float:
         somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
         somadia = round(somadia, 2)
         somas += somadia
+    session.close()
     return somas
 
 
@@ -1378,7 +1395,8 @@ def somar_aulas_de_domingo(nome: str, depto: str) -> float:
         somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
         somadia = round(somadia, 2)
         somas += somadia
-    return somas
+    session.close()
+    return somas * 2
 
 
 def salvar_planilha_soma_final(compet: int):
@@ -1559,6 +1577,7 @@ def lancar_ferias(nome, depto, inicio, fim):
     fer = Ferias(professor=nome, matrprof=matricula, departamento=depto, inicio=inicio, fim=fim)
     session.add(fer)
     session.commit()
+    session.close()
     tkinter.messagebox.showinfo('Férias ok!', 'Férias lançadas com sucesso!')
 
 
@@ -1574,6 +1593,7 @@ def lancar_atestado(nome, depto, data):
     atest = Atestado(professor=nome, matrprof=matricula, departamento=depto, data=data)
     session.add(atest)
     session.commit()
+    session.close()
     tkinter.messagebox.showinfo('Atestado salvo!', 'Atestado salvo com sucesso!')
 
 
@@ -1590,6 +1610,8 @@ def lancar_desligamento(nome, depto, data):
     deslig = Desligados(professor=nome, matrprof=matricula, departamento=depto, datadesligamento=data)
     session.add(deslig)
     session.commit()
+    session.close()
+
     # se desligamento antes do iniício da folha: tornar inativas as aulas da pessoa
     tkinter.messagebox.showinfo('Desligamento ok!', 'Desligamento lançado com sucesso!')
 
@@ -1608,6 +1630,7 @@ def lancar_substit(substituido, substituto, departamento, aula, data, horas):
                         horas=horas)
     session.add(subs)
     session.commit()
+    session.close()
     tkinter.messagebox.showinfo('Substituição ok!', 'Substituição lançada com sucesso!')
 
 
@@ -1621,6 +1644,7 @@ def lancar_hrscomple(nome, departamento, aula, data, horas):
     hrcomp = Hrcomplement(professor=nome, matrprof=matricula, departamento=departamento, horas=horas, aula=aula, data=data)
     session.add(hrcomp)
     session.commit()
+    session.close()
     tkinter.messagebox.showinfo('Horas Salvas!', 'Horas complementares salvas com sucesso!')
 
 
@@ -1635,6 +1659,7 @@ def lancar_faltas(nome, depto, data, hrs):
     falt = Faltas(professor=nome, matrprof=matricula, departamento=depto, data=data, horas=hrs)
     session.add(falt)
     session.commit()
+    session.close()
     tkinter.messagebox.showinfo('Falta Salva!', 'Falta salva com sucesso!')
 
 
@@ -1652,6 +1677,7 @@ def lancar_novaaula(nomeprof, depto, nomeaula, diasemana, inicio, fim, valor):
                  fim=fim, valor=valor, status='Ativa', iniciograde=dt.strftime(hj, '%d/%m/%Y'), matrprof=matricula)
     session.add(aula)
     session.commit()
+    session.close()
     tkinter.messagebox.showinfo('Aula Salva!', 'Aula lançada com sucesso!')
 
 
@@ -1665,6 +1691,7 @@ def lancar_escala(nome, departamento, aula, data, horas):
     esc = Escala(professor=nome, matrprof=matricula, departamento=departamento, horas=horas, aula=aula, data=data)
     session.add(esc)
     session.commit()
+    session.close()
     tkinter.messagebox.showinfo('Escala Salva!', 'Escala salva com sucesso!')
 
 
