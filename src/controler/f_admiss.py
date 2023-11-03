@@ -12,6 +12,7 @@ from openpyxl import load_workbook as l_w
 import os
 import pyautogui as pa
 import pyperclip as pp
+import shutil
 from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
@@ -1199,7 +1200,7 @@ def apenas_registrar_estagiario(solicitar_contr=0, caminho='', editar=0, ondesto
 
 def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
                         cargo='', depto='', tipo_contr='Mensalista',
-                        hrsem='25', hrmens='100', agencia='', conta='', digito=''):
+                        hrsem='25', hrmens='100', agencia='', conta='', digito='', tce=''):
     sessions = sessionmaker(bind=engine)
     session = sessions()
     pa.FAILSAFE = False
@@ -1210,518 +1211,293 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
             message='Preencha todos os campos antes de cadastrar o estagiário!'
         )
     else:
-        if solicitar_contr == 1:
-            hoje = dt.today()
-            wb = l_w(caminho)
-            sh = wb['Respostas ao formulário 1']
-            num, name = nome.strip().split(' - ')
-            linha = int(num)
-            lotacao = {
-                'Unidade Park Sul - Qualquer Departamento': ['0013', lidermusc, elidermusc, 'Líder Park Sul'],
-                'Kids': ['0010', liderkids, eliderkids, 'Líder Kids'],
-                'Musculação': ['0007', lidermusc, elidermusc, 'Líder Musculação'],
-                'Esportes E Lutas': ['0008', lidernat, elidernat, 'Líder Natação'],
-                'Crossfit': ['0012', lidercross, elidercross, 'Líder Crossfit'],
-                'Ginástica': ['0006', lidergin, elidergin, 'Líder Ginástica'],
-                'Gestantes': ['0006', gerentetec, egerentetec, 'Gerente Técnico'],
-                'Recepção': ['0003', gerentevend, egerentevend, 'Gerente Vendas'],
-                'Administrativo': ['0001', gerenterh, egerenterh, 'Gerente RH'],
-                'Manutenção': ['0004', gerentemanut, egerentemanut, 'Gerente Manutenção'],
-            }
-            cadastro = {'nome': str(sh[f"C{linha}"].value).title().strip(), 'nasc_ed': sh[f"D{linha}"].value,
-                        'genero': str(sh[f"E{linha}"].value), 'est_civ': str(sh[f"F{linha}"].value),
-                        'pai': str(sh[f"M{linha}"].value), 'mae': str(sh[f"N{linha}"].value),
-                        'end': str(sh[f"O{linha}"].value),
-                        'num': str(sh[f"P{linha}"].value), 'bairro': str(sh[f"Q{linha}"].value),
-                        'cep': str(sh[f"R{linha}"].value).replace('.', '').replace('-', ''),
-                        'cid_end': str(sh[f"S{linha}"].value), 'uf_end': str(sh[f"T{linha}"].value),
-                        'tel': str(sh[f"U{linha}"].value).replace('(', '').replace(')', '').replace('-', '').replace(
-                            ' ',
-                            ''),
-                        'mun_end': str(sh[f"AP{linha}"].value),
-                        'cpf': str(sh[f"V{linha}"].value).strip().replace('.', '').replace('-', '').replace(' ',
-                                                                                                            '').zfill(
-                            11),
-                        'rg': str(sh[f"W{linha}"].value).strip().replace('.', '').replace('-', '').replace(' ', ''),
-                        'emissor': str(sh[f"X{linha}"].value),
-                        'lotacao': str(lotacao[f'{sh[f"AG{linha}"].value}'][0]).zfill(4),
-                        'cargo': str(sh[f"AH{linha}"].value), 'horario': str(sh[f"AI{linha}"].value),
-                        'email': str(sh[f"B{linha}"].value).strip(),
-                        'admissao_ed': str(sh[f"AL{linha}"].value),
-                        'faculdade': str(sh[f"AV{linha}"].value), 'semestre': str(sh[f"AS{linha}"].value),
-                        'turno': str(sh[f"AT{linha}"].value), 'conclusao': str(sh[f"AU{linha}"].value),
-                        'salario': str(sh[f"AM{linha}"].value),
-                        'hrsemanais': str(sh[f"AQ{linha}"].value), 'hrmensais': str(sh[f"AR{linha}"].value)}
-            email_remetente = em_rem
-            senha = k1
-            lot = lotacao[f'{sh[f"AG{linha}"].value}']
-            pasta = r'\192.168.0.250'
-            modelo = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\' \
-                     f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\Modelo'
-            try:
-                os.makedirs(
-                    f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-                    f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-                    f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}')
-                os.makedirs(
-                    f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-                    f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-                    f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Atestados')
-                os.makedirs(
-                    f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-                    f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-                    f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Diversos')
-                os.makedirs(
-                    f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-                    f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-                    f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Contratuais')
-                os.makedirs(
-                    f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-                    f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-                    f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Ferias')
-                os.makedirs(
-                    f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-                    f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-                    f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Ponto')
-                os.makedirs(
-                    f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-                    f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-                    f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Recibo')
-                os.makedirs(
-                    f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
-                    f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
-                    f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Rescisao')
-            except FileExistsError:
-                pass
-            pasta_contratuais = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\' \
-                                f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\' \
-                                f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\' \
-                                f'{str(cadastro["nome"]).upper()}\\Contratuais'
-
-            # change tree docx models files with intern data and save pdfs files
-            solicitacao = docx.Document(modelo + r'\Solicitacao MODELO - Copia.docx')
-            solicitacao.tables[0].rows[4].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[4].cells[0].paragraphs[0].text).replace('#supervisor_estagio', f'{lot[1]}')
-            solicitacao.tables[0].rows[5].cells[1].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[5].cells[1].paragraphs[0].text).replace('#cargo', f'{lot[3]}')
-            solicitacao.tables[0].rows[6].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[6].cells[0].paragraphs[0].text).replace('#email_supervisor', f'{lot[2]}')
-            solicitacao.tables[0].rows[9].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[9].cells[0].paragraphs[0].text).replace('#horario', cadastro['horario'])
-            solicitacao.tables[0].rows[14].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[14].cells[0].paragraphs[0].text).replace('#nome_completo', cadastro['nome'])
-            solicitacao.tables[0].rows[15].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[15].cells[0].paragraphs[0].text).replace('#nasc',
-                                                                                    dt.strftime(cadastro['nasc_ed'],
-                                                                                                '%d/%m/%Y')
-                                                                                    ).replace('#rg',
-                                                                                              cadastro['rg']).replace(
-                '#cpf', cadastro['cpf'])
-            solicitacao.tables[0].rows[16].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[16].cells[0].paragraphs[0].text).replace('#sexo', cadastro['genero'])
-            solicitacao.tables[0].rows[17].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[17].cells[0].paragraphs[0].text).replace('#endereco', cadastro['end'])
-            solicitacao.tables[0].rows[18].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[18].cells[0].paragraphs[0].text).replace('#cep', cadastro['cep']).replace(
-                '#bairro', cadastro['bairro'])
-            solicitacao.tables[0].rows[19].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[19].cells[0].paragraphs[0].text).replace('#telefone',
-                                                                                    str(cadastro['tel']).replace('.0',
-                                                                                                                 ''))
-            solicitacao.tables[0].rows[20].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[20].cells[0].paragraphs[0].text).replace('#end_eletr', cadastro['email'])
-            solicitacao.tables[0].rows[22].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[22].cells[0].paragraphs[0].text).replace('#semestre',
-                                                                                    str(cadastro['semestre']).replace(
-                                                                                        '.0', ''))
-            solicitacao.tables[0].rows[23].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[23].cells[0].paragraphs[0].text).replace('#turno',
-                                                                                    cadastro['turno']).replace(
-                '#ano_concl', str(cadastro['conclusao']).replace('.0', ''))
-            solicitacao.tables[0].rows[24].cells[0].paragraphs[0].text = str(
-                solicitacao.tables[0].rows[24].cells[0].paragraphs[0].text).replace('#faculdade', cadastro['faculdade'])
-            solicitacao.save(pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.docx')
-            docx2pdf.convert(pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.docx',
-                             pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf')
-            os.remove(pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.docx')
-
-            ficha_cadastral = docx.Document(modelo + r'\Ficha Cadastral MODELO - Copia.docx')
-            ficha_cadastral.tables[1].rows[0].cells[0].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[0].cells[0].paragraphs[0].text).replace('#nome_completo',
-                                                                                       cadastro['nome'])
-            ficha_cadastral.tables[1].rows[1].cells[0].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[1].cells[0].paragraphs[0].text) \
-                .replace('#nasc', dt.strftime(cadastro['nasc_ed'], '%d/%m/%Y'))
-            ficha_cadastral.tables[1].rows[1].cells[2].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[1].cells[2].paragraphs[0].text).replace('#gen', cadastro['genero'])
-            ficha_cadastral.tables[1].rows[1].cells[4].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[1].cells[4].paragraphs[0].text).replace('#est_civ', cadastro['est_civ'])
-            ficha_cadastral.tables[1].rows[2].cells[0].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[2].cells[0].paragraphs[0].text).replace('#local', cadastro['end'])
-            ficha_cadastral.tables[1].rows[2].cells[4].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[2].cells[4].paragraphs[0].text).replace('#qd', cadastro['bairro'])
-            ficha_cadastral.tables[1].rows[2].cells[7].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[2].cells[7].paragraphs[0].text).replace('#codigo', cadastro['cep'])
-            ficha_cadastral.tables[1].rows[4].cells[1].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[4].cells[1].paragraphs[0].text).replace('#telefone', cadastro['tel'])
-            ficha_cadastral.tables[1].rows[4].cells[5].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[4].cells[5].paragraphs[0].text).replace('#ident', cadastro['rg'])
-            ficha_cadastral.tables[1].rows[5].cells[1].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[5].cells[1].paragraphs[0].text).replace('#cpf#', cadastro['cpf'])
-            ficha_cadastral.tables[1].rows[6].cells[3].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[6].cells[3].paragraphs[0].text).replace('#pai#', cadastro['pai'])
-            ficha_cadastral.tables[1].rows[7].cells[1].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[7].cells[1].paragraphs[0].text).replace('#mae#', cadastro['mae'])
-            ficha_cadastral.tables[1].rows[8].cells[0].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[8].cells[0].paragraphs[0].text).replace('#end_eletr', cadastro['email'])
-            ficha_cadastral.tables[1].rows[8].cells[1].paragraphs[0].text = str(
-                ficha_cadastral.tables[1].rows[8].cells[1].paragraphs[0].text).replace('#depart', str(sh["AG3"].value))
-            ficha_cadastral.save(pasta_contratuais + f'\\Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.docx')
-            docx2pdf.convert(pasta_contratuais + f'\\Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.docx',
-                             pasta_contratuais + f'\\Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.pdf')
-            os.remove(pasta_contratuais + f'\\Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.docx')
-
-            carta_banco = docx.Document(
-                modelo + r'\Abertura Conta MODELO.docx')
-            carta_banco.paragraphs[14].text = str(carta_banco.paragraphs[14].text).replace('#nome_completo',
-                                                                                           cadastro['nome']
-                                                                                           ).replace('#rg',
-                                                                                                     cadastro['rg']
-                                                                                                     ).replace(
-                '#cpf', cadastro['cpf']).replace('#endereço', cadastro['end']).replace('#cep', cadastro['cep']).replace(
-                '#bairro', cadastro['bairro']).replace('#desde#', dt.strftime(hoje, '%d/%m/%Y'))
-            carta_banco.save(pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.docx')
-            docx2pdf.convert(pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.docx',
-                             pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.pdf')
-            os.remove(pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.docx')
-
-            # set up smtpp connection
-            s = smtplib.SMTP(host=host, port=port)
-            s.starttls()
-            s.login(email_remetente, senha)
-
-            # send e-mail to intern with a pdf file so he/she can go to bank to open an account
-            msg = MIMEMultipart('alternative')
-            arquivo = pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.pdf'
-            text = MIMEText(f'''Olá, {str(cadastro["nome"]).split(" ")[0]}!<br><br>
-            Segue sua carta para abertura de conta bancária no Itaú.<br>
-            Você deve abrir a conta antes de iniciar os trabalhos no estágio. Ok?<br><br>
-            Seu contrato já foi solicitado ao IF por e-mail, com você em cópia.<br>
-            Você já pode ir até o IF retirar seu contrato. Será necessário levar uma declaração de matrícula do seu curso.<br>
-            Ao chegar no IF, caso eles não tenham recebido o pedido do seu contrato, favor encaminhar para eles o e-mail do pedido, que você está em cópia.<br><br>
-            Atenciosamente,<br>
-            <img src="cid:image1">''', 'html')
-            msg.attach(text)
-            image = MIMEImage(
-                open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\assinatura.png',
-                     'rb').read())
-            image.add_header('Content-ID', '<image1>')
-            msg.attach(image)
-            # set up the parameters of the message
-            msg['From'] = email_remetente
-            msg['To'] = cadastro['email']
-            msg['Subject'] = "Carta para Abertura de conta"
-            # attach pdf file
-            part = MIMEBase('application', "octet-stream")
-            part.set_payload(open(arquivo, "rb").read())
-            encoders.encode_base64(part)
-            part.add_header('Content-Disposition', 'attachment',
-                            filename=f'Carta Banco {str(cadastro["nome"]).split(" ")[0]}.pdf')
-            msg.attach(part)
-            s.sendmail(email_remetente, cadastro['email'], msg.as_string())
-            del msg
-
-            # send e-mail to coworker asking to register the intern
-            msg = MIMEMultipart('alternative')
-            arquivo = pasta_contratuais + f'\\Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.pdf'
-            text = MIMEText(f'''Oi, Wallace!<br><br>
-            Segue a ficha cadastral do(a) estagiário(a) {cadastro["nome"]}.<br><br>
-            Abs.,<br>
-            <img src="cid:image1">''', 'html')
-            msg.attach(text)
-            image = MIMEImage(
-                open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\assinatura.png',
-                     'rb').read())
-            # Define the image's ID as referenced in the HTML body above
-            image.add_header('Content-ID', '<image1>')
-            msg.attach(image)
-            # set up the parameters of the message
-            msg['From'] = email_remetente
-            msg['To'] = em_ti
-            msg['Subject'] = f"Ficha Cadastral {str(cadastro['nome']).split(' ')[0]}"
-            # attach pdf file
-            part = MIMEBase('application', "octet-stream")
-            part.set_payload(open(arquivo, "rb").read())
-            encoders.encode_base64(part)
-            part.add_header('Content-Disposition', 'attachment',
-                            filename=f'Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.pdf')
-            msg.attach(part)
-            s.sendmail(email_remetente, em_ti, msg.as_string())
-            del msg
-
-            # send document asking for the intern contract
-            msg = MIMEMultipart('alternative')
-            arquivo = pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf'
-            text = MIMEText(
-                f'''Olá!<br><br>Segue pedido de TCE do(a) estagiário(a) {cadastro["nome"]}.
-                <br><br>Atenciosamente,<br><img src="cid:image1">''',
-                'html')
-            msg.attach(text)
-            image = MIMEImage(
-                open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\assinatura.png',
-                     'rb').read())
-            # Define the image's ID as referenced in the HTML body above
-            image.add_header('Content-ID', '<image1>')
-            msg.attach(image)
-            # set up the parameters of the message
-            msg['From'] = email_remetente
-            msg['To'] = em_if
-            msg['Cc'] = cadastro['email']
-            msg['Subject'] = f"Pedido TCE {str(cadastro['nome']).split(' ')[0]}"
-            # attach pdf file
-            part = MIMEBase('application', "octet-stream")
-            part.set_payload(open(arquivo, "rb").read())
-            encoders.encode_base64(part)
-            part.add_header('Content-Disposition', 'attachment',
-                            filename=f'Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf')
-            msg.attach(part)
-            s.sendmail(email_remetente, [em_if, cadastro['email'], em_pnt], msg.as_string())
-            del msg
-            s.quit()
-            tkinter.messagebox.showinfo(title='E-mails ok!', message='E-mails enviados com sucesso')
+        if tce == '':
+            tkinter.messagebox.showinfo(
+                title='Erro de preenchimento',
+                message='O TCE em PDF deve ser anexado!'
+            )
         else:
-            if editar == 0:
+            if solicitar_contr == 1:
+                hoje = dt.today()
                 wb = l_w(caminho)
                 sh = wb['Respostas ao formulário 1']
                 num, name = nome.strip().split(' - ')
                 linha = int(num)
-                lotacao = {'UNIDADE PARK SUL - QUALQUER DEPARTAMENTO': '0013', 'KIDS': '0010', 'MUSCULAÇÃO': '0007',
-                           'ESPORTES E LUTAS': '0008', 'CROSSFIT': '0012', 'GINÁSTICA': '0006', 'GESTANTES': '0008',
-                           'RECEPÇÃO': '0003',
-                           'FINANCEIRO': '0001', 'TI': '0001', 'MARKETING': '0001', 'MANUTENÇÃO': '0004'}
-                if str(sh[f'E{linha}'].value) == 'Masculino':
-                    cargo = 'ESTAGIARIO'
-                else:
-                    cargo = 'ESTAGIARIA'
-
-                estag = session.query(Colaborador).filter_by(matricula=matricula).first()
-                if estag:
-                    pass
-                else:
-                    estag_cadastrado = Colaborador(
-                        matricula=matricula, nome=name.upper(), admiss=admissao,
-                        nascimento=str(sh[f'D{linha}'].value),
-                        cpf=str(sh[f'V{linha}'].value).replace('.', '').replace('-', '').zfill(11),
-                        rg=str(int(sh[f'W{linha}'].value)),
-                        emissor='SSP/DF', email=str(sh[f'B{linha}'].value),
-                        genero=str(sh[f'E{linha}'].value),
-                        estado_civil=str(sh[f'F{linha}'].value), cor='9',
-                        instru='08 - Educação Superior Incompleta',
-                        nacional='Brasileiro(a)',
-                        pai=str(sh[f'M{linha}'].value).upper(),
-                        mae=str(sh[f'N{linha}'].value).upper(), endereco=str(sh[f'O{linha}'].value),
-                        num='1',
-                        bairro=str(sh[f'Q{linha}'].value),
-                        cep=str(sh[f'R{linha}'].value).replace('.', '').replace('-', ''),
-                        cidade='Brasília', cid_nas='Brasília - DF',
-                        uf='DF',
-                        cod_municipioend=municipios['DF']['Brasília'],
-                        tel=str(sh[f'U{linha}'].value).replace('(', '').replace(')', '').replace('.', '').replace(
-                            '-',
-                            ''),
-                        depto=depto, cargo=cargo,
-                        horario=str(sh[f'AI{linha}'].value), salario=salario, tipo_contr=tipo_contr,
-                        hr_sem='25', hr_mens='100',
-                        est_semestre=str(sh[f'AS{linha}'].value),
-                        est_turno=str(sh[f'AT{linha}'].value),
-                        est_prev_conclu=str(sh[f'AU{linha}'].value),
-                        est_faculdade=str(sh[f'AV{linha}'].value),
-                        est_endfacul='End',
-                        est_numendfacul='1',
-                        est_bairroendfacul='Bairro',
-                        ag=agencia, conta=conta, cdigito=digito
-
-                    )
-                    session.add(estag_cadastrado)
-                    session.commit()
-                estag = session.query(Colaborador).filter_by(matricula=matricula).first()
+                lotacao = {
+                    'Unidade Park Sul - Qualquer Departamento': ['0013', lidermusc, elidermusc, 'Líder Park Sul'],
+                    'Kids': ['0010', liderkids, eliderkids, 'Líder Kids'],
+                    'Musculação': ['0007', lidermusc, elidermusc, 'Líder Musculação'],
+                    'Esportes E Lutas': ['0008', lidernat, elidernat, 'Líder Natação'],
+                    'Crossfit': ['0012', lidercross, elidercross, 'Líder Crossfit'],
+                    'Ginástica': ['0006', lidergin, elidergin, 'Líder Ginástica'],
+                    'Gestantes': ['0006', gerentetec, egerentetec, 'Gerente Técnico'],
+                    'Recepção': ['0003', gerentevend, egerentevend, 'Gerente Vendas'],
+                    'Administrativo': ['0001', gerenterh, egerenterh, 'Gerente RH'],
+                    'Manutenção': ['0004', gerentemanut, egerentemanut, 'Gerente Manutenção'],
+                }
+                cadastro = {'nome': str(sh[f"C{linha}"].value).title().strip(), 'nasc_ed': sh[f"D{linha}"].value,
+                            'genero': str(sh[f"E{linha}"].value), 'est_civ': str(sh[f"F{linha}"].value),
+                            'pai': str(sh[f"M{linha}"].value), 'mae': str(sh[f"N{linha}"].value),
+                            'end': str(sh[f"O{linha}"].value),
+                            'num': str(sh[f"P{linha}"].value), 'bairro': str(sh[f"Q{linha}"].value),
+                            'cep': str(sh[f"R{linha}"].value).replace('.', '').replace('-', ''),
+                            'cid_end': str(sh[f"S{linha}"].value), 'uf_end': str(sh[f"T{linha}"].value),
+                            'tel': str(sh[f"U{linha}"].value).replace('(', '').replace(')', '').replace('-', '').replace(
+                                ' ',
+                                ''),
+                            'mun_end': str(sh[f"AP{linha}"].value),
+                            'cpf': str(sh[f"V{linha}"].value).strip().replace('.', '').replace('-', '').replace(' ',
+                                                                                                                '').zfill(
+                                11),
+                            'rg': str(sh[f"W{linha}"].value).strip().replace('.', '').replace('-', '').replace(' ', ''),
+                            'emissor': str(sh[f"X{linha}"].value),
+                            'lotacao': str(lotacao[f'{sh[f"AG{linha}"].value}'][0]).zfill(4),
+                            'cargo': str(sh[f"AH{linha}"].value), 'horario': str(sh[f"AI{linha}"].value),
+                            'email': str(sh[f"B{linha}"].value).strip(),
+                            'admissao_ed': str(sh[f"AL{linha}"].value),
+                            'faculdade': str(sh[f"AV{linha}"].value), 'semestre': str(sh[f"AS{linha}"].value),
+                            'turno': str(sh[f"AT{linha}"].value), 'conclusao': str(sh[f"AU{linha}"].value),
+                            'salario': str(sh[f"AM{linha}"].value),
+                            'hrsemanais': str(sh[f"AQ{linha}"].value), 'hrmensais': str(sh[f"AR{linha}"].value)}
+                email_remetente = em_rem
+                senha = k1
+                lot = lotacao[f'{sh[f"AG{linha}"].value}']
                 pasta = r'\192.168.0.250'
+                modelo = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\' \
+                         f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\Modelo'
                 try:
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
-                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
-                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                        f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                        f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
-                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
-                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Atestados')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                        f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                        f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Atestados')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
-                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
-                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Diversos')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                        f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                        f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Diversos')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
-                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
-                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Contratuais')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                        f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                        f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Contratuais')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
-                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
-                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ferias')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                        f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                        f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Ferias')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
-                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
-                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ponto')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                        f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                        f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Ponto')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
-                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
-                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Recibo')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                        f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                        f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Recibo')
                     os.makedirs(
-                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
-                        f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
-                        f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Rescisao')
+                        f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\02 - Funcionários, Departamentos e Férias\\'
+                        f'000 - Pastas Funcionais\\00 - ATIVOS\\0 - Estagiários\\'
+                        f'0 - Ainda nao iniciaram\\{str(cadastro["nome"]).upper()}\\Rescisao')
                 except FileExistsError:
                     pass
-                # abrir cadastro no dexion e atualizar informações campo a campo
-                pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
-                pastapessoa = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\' \
-                              f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\' \
-                              f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{pessoa.nome}'
-                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Dexion.png')))
-                pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
-                    'i'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter')
-                if ondestou == 0:
-                    t.sleep(40)
-                else:
-                    t.sleep(60)
-                pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.cpf)
-                t.sleep(1), pa.press('tab', 3), pa.write(pessoa.genero), pa.press('tab'), pa.write(pessoa.cor)
-                t.sleep(1), pa.press('tab', 2), pa.write(pessoa.instru)
-                t.sleep(1), pa.press('tab')
-                if str(pessoa.estado_civil) == 'Casado(a)':
-                    pa.write('2')
-                    pa.press('tab', 6)
-                else:
-                    pa.write('1')
-                    pa.press('tab', 5)
-                pa.write(dt.strftime(dt.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
-                t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
-                t.sleep(1), pa.write(pessoa.uf), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press('tab')
-                t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press(
-                    'tab')
-                t.sleep(1), pp.copy(pessoa.mae), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105')
-                # # clique em documentos
-                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Documentos.png')))
-                pa.press('tab'), pa.write(str(pessoa.rg)), pa.press('tab'), pa.write(
-                    pessoa.emissor), pa.press('tab', 3), pa.write(pessoa.cod_municipioend)
-                pa.press('tab', 9), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
-                pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press('tab')
-                # #clique em endereço
-                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Endereco.png')))
-                pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
-                    'tab'), pa.write(pessoa.num), pa.press('tab', 2)
-                pp.copy(pessoa.bairro), pa.hotkey('ctrl', 'v'), pa.press('tab'), pp.copy(pessoa.cidade), pa.hotkey(
-                    'ctrl', 'v'), pa.press('tab'), pa.write(pessoa.uf)
-                pa.press('tab'), pa.write(pessoa.cep), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press(
-                    'tab'), pa.write(str(pessoa.tel)), pa.press('tab', 2), pa.write(pessoa.email)
-                # #clique em dados contratuais
-                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Contratuais.png')))
-                pa.press('tab'), pa.write(str(pessoa.admiss).replace('/', '')), t.sleep(1)
-                pa.press('tab'), pa.write('9')
-                pa.press('tab', 7), pa.write('n'), pa.press('tab'), pa.write('4')
-                pa.press('tab'), pa.write('Ed. Fisica')
-                pa.press('tab', 2), pa.write(str(int(str(pessoa.admiss).replace('/', '')) + 2).zfill(8))
-                t.sleep(2)
-                # #clique em instituição de ensino
-                while 1 < 2:
-                    if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/faculdade.png'))):
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/faculdade.png')))
-                        break
-                    else:
-                        t.sleep(5)
-                pa.press('tab'), pp.copy(pessoa.est_faculdade), pa.hotkey('ctrl', 'v')
-                pa.press('tab'), pp.copy(pessoa.est_endfacul), pa.hotkey('ctrl', 'v')
-                pa.press('tab'), pp.copy(pessoa.est_numendfacul), pa.hotkey('ctrl', 'v')
-                pa.press('tab'), pp.copy(pessoa.est_bairroendfacul), pa.hotkey('ctrl', 'v')
-                # #clique em Outros
-                while 1 < 2:
-                    if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png'))):
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
-                        break
-                    else:
-                        t.sleep(5)
-                t.sleep(2), pa.write('CARGO GERAL')
-                pa.press('tab'), pa.write(pessoa.cargo)
-                t.sleep(1), pa.press('tab'), pa.write(pessoa.salario), pa.press('tab')
-                if str(pessoa.tipo_contr) == 'Horista':
-                    pa.press('1')
-                else:
-                    pa.press('5')
-                pa.press('tab', 2), t.sleep(1), pa.write(str(pessoa.hr_sem)), pa.press('tab'), t.sleep(1)
-                pa.write(str(pessoa.hr_mens))
-                # #clique em eventos trabalhistas
-                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/EVTrab.png')))
-                t.sleep(1)
-                # #clique em lotação
-                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Lotacoes.png')))
-                pa.press('tab'), pa.press('tab'), pa.write('i'), pa.write(str(pessoa.admiss).replace('/', ''))
-                t.sleep(1), pa.press('enter'), t.sleep(1)
-                pp.copy(lotacao[f'{pessoa.depto}']), pa.hotkey('ctrl', 'v'), pa.press('enter'), pa.write('f')
-                pa.press('tab'), pa.write('4')
-                # #clique em salvar lotação
-                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarbtn.png'))), t.sleep(1)
-                # #clique em fechar lotação
-                while 1 < 2:
-                    if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png'))):
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png')))
-                        break
-                    else:
-                        t.sleep(5)
-                # #clique em Compatibilidade
-                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade3.png'))), t.sleep(1)
-                # #clique em Compatibilidade de novo
-                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade2.png'))), t.sleep(1)
-                pa.press('tab', 2), pa.write('9')
-                # #clique em Salvar
-                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarcadastro.png'))), t.sleep(10)
-                # #clique em fechar novo cadastro
-                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharnovo1.png'))), t.sleep(2)
-                # #clique em fechar trabalhadores
-                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fechartrab1.png'))), t.sleep(0.5)
-                os.rename(pastapessoa,
-                          f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
-                          f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
-                          f'00 - ATIVOS\\0 - Estagiários\\{pessoa.nome}')
-                while 1 < 2:
-                    if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png'))):
-                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png')))
-                        break
-                    else:
-                        t.sleep(5)
-                tkinter.messagebox.showinfo(
-                    title='Cadastro ok!',
-                    message='Cadastro realizado com sucesso!'
-                )
+                pasta_contratuais = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\' \
+                                    f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\' \
+                                    f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\' \
+                                    f'{str(cadastro["nome"]).upper()}\\Contratuais'
+
+                # change tree docx models files with intern data and save pdfs files
+                solicitacao = docx.Document(modelo + r'\Solicitacao MODELO - Copia.docx')
+                solicitacao.tables[0].rows[4].cells[0].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[4].cells[0].paragraphs[0].text).replace('#supervisor_estagio', f'{lot[1]}')
+                solicitacao.tables[0].rows[5].cells[1].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[5].cells[1].paragraphs[0].text).replace('#cargo', f'{lot[3]}')
+                solicitacao.tables[0].rows[6].cells[0].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[6].cells[0].paragraphs[0].text).replace('#email_supervisor', f'{lot[2]}')
+                solicitacao.tables[0].rows[9].cells[0].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[9].cells[0].paragraphs[0].text).replace('#horario', cadastro['horario'])
+                solicitacao.tables[0].rows[14].cells[0].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[14].cells[0].paragraphs[0].text).replace('#nome_completo', cadastro['nome'])
+                solicitacao.tables[0].rows[15].cells[0].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[15].cells[0].paragraphs[0].text).replace('#nasc',
+                                                                                        dt.strftime(cadastro['nasc_ed'],
+                                                                                                    '%d/%m/%Y')
+                                                                                        ).replace('#rg',
+                                                                                                  cadastro['rg']).replace(
+                    '#cpf', cadastro['cpf'])
+                solicitacao.tables[0].rows[16].cells[0].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[16].cells[0].paragraphs[0].text).replace('#sexo', cadastro['genero'])
+                solicitacao.tables[0].rows[17].cells[0].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[17].cells[0].paragraphs[0].text).replace('#endereco', cadastro['end'])
+                solicitacao.tables[0].rows[18].cells[0].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[18].cells[0].paragraphs[0].text).replace('#cep', cadastro['cep']).replace(
+                    '#bairro', cadastro['bairro'])
+                solicitacao.tables[0].rows[19].cells[0].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[19].cells[0].paragraphs[0].text).replace('#telefone',
+                                                                                        str(cadastro['tel']).replace('.0',
+                                                                                                                     ''))
+                solicitacao.tables[0].rows[20].cells[0].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[20].cells[0].paragraphs[0].text).replace('#end_eletr', cadastro['email'])
+                solicitacao.tables[0].rows[22].cells[0].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[22].cells[0].paragraphs[0].text).replace('#semestre',
+                                                                                        str(cadastro['semestre']).replace(
+                                                                                            '.0', ''))
+                solicitacao.tables[0].rows[23].cells[0].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[23].cells[0].paragraphs[0].text).replace('#turno',
+                                                                                        cadastro['turno']).replace(
+                    '#ano_concl', str(cadastro['conclusao']).replace('.0', ''))
+                solicitacao.tables[0].rows[24].cells[0].paragraphs[0].text = str(
+                    solicitacao.tables[0].rows[24].cells[0].paragraphs[0].text).replace('#faculdade', cadastro['faculdade'])
+                solicitacao.save(pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.docx')
+                docx2pdf.convert(pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.docx',
+                                 pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf')
+                os.remove(pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.docx')
+
+                ficha_cadastral = docx.Document(modelo + r'\Ficha Cadastral MODELO - Copia.docx')
+                ficha_cadastral.tables[1].rows[0].cells[0].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[0].cells[0].paragraphs[0].text).replace('#nome_completo',
+                                                                                           cadastro['nome'])
+                ficha_cadastral.tables[1].rows[1].cells[0].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[1].cells[0].paragraphs[0].text) \
+                    .replace('#nasc', dt.strftime(cadastro['nasc_ed'], '%d/%m/%Y'))
+                ficha_cadastral.tables[1].rows[1].cells[2].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[1].cells[2].paragraphs[0].text).replace('#gen', cadastro['genero'])
+                ficha_cadastral.tables[1].rows[1].cells[4].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[1].cells[4].paragraphs[0].text).replace('#est_civ', cadastro['est_civ'])
+                ficha_cadastral.tables[1].rows[2].cells[0].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[2].cells[0].paragraphs[0].text).replace('#local', cadastro['end'])
+                ficha_cadastral.tables[1].rows[2].cells[4].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[2].cells[4].paragraphs[0].text).replace('#qd', cadastro['bairro'])
+                ficha_cadastral.tables[1].rows[2].cells[7].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[2].cells[7].paragraphs[0].text).replace('#codigo', cadastro['cep'])
+                ficha_cadastral.tables[1].rows[4].cells[1].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[4].cells[1].paragraphs[0].text).replace('#telefone', cadastro['tel'])
+                ficha_cadastral.tables[1].rows[4].cells[5].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[4].cells[5].paragraphs[0].text).replace('#ident', cadastro['rg'])
+                ficha_cadastral.tables[1].rows[5].cells[1].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[5].cells[1].paragraphs[0].text).replace('#cpf#', cadastro['cpf'])
+                ficha_cadastral.tables[1].rows[6].cells[3].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[6].cells[3].paragraphs[0].text).replace('#pai#', cadastro['pai'])
+                ficha_cadastral.tables[1].rows[7].cells[1].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[7].cells[1].paragraphs[0].text).replace('#mae#', cadastro['mae'])
+                ficha_cadastral.tables[1].rows[8].cells[0].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[8].cells[0].paragraphs[0].text).replace('#end_eletr', cadastro['email'])
+                ficha_cadastral.tables[1].rows[8].cells[1].paragraphs[0].text = str(
+                    ficha_cadastral.tables[1].rows[8].cells[1].paragraphs[0].text).replace('#depart', str(sh["AG3"].value))
+                ficha_cadastral.save(pasta_contratuais + f'\\Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.docx')
+                docx2pdf.convert(pasta_contratuais + f'\\Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.docx',
+                                 pasta_contratuais + f'\\Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.pdf')
+                os.remove(pasta_contratuais + f'\\Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.docx')
+
+                carta_banco = docx.Document(
+                    modelo + r'\Abertura Conta MODELO.docx')
+                carta_banco.paragraphs[14].text = str(carta_banco.paragraphs[14].text).replace('#nome_completo',
+                                                                                               cadastro['nome']
+                                                                                               ).replace('#rg',
+                                                                                                         cadastro['rg']
+                                                                                                         ).replace(
+                    '#cpf', cadastro['cpf']).replace('#endereço', cadastro['end']).replace('#cep', cadastro['cep']).replace(
+                    '#bairro', cadastro['bairro']).replace('#desde#', dt.strftime(hoje, '%d/%m/%Y'))
+                carta_banco.save(pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.docx')
+                docx2pdf.convert(pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.docx',
+                                 pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.pdf')
+                os.remove(pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.docx')
+
+                # set up smtpp connection
+                s = smtplib.SMTP(host=host, port=port)
+                s.starttls()
+                s.login(email_remetente, senha)
+
+                # send e-mail to intern with a pdf file so he/she can go to bank to open an account
+                msg = MIMEMultipart('alternative')
+                arquivo = pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.pdf'
+                text = MIMEText(f'''Olá, {str(cadastro["nome"]).split(" ")[0]}!<br><br>
+                Segue sua carta para abertura de conta bancária no Itaú.<br>
+                Você deve abrir a conta antes de iniciar os trabalhos no estágio. Ok?<br><br>
+                Seu contrato já foi solicitado ao IF por e-mail, com você em cópia.<br>
+                Você já pode ir até o IF retirar seu contrato. Será necessário levar uma declaração de matrícula do seu curso.<br>
+                Ao chegar no IF, caso eles não tenham recebido o pedido do seu contrato, favor encaminhar para eles o e-mail do pedido, que você está em cópia.<br><br>
+                Atenciosamente,<br>
+                <img src="cid:image1">''', 'html')
+                msg.attach(text)
+                image = MIMEImage(
+                    open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\assinatura.png',
+                         'rb').read())
+                image.add_header('Content-ID', '<image1>')
+                msg.attach(image)
+                # set up the parameters of the message
+                msg['From'] = email_remetente
+                msg['To'] = cadastro['email']
+                msg['Subject'] = "Carta para Abertura de conta"
+                # attach pdf file
+                part = MIMEBase('application', "octet-stream")
+                part.set_payload(open(arquivo, "rb").read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', 'attachment',
+                                filename=f'Carta Banco {str(cadastro["nome"]).split(" ")[0]}.pdf')
+                msg.attach(part)
+                s.sendmail(email_remetente, cadastro['email'], msg.as_string())
+                del msg
+
+                # send e-mail to coworker asking to register the intern
+                msg = MIMEMultipart('alternative')
+                arquivo = pasta_contratuais + f'\\Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.pdf'
+                text = MIMEText(f'''Oi, Wallace!<br><br>
+                Segue a ficha cadastral do(a) estagiário(a) {cadastro["nome"]}.<br><br>
+                Abs.,<br>
+                <img src="cid:image1">''', 'html')
+                msg.attach(text)
+                image = MIMEImage(
+                    open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\assinatura.png',
+                         'rb').read())
+                # Define the image's ID as referenced in the HTML body above
+                image.add_header('Content-ID', '<image1>')
+                msg.attach(image)
+                # set up the parameters of the message
+                msg['From'] = email_remetente
+                msg['To'] = em_ti
+                msg['Subject'] = f"Ficha Cadastral {str(cadastro['nome']).split(' ')[0]}"
+                # attach pdf file
+                part = MIMEBase('application', "octet-stream")
+                part.set_payload(open(arquivo, "rb").read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', 'attachment',
+                                filename=f'Ficha Cadastral {str(cadastro["nome"]).split(" ")[0]}.pdf')
+                msg.attach(part)
+                s.sendmail(email_remetente, em_ti, msg.as_string())
+                del msg
+
+                # send document asking for the intern contract
+                msg = MIMEMultipart('alternative')
+                arquivo = pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf'
+                text = MIMEText(
+                    f'''Olá!<br><br>Segue pedido de TCE do(a) estagiário(a) {cadastro["nome"]}.
+                    <br><br>Atenciosamente,<br><img src="cid:image1">''',
+                    'html')
+                msg.attach(text)
+                image = MIMEImage(
+                    open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\assinatura.png',
+                         'rb').read())
+                # Define the image's ID as referenced in the HTML body above
+                image.add_header('Content-ID', '<image1>')
+                msg.attach(image)
+                # set up the parameters of the message
+                msg['From'] = email_remetente
+                msg['To'] = em_if
+                msg['Cc'] = cadastro['email']
+                msg['Subject'] = f"Pedido TCE {str(cadastro['nome']).split(' ')[0]}"
+                # attach pdf file
+                part = MIMEBase('application', "octet-stream")
+                part.set_payload(open(arquivo, "rb").read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', 'attachment',
+                                filename=f'Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf')
+                msg.attach(part)
+                s.sendmail(email_remetente, [em_if, cadastro['email'], em_pnt], msg.as_string())
+                del msg
+                s.quit()
+                tkinter.messagebox.showinfo(title='E-mails ok!', message='E-mails enviados com sucesso')
             else:
-                if ondestou == 0:
-                    # Editando o cadastro na Cia
-                    wb = l_w(caminho)
-                    sh = wb['Respostas ao formulário 1']
-                    num, name = nome.strip().split(' - ')
-                    linha = int(num)
-                    lotacao = {
-                        'Unidade Park Sul - Qualquer Departamento': ['0013', lidermusc, elidermusc, 'Líder Park Sul'],
-                        'Kids': ['0010', liderkids, eliderkids, 'Líder Kids'],
-                        'Musculação': ['0007', lidermusc, elidermusc, 'Líder Musculação'],
-                        'Esportes E Lutas': ['0008', lidernat, elidernat, 'Líder Natação'],
-                        'Crossfit': ['0012', lidercross, elidercross, 'Líder Crossfit'],
-                        'Ginástica': ['0006', lidergin, elidergin, 'Líder Ginástica'],
-                        'Gestantes': ['0006', gerentetec, egerentetec, 'Gerente Técnico'],
-                        'Recepção': ['0003', gerentevend, egerentevend, 'Gerente Vendas'],
-                        'Administrativo': ['0001', gerenterh, egerenterh, 'Gerente RH'],
-                        'Manutenção': ['0004', gerentemanut, egerentemanut, 'Gerente Manutenção'],
-                    }
-                else:
-                    # Editando o cadastro em Casa
+                if editar == 0:
                     wb = l_w(caminho)
                     sh = wb['Respostas ao formulário 1']
                     num, name = nome.strip().split(' - ')
@@ -1742,7 +1518,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                         estag_cadastrado = Colaborador(
                             matricula=matricula, nome=name.upper(), admiss=admissao,
                             nascimento=str(sh[f'D{linha}'].value),
-                            cpf=str(int(sh[f'V{linha}'].value)).zfill(11),
+                            cpf=str(sh[f'V{linha}'].value).replace('.', '').replace('-', '').zfill(11),
                             rg=str(int(sh[f'W{linha}'].value)),
                             emissor='SSP/DF', email=str(sh[f'B{linha}'].value),
                             genero=str(sh[f'E{linha}'].value),
@@ -1771,9 +1547,11 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                             est_numendfacul='1',
                             est_bairroendfacul='Bairro',
                             ag=agencia, conta=conta, cdigito=digito
+
                         )
                         session.add(estag_cadastrado)
                         session.commit()
+                    estag = session.query(Colaborador).filter_by(matricula=matricula).first()
                     pasta = r'\192.168.0.250'
                     try:
                         os.makedirs(
@@ -1812,9 +1590,16 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                         pass
                     # abrir cadastro no dexion e atualizar informações campo a campo
                     pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
+                    pastapessoa = f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\' \
+                                  f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\' \
+                                  f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{pessoa.nome}'
                     pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Dexion.png')))
                     pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
-                        'a'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(20)
+                        'i'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter')
+                    if ondestou == 0:
+                        t.sleep(40)
+                    else:
+                        t.sleep(60)
                     pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.cpf)
                     t.sleep(1), pa.press('tab', 3), pa.write(pessoa.genero), pa.press('tab'), pa.write(pessoa.cor)
                     t.sleep(1), pa.press('tab', 2), pa.write(pessoa.instru)
@@ -1852,15 +1637,21 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                     pa.press('tab', 7), pa.write('n'), pa.press('tab'), pa.write('4')
                     pa.press('tab'), pa.write('Ed. Fisica')
                     pa.press('tab', 2), pa.write(str(int(str(pessoa.admiss).replace('/', '')) + 2).zfill(8))
+                    t.sleep(2)
                     # #clique em instituição de ensino
-                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/faculdade.png')))
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/faculdade.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/faculdade.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     pa.press('tab'), pp.copy(pessoa.est_faculdade), pa.hotkey('ctrl', 'v')
                     pa.press('tab'), pp.copy(pessoa.est_endfacul), pa.hotkey('ctrl', 'v')
                     pa.press('tab'), pp.copy(pessoa.est_numendfacul), pa.hotkey('ctrl', 'v')
                     pa.press('tab'), pp.copy(pessoa.est_bairroendfacul), pa.hotkey('ctrl', 'v')
                     # #clique em Outros
                     while 1 < 2:
-                        if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png'))):
+                        if pa.locateOnScreen('../models/static/imgs/Outros.png'):
                             pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
                             break
                         else:
@@ -1874,6 +1665,24 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                         pa.press('5')
                     pa.press('tab', 2), t.sleep(1), pa.write(str(pessoa.hr_sem)), pa.press('tab'), t.sleep(1)
                     pa.write(str(pessoa.hr_mens))
+                    # #clique em eventos trabalhistas
+                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/EVTrab.png')))
+                    t.sleep(1)
+                    # #clique em lotação
+                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Lotacoes.png')))
+                    pa.press('tab'), pa.press('tab'), pa.write('i'), pa.write(str(pessoa.admiss).replace('/', ''))
+                    t.sleep(1), pa.press('enter'), t.sleep(1)
+                    pp.copy(lotacao[f'{pessoa.depto}']), pa.hotkey('ctrl', 'v'), pa.press('enter'), pa.write('f')
+                    pa.press('tab'), pa.write('4')
+                    # #clique em salvar lotação
+                    pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarbtn.png'))), t.sleep(1)
+                    # #clique em fechar lotação
+                    while 1 < 2:
+                        if pa.locateOnScreen('../models/static/imgs/Fecharlot.png'):
+                            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharlot.png')))
+                            break
+                        else:
+                            t.sleep(5)
                     # #clique em Compatibilidade
                     pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade3.png'))), t.sleep(1)
                     # #clique em Compatibilidade de novo
@@ -1885,16 +1694,218 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                     pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharnovo1.png'))), t.sleep(2)
                     # #clique em fechar trabalhadores
                     pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fechartrab1.png'))), t.sleep(0.5)
+                    os.rename(pastapessoa,
+                              f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                              f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                              f'00 - ATIVOS\\0 - Estagiários\\{pessoa.nome}')
+                    shutil.move(tce,
+                              f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                              f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                              f'00 - ATIVOS\\0 - Estagiários\\{pessoa.nome}\\Contratuais\\TCE {pessoa.nome}.pdf')
                     while 1 < 2:
-                        if pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png'))):
+                        if pa.locateOnScreen('../models/static/imgs/pyt.png'):
                             pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png')))
                             break
                         else:
                             t.sleep(5)
                     tkinter.messagebox.showinfo(
                         title='Cadastro ok!',
-                        message='Cadastro editado com sucesso!'
+                        message='Cadastro realizado com sucesso!'
                     )
+                else:
+                    if ondestou == 0:
+                        # Editando o cadastro na Cia
+                        wb = l_w(caminho)
+                        sh = wb['Respostas ao formulário 1']
+                        num, name = nome.strip().split(' - ')
+                        linha = int(num)
+                        lotacao = {
+                            'Unidade Park Sul - Qualquer Departamento': ['0013', lidermusc, elidermusc, 'Líder Park Sul'],
+                            'Kids': ['0010', liderkids, eliderkids, 'Líder Kids'],
+                            'Musculação': ['0007', lidermusc, elidermusc, 'Líder Musculação'],
+                            'Esportes E Lutas': ['0008', lidernat, elidernat, 'Líder Natação'],
+                            'Crossfit': ['0012', lidercross, elidercross, 'Líder Crossfit'],
+                            'Ginástica': ['0006', lidergin, elidergin, 'Líder Ginástica'],
+                            'Gestantes': ['0006', gerentetec, egerentetec, 'Gerente Técnico'],
+                            'Recepção': ['0003', gerentevend, egerentevend, 'Gerente Vendas'],
+                            'Administrativo': ['0001', gerenterh, egerenterh, 'Gerente RH'],
+                            'Manutenção': ['0004', gerentemanut, egerentemanut, 'Gerente Manutenção'],
+                        }
+                    else:
+                        # Editando o cadastro em Casa
+                        wb = l_w(caminho)
+                        sh = wb['Respostas ao formulário 1']
+                        num, name = nome.strip().split(' - ')
+                        linha = int(num)
+                        lotacao = {'UNIDADE PARK SUL - QUALQUER DEPARTAMENTO': '0013', 'KIDS': '0010', 'MUSCULAÇÃO': '0007',
+                                   'ESPORTES E LUTAS': '0008', 'CROSSFIT': '0012', 'GINÁSTICA': '0006', 'GESTANTES': '0008',
+                                   'RECEPÇÃO': '0003',
+                                   'FINANCEIRO': '0001', 'TI': '0001', 'MARKETING': '0001', 'MANUTENÇÃO': '0004'}
+                        if str(sh[f'E{linha}'].value) == 'Masculino':
+                            cargo = 'ESTAGIARIO'
+                        else:
+                            cargo = 'ESTAGIARIA'
+
+                        estag = session.query(Colaborador).filter_by(matricula=matricula).first()
+                        if estag:
+                            pass
+                        else:
+                            estag_cadastrado = Colaborador(
+                                matricula=matricula, nome=name.upper(), admiss=admissao,
+                                nascimento=str(sh[f'D{linha}'].value),
+                                cpf=str(int(sh[f'V{linha}'].value)).zfill(11),
+                                rg=str(int(sh[f'W{linha}'].value)),
+                                emissor='SSP/DF', email=str(sh[f'B{linha}'].value),
+                                genero=str(sh[f'E{linha}'].value),
+                                estado_civil=str(sh[f'F{linha}'].value), cor='9',
+                                instru='08 - Educação Superior Incompleta',
+                                nacional='Brasileiro(a)',
+                                pai=str(sh[f'M{linha}'].value).upper(),
+                                mae=str(sh[f'N{linha}'].value).upper(), endereco=str(sh[f'O{linha}'].value),
+                                num='1',
+                                bairro=str(sh[f'Q{linha}'].value),
+                                cep=str(sh[f'R{linha}'].value).replace('.', '').replace('-', ''),
+                                cidade='Brasília', cid_nas='Brasília - DF',
+                                uf='DF',
+                                cod_municipioend=municipios['DF']['Brasília'],
+                                tel=str(sh[f'U{linha}'].value).replace('(', '').replace(')', '').replace('.', '').replace(
+                                    '-',
+                                    ''),
+                                depto=depto, cargo=cargo,
+                                horario=str(sh[f'AI{linha}'].value), salario=salario, tipo_contr=tipo_contr,
+                                hr_sem='25', hr_mens='100',
+                                est_semestre=str(sh[f'AS{linha}'].value),
+                                est_turno=str(sh[f'AT{linha}'].value),
+                                est_prev_conclu=str(sh[f'AU{linha}'].value),
+                                est_faculdade=str(sh[f'AV{linha}'].value),
+                                est_endfacul='End',
+                                est_numendfacul='1',
+                                est_bairroendfacul='Bairro',
+                                ag=agencia, conta=conta, cdigito=digito
+                            )
+                            session.add(estag_cadastrado)
+                            session.commit()
+                        pasta = r'\192.168.0.250'
+                        try:
+                            os.makedirs(
+                                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                                f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                                f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}')
+                            os.makedirs(
+                                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                                f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                                f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Atestados')
+                            os.makedirs(
+                                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                                f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                                f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Diversos')
+                            os.makedirs(
+                                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                                f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                                f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Contratuais')
+                            os.makedirs(
+                                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                                f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                                f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ferias')
+                            os.makedirs(
+                                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                                f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                                f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Ponto')
+                            os.makedirs(
+                                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                                f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                                f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Recibo')
+                            os.makedirs(
+                                f'\\{pasta}\\rh\\01 - RH\\01 - Administração.Controles\\'
+                                f'02 - Funcionários, Departamentos e Férias\\000 - Pastas Funcionais\\'
+                                f'00 - ATIVOS\\0 - Estagiários\\0 - Ainda nao iniciaram\\{estag.nome}\\Rescisao')
+                        except FileExistsError:
+                            pass
+                        # abrir cadastro no dexion e atualizar informações campo a campo
+                        pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Dexion.png')))
+                        pa.press('alt'), pa.press('a'), pa.press('t'), t.sleep(2), pa.press(
+                            'a'), t.sleep(5), pa.write(str(pessoa.matricula)), pa.press('enter'), t.sleep(20)
+                        pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(pessoa.cpf)
+                        t.sleep(1), pa.press('tab', 3), pa.write(pessoa.genero), pa.press('tab'), pa.write(pessoa.cor)
+                        t.sleep(1), pa.press('tab', 2), pa.write(pessoa.instru)
+                        t.sleep(1), pa.press('tab')
+                        if str(pessoa.estado_civil) == 'Casado(a)':
+                            pa.write('2')
+                            pa.press('tab', 6)
+                        else:
+                            pa.write('1')
+                            pa.press('tab', 5)
+                        pa.write(dt.strftime(dt.strptime(pessoa.nascimento, '%Y-%m-%d %H:%M:%S'), '%d%m%Y'))
+                        t.sleep(1), pa.press('tab'), pp.copy(pessoa.cid_nas), pa.hotkey('ctrl', 'v'), pa.press('tab')
+                        t.sleep(1), pa.write(pessoa.uf), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press('tab')
+                        t.sleep(1), pp.copy(pessoa.pai), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105'), pa.press(
+                            'tab')
+                        t.sleep(1), pp.copy(pessoa.mae), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write('105')
+                        # # clique em documentos
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Documentos.png')))
+                        pa.press('tab'), pa.write(str(pessoa.rg)), pa.press('tab'), pa.write(
+                            pessoa.emissor), pa.press('tab', 3), pa.write(pessoa.cod_municipioend)
+                        pa.press('tab', 9), pa.write('3'), pa.press('tab'), pa.write('341'), pa.press('tab')
+                        pa.write(pessoa.ag), pa.press('tab'), pa.write(f'{pessoa.conta}-{pessoa.cdigito}'), pa.press('tab')
+                        # #clique em endereço
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Endereco.png')))
+                        pa.press('tab', 2), pp.copy(pessoa.endereco), pa.hotkey('ctrl', 'v'), pa.press(
+                            'tab'), pa.write(pessoa.num), pa.press('tab', 2)
+                        pp.copy(pessoa.bairro), pa.hotkey('ctrl', 'v'), pa.press('tab'), pp.copy(pessoa.cidade), pa.hotkey(
+                            'ctrl', 'v'), pa.press('tab'), pa.write(pessoa.uf)
+                        pa.press('tab'), pa.write(pessoa.cep), pa.press('tab'), pa.write(pessoa.cod_municipioend), pa.press(
+                            'tab'), pa.write(str(pessoa.tel)), pa.press('tab', 2), pa.write(pessoa.email)
+                        # #clique em dados contratuais
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Contratuais.png')))
+                        pa.press('tab'), pa.write(str(pessoa.admiss).replace('/', '')), t.sleep(1)
+                        pa.press('tab'), pa.write('9')
+                        pa.press('tab', 7), pa.write('n'), pa.press('tab'), pa.write('4')
+                        pa.press('tab'), pa.write('Ed. Fisica')
+                        pa.press('tab', 2), pa.write(str(int(str(pessoa.admiss).replace('/', '')) + 2).zfill(8))
+                        # #clique em instituição de ensino
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/faculdade.png')))
+                        pa.press('tab'), pp.copy(pessoa.est_faculdade), pa.hotkey('ctrl', 'v')
+                        pa.press('tab'), pp.copy(pessoa.est_endfacul), pa.hotkey('ctrl', 'v')
+                        pa.press('tab'), pp.copy(pessoa.est_numendfacul), pa.hotkey('ctrl', 'v')
+                        pa.press('tab'), pp.copy(pessoa.est_bairroendfacul), pa.hotkey('ctrl', 'v')
+                        # #clique em Outros
+                        while 1 < 2:
+                            if pa.locateOnScreen('../models/static/imgs/Outros.png'):
+                                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Outros.png')))
+                                break
+                            else:
+                                t.sleep(5)
+                        t.sleep(2), pa.write('CARGO GERAL')
+                        pa.press('tab'), pa.write(pessoa.cargo)
+                        t.sleep(1), pa.press('tab'), pa.write(pessoa.salario), pa.press('tab')
+                        if str(pessoa.tipo_contr) == 'Horista':
+                            pa.press('1')
+                        else:
+                            pa.press('5')
+                        pa.press('tab', 2), t.sleep(1), pa.write(str(pessoa.hr_sem)), pa.press('tab'), t.sleep(1)
+                        pa.write(str(pessoa.hr_mens))
+                        # #clique em Compatibilidade
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade3.png'))), t.sleep(1)
+                        # #clique em Compatibilidade de novo
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Compatibilidade2.png'))), t.sleep(1)
+                        pa.press('tab', 2), pa.write('9')
+                        # #clique em Salvar
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Salvarcadastro.png'))), t.sleep(10)
+                        # #clique em fechar novo cadastro
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fecharnovo1.png'))), t.sleep(2)
+                        # #clique em fechar trabalhadores
+                        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/Fechartrab1.png'))), t.sleep(0.5)
+                        while 1 < 2:
+                            if pa.locateOnScreen('../models/static/imgs/pyt.png'):
+                                pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png')))
+                                break
+                            else:
+                                t.sleep(5)
+                        tkinter.messagebox.showinfo(
+                            title='Cadastro ok!',
+                            message='Cadastro editado com sucesso!'
+                        )
 
 
 def cadastrar_autonomo(caminhoaut, nomeaut, matriculaaut, admissaoaut, cargoaut, deptoaut, ondeaut):

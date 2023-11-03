@@ -219,6 +219,7 @@ class CadastrarEst(ttk.Frame):
         super().__init__()
         self.hoje = datetime.today()
         self.caminhoest = StringVar()
+        self.caminhotce = StringVar()
         self.nomeest = StringVar()
         self.horarioest = StringVar()
         self.cargoest = StringVar()
@@ -277,6 +278,11 @@ class CadastrarEst(ttk.Frame):
         self.ondeest = ttk.Checkbutton(self, text='Cadastro realizado fora da Cia.', variable=self.feitondeest)
         self.ondeest.grid(column=1, row=27, padx=26, pady=1, sticky=W)
         self.cargoest = StringVar()
+        self.labeltce = ttk.Label(self, width=40, text="Anexe o arquivo do TCE assinado:")
+        self.labeltce.grid(column=1, row=28, padx=25, pady=1, sticky=W)
+        self.botaotce = ttk.Button(self, text="Escolher arquivo", command=self.selecionartce)
+        self.botaotce.grid(column=1, row=28, padx=350, pady=1, sticky=W)
+
         self.botaocadastrarest = ttk.Button(self, width=20, text="Cadastrar Estagiário",
                                             command=lambda: [
                                                 cadastro_estagiario(
@@ -288,11 +294,12 @@ class CadastrarEst(ttk.Frame):
                                                     '', '', '',
                                                     self.agenciaest.get(),
                                                     self.contaest.get(),
-                                                    self.digitoest.get()
+                                                    self.digitoest.get(),
+                                                    self.caminhotce.get()
                                                 )
                                             ]
                                             )
-        self.botaocadastrarest.grid(column=1, row=28, padx=320, pady=1, sticky=W)
+        self.botaocadastrarest.grid(column=1, row=29, padx=320, pady=1, sticky=W)
 
         def carregarest(local):
             planwb = l_w(local)
@@ -324,6 +331,14 @@ class CadastrarEst(ttk.Frame):
             self.caminhoest.set(str(caminhoplanest))
         except ValueError:
             pass
+
+    def selecionartce(self):
+        try:
+            caminhoplantce = tkinter.filedialog.askopenfilename(title='Arquivo PDF do TCE')
+            self.caminhotce.set(str(caminhoplantce))
+        except ValueError:
+            pass
+
 
 
 class CadastrarAut(ttk.Frame):

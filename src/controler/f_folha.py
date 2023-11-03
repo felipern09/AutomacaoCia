@@ -101,10 +101,8 @@ def lancar_folha_no_dexion(competencia):
         mat = str(sh[f'A{x}'].value)
         rub = str(sh[f'C{x}'].value)
         hr = str(sh[f'D{x}'].value)
-        pa.write(mat), t.sleep(0.5), t.sleep(2), t.sleep(0.5), pa.press('enter', 2), t.sleep(0.5), t.sleep(
-            1.5), t.sleep(0.5), pa.press('i'), t.sleep(0.5), t.sleep(0.5), t.sleep(0.5), pa.write(rub)
-        t.sleep(0.5), t.sleep(0.5), pa.press('enter'), t.sleep(0.5), t.sleep(0.5), t.sleep(0.5), pa.write(hr), t.sleep(
-            0.5), t.sleep(0.5), t.sleep(0.5), pa.press('enter', 65)
+        pa.write(mat), t.sleep(3), pa.press('enter', 2), t.sleep(2.5), pa.press('i'), t.sleep(2.5), pa.write(rub)
+        t.sleep(1), pa.press('enter'), t.sleep(1.5), pa.write(hr), t.sleep(1.5), pa.press('enter', 65), t.sleep(4)
         x += 1
 
     # deletar férias antigas
@@ -131,24 +129,21 @@ def lancar_folha_no_dexion(competencia):
             hr = str(sh[f'D{x}'].value)
             obshr = str(sh[f'E{x}'].value)
             pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(2.3)
-            try:
-                pa.center(pa.locateOnScreen(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\dsr.png'))
-                dsrlancado = True
-            except:
-                try:
-                    pa.center(pa.locateOnScreen(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\dsr2.png'))
-                    dsrlancado = True
-                except:
-                    dsrlancado = False
             pa.press('a'), t.sleep(0.5), pa.write(rub)
             pa.press('enter'), t.sleep(0.5), pa.write(hr), t.sleep(0.5), pa.press('enter', 2)
-            if dsrlancado:
-                pass
-            else:
-                if obshr != 'HORA AULA ESTÁGIO 5.10':
-                    pa.press('i'), t.sleep(0.5), pa.write('27'), t.sleep(0.5)
-                    pa.press('enter', 3), t.sleep(0.5)
             pa.press('enter')
+            x += 1
+    # lançamento de dias dobrados — estágio
+    sh = wb['Compl Est']
+    x = 2
+    while x <= len(sh['A']):
+        if sh[f'A{x}'].value is not None:
+            mat = str(sh[f'A{x}'].value)
+            rub = str(sh[f'C{x}'].value)
+            dias = str(sh[f'D{x}'].value)
+            pa.write(mat), t.sleep(0.5), pa.press('enter', 2), t.sleep(0.5), pa.press('i'), t.sleep(0.5), pa.write(rub)
+            pa.press('enter'), t.sleep(0.5), pa.write(dias), t.sleep(0.5), pa.press('enter')
+            pa.press('enter'), t.sleep(0.5), pa.press('enter')
             x += 1
 
     # lançamento de comissões
@@ -202,6 +197,12 @@ def lancar_folha_no_dexion(competencia):
             pa.press('enter'), t.sleep(0.5), pa.write(sq), t.sleep(0.5), pa.press('enter'), t.sleep(0.5), pa.write(hr)
             pa.press('enter', 3), t.sleep(0.5),
             x += 1
+    while 1 < 2:
+        if pa.locateOnScreen('../models/static/imgs/pyt.png'):
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png')))
+            break
+        else:
+            t.sleep(5)
     tkinter.messagebox.showinfo(
         title='Folha ok!',
         message=f'Folha do mês {competencia} lançada no Dexion com sucesso!'
