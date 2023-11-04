@@ -152,7 +152,7 @@ class CadastrarNoRelogio(ttk.Frame):
         sessions = sessionmaker(bind=engine)
         session = sessions()
         self.grupo = []
-        pessoas = session.query(Colaborador).filter_by(desligamento=None).all()
+        pessoas = session.query(Colaborador).filter_by(desligamento=None).filter(Colaborador.ag.isnot(None)).filter(Colaborador.ag.isnot('None')).all()
         for pess in pessoas:
             if pess.nome != '':
                 self.grupo.append(pess.nome)

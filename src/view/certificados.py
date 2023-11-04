@@ -37,11 +37,11 @@ class Certificados(ttk.Frame):
         sessions = sessionmaker(bind=engine)
         session = sessions()
         self.grupo = []
-        pessoas = session.query(Colaborador).filter_by(desligamento=None).all()
+        pessoas = session.query(Colaborador).filter_by(desligamento=None).filter(Colaborador.ag.isnot(None)).filter(Colaborador.ag.isnot('None')).all()
         for pess in pessoas:
             if pess.nome != '':
                 self.grupo.append(pess.nome)
-        pessoas2 = session.query(Colaborador).filter_by(desligamento='None').all()
+        pessoas2 = session.query(Colaborador).filter_by(desligamento='None').filter(Colaborador.ag.isnot(None)).filter(Colaborador.ag.isnot('None')).all()
         for pess in pessoas2:
             if pess.nome != '':
                 self.grupo.append(pess.nome)
@@ -126,7 +126,7 @@ class CertUnico(ttk.Frame):
         self.canvas.bind('<Configure>', lambda e: self.canvas.config(scrollregion=self.canvas.bbox('all')))
 
         self.canvframe = Frame(self.canvas)
-        self.canvas.create_window((0,0), window=self.canvframe, anchor='nw')
+        self.canvas.create_window((0, 0), window=self.canvframe, anchor='nw')
 
         #   loop for pessoa.nome com pesq em db
         #       i, enumerate(lista de nomes)
