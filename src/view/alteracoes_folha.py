@@ -531,13 +531,13 @@ class InativarAula(ttk.Frame):
     def __init__(self, container):
         super().__init__()
         self.hoje = datetime.datetime.today()
-        sessions = sessionmaker(bind=engine)
-        session = sessions()
         self.grupo = []
-        pessoas = session.query(Colaborador).filter_by(desligamento=None).all()
+        sessions = sessionmaker(enginefolha)
+        session = sessions()
+        pessoas = session.query(Aulas).filter_by(status='Ativa').order_by(Aulas.professor).all()
         for pess in pessoas:
             if pess.nome != '':
-                self.grupo.append(pess.nome)
+                self.grupo.append(pess.professor)
         self.nomes = list(sorted(set(filter(None, self.grupo))))
         self.canvas = Canvas(self)
         self.canvas.pack(side=LEFT, fill=BOTH, expand=1)

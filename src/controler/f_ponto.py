@@ -839,7 +839,7 @@ def cadastrar_no_ponto(nome, altera, matrpt=''):
             pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/controlid.png'))), t.sleep(0.5)
             pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/novofunc.png'))), t.sleep(0.5)
             pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/adcusuario.png'))), t.sleep(0.5)
-            pa.write(pessoa.nome), pa.press('tab'), pa.write(str(pessoa.matricula)), t.sleep(0.5)
+            pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(str(pessoa.matricula)), t.sleep(0.5)
             pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okponto.png'))), t.sleep(0.5)
             pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okconfirmaponto.png')))
             estag = BasePonto(nome=pessoa.nome, matricula=pessoa.matricula, pis=pessoa.pis,
@@ -851,7 +851,7 @@ def cadastrar_no_ponto(nome, altera, matrpt=''):
             pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/controlid.png'))), t.sleep(0.5)
             pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/novofunc.png'))), t.sleep(0.5)
             pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/adcusuario.png'))), t.sleep(0.5)
-            pa.write(pessoa.nome), pa.press('tab'), pa.write(str(pessoa.pis)), t.sleep(0.5)
+            pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(str(pessoa.pis)), t.sleep(0.5)
             pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okponto.png')))
             func = BasePonto(nome=pessoa.nome, matricula=pessoa.matricula, pis=pessoa.pis,
                               matrponto=pessoa.pis, email=pessoa.email, cargo=pessoa.cargo,
@@ -863,7 +863,7 @@ def cadastrar_no_ponto(nome, altera, matrpt=''):
         pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/controlid.png'))), t.sleep(0.5)
         pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/novofunc.png'))), t.sleep(0.5)
         pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/adcusuario.png'))), t.sleep(0.5)
-        pa.write(pessoa.nome), pa.press('tab'), pa.write(str(matrpt)), t.sleep(0.5)
+        pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(str(matrpt)), t.sleep(0.5)
         pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okponto.png'))), t.sleep(0.5)
         pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okconfirmaponto.png')))
         estag = BasePonto(nome=pessoa.nome, matricula=pessoa.matricula, pis=pessoa.pis,

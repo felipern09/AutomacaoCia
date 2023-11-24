@@ -7,12 +7,9 @@
     <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/controler/f_admiss.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_admiss.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/admissao_e_desligamento.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/admissao_e_desligamento.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/certificados.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/certificados.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/emitir_contrachques.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/emitir_contrachques.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/ponto.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/ponto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controler/f_ponto.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_ponto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/view/alteracoes_folha.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/alteracoes_folha.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/view/solicitar_pagamento.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/solicitar_pagamento.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/solicitar_vt.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/solicitar_vt.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,8 +56,8 @@
       <recent name="C:\Users\Felipe\PycharmProjects\PersonalTrainer" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.uniformes">
-    <configuration name="gerar_lancar_folha" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="Python.00_janela_principal">
+    <configuration name="00_janela_principal" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -72,7 +69,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/view/gerar_lancar_folha.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/view/00_janela_principal.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -81,7 +78,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="ponto" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="alteracoes_folha" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -93,7 +90,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/view/ponto.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/view/alteracoes_folha.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -102,7 +99,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="solicitar_pagamento" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="alterar_bancoAulas" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -110,11 +107,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/view" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/view/solicitar_pagamento.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test/alterar_bancoAulas.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -123,7 +120,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="solicitar_vt" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="emitir_contrachques" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -135,7 +132,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/view/solicitar_vt.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/view/emitir_contrachques.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -144,7 +141,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="uniformes" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="testes_diversos" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -152,11 +149,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/view" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/test" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/view/uniformes.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test/testes_diversos.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -167,11 +164,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.uniformes" />
-        <item itemvalue="Python.solicitar_vt" />
-        <item itemvalue="Python.solicitar_pagamento" />
-        <item itemvalue="Python.ponto" />
-        <item itemvalue="Python.gerar_lancar_folha" />
+        <item itemvalue="Python.00_janela_principal" />
+        <item itemvalue="Python.testes_diversos" />
+        <item itemvalue="Python.alterar_bancoAulas" />
+        <item itemvalue="Python.alteracoes_folha" />
+        <item itemvalue="Python.emitir_contrachques" />
       </list>
     </recent_temporary>
   </component>
