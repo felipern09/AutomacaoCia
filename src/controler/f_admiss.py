@@ -2140,28 +2140,28 @@ def updatedb(pessoa, nome, cargo, departamento, agencia, conta, digito):
     session = sessions()
 
     def alteranome():
-        pess = session.query(Colaborador).filter_by(nome=pessoa).first()
+        pess = session.query(Colaborador).filter_by(nome=pessoa).order_by(Colaborador.matricula.desc()).first()
         pess.nome = nome
         session.commit()
         tkinter.messagebox.showinfo(title='Alteração efetuada!',
                                     message=f'{pessoa} teve seu NOME alterado para: {nome}.')
 
     def alteracargo():
-        pess = session.query(Colaborador).filter_by(nome=pessoa).first()
+        pess = session.query(Colaborador).filter_by(nome=pessoa).order_by(Colaborador.matricula.desc()).first()
         pess.cargo = cargo
         session.commit()
         tkinter.messagebox.showinfo(title='Alteração efetuada!',
                                     message=f'{pessoa} teve seu CARGO alterado para: {cargo}.')
 
     def alteradepto():
-        pess = session.query(Colaborador).filter_by(nome=pessoa).first()
+        pess = session.query(Colaborador).filter_by(nome=pessoa).order_by(Colaborador.matricula.desc()).first()
         pess.depto = departamento
         session.commit()
         tkinter.messagebox.showinfo(title='Alteração efetuada!',
                                     message=f'{pessoa} teve seu DEPTO alterado para: {departamento}.')
 
     def alteracc():
-        pess = session.query(Colaborador).filter_by(nome=pessoa).first()
+        pess = session.query(Colaborador).filter_by(nome=pessoa).order_by(Colaborador.matricula.desc()).first()
         pess.ag = agencia
         pess.conta = conta
         pess.cdigito = digito

@@ -479,12 +479,7 @@ def consultar_substituicoes(comp: int) -> dict:
     dic = {}
     for s in subst:
         if inicio <= dt.strptime(s.data, '%d/%m/%Y') <= fim:
-            if s.professorsubst in dic:
-                dic2 = {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
-                dic[s.professorsubst] = {**dic[s.professorsubst], **dic2[s.professorsubst]}
-            else:
-                d2 = {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
-                dic = {**dic, **d2}
+            dic.update({s.numero: {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}})
     session.close()
     return dic
 
@@ -653,28 +648,25 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                         dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
                                     plan1.cell(column=cell.column, row=novalinha).fill = falta
                 # aplica alterações de substituição
-                # {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
-                # {s.professorsubst: {s.data: {s.substituto: {s.departamento: s.horas}}}}
-                for nome in subs:
-                    for substituto in subs[nome]:
-                        for depart in subs[nome][substituto]:
-                            for dia in subs[nome][substituto][depart]:
-                                if depart == 'Musculação' and nome == i:
-                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
-                                            dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                        plan1.cell(column=cell.column, row=novalinha).fill = falta
-                                if depart == 'Musculação' and substituto == i:
-                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
-                                            dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                        plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(
-                                            column=cell.column, row=novalinha).value + float(
-                                            str(subs[nome][substituto][depart][dia]).replace(',', '.'))
-                                        plan1.cell(column=cell.column, row=novalinha).fill = subst
+                for numb in subs:
+                    for nome in subs[numb]:
+                        for substituto in subs[numb][nome]:
+                            for depart in subs[numb][nome][substituto]:
+                                for dia in subs[numb][nome][substituto][depart]:
+                                    if depart == 'Musculação' and nome == i:
+                                        if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                            plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                    if depart == 'Musculação' and substituto == i:
+                                        if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                            plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(
+                                                column=cell.column, row=novalinha).value + float(
+                                                str(subs[numb][nome][substituto][depart][dia]).replace(',', '.'))
+                                            plan1.cell(column=cell.column, row=novalinha).fill = subst
 
                 # aplica alterações de desligamento
                 # {d.professor: {d.departamento: d.datadesligamento}}
-                # conferir se tem outras aulas ativas ou foi desligado de tudo
-                # se desligado de tudo, alterar status das aulas para inativas
                 for nome in dslg:
                     for depart in dslg[nome]:
                         if depart == 'Musculação' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
@@ -781,27 +773,24 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                         dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
                                     plan1.cell(column=cell.column, row=novalinha).fill = falta
                 # aplica alterações de substituição
-                # {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
-                for nome in subs:
-                    for substituto in subs[nome]:
-                        for depart in subs[nome][substituto]:
-                            for dia in subs[nome][substituto][depart]:
-                                if depart == 'Ginástica' and nome == i:
-                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
-                                            dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                        plan1.cell(column=cell.column, row=novalinha).fill = falta
-                                if depart == 'Ginástica' and substituto == i:
-                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
-                                            dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                        plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(
-                                            column=cell.column, row=novalinha).value + float(
-                                            str(subs[nome][substituto][depart][dia]).replace(',', '.'))
-                                        plan1.cell(column=cell.column, row=novalinha).fill = subst
+                    for numb in subs:
+                        for nome in subs[numb]:
+                            for substituto in subs[numb][nome]:
+                                for depart in subs[numb][nome][substituto]:
+                                    for dia in subs[numb][nome][substituto][depart]:
+                                        if depart == 'Ginástica' and nome == i:
+                                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                    dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                                plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                        if depart == 'Ginástica' and substituto == i:
+                                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                    dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                                plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(
+                                                    column=cell.column, row=novalinha).value + float(
+                                                    str(subs[numb][nome][substituto][depart][dia]).replace(',', '.'))
+                                                plan1.cell(column=cell.column, row=novalinha).fill = subst
 
                 # aplica alterações de desligamento
-                # {d.professor: {d.departamento: d.datadesligamento}}
-                # conferir se tem outras aulas ativas ou foi desligado de tudo
-                # se desligado de tudo, alterar status das aulas para inativas
                 for nome in dslg:
                     for depart in dslg[nome]:
                         if depart == 'Ginástica' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
@@ -817,7 +806,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                     plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
 
                 # aplica talterações de férias
-                # # {f.professor: {f.departamento: {f.inicio: f.fim}}}
                 for nome in fer:
                     for depart in fer[nome]:
                         for inic in fer[nome][depart]:
@@ -834,7 +822,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                         plan1.cell(column=cell.column, row=novalinha).value = 0
 
                 # aplica alterações de horas complementares
-                # {h.professor: {h.data: {h.departamento: h.horas}}}
                 for nome in complem:
                     for dia in complem[nome]:
                         for depart in complem[nome][dia]:
@@ -847,7 +834,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                     plan1.cell(column=cell.column, row=novalinha).fill = comple
 
                 # aplica alterações de atestados
-                # {a.professor: {a.data: a.departamento}}
                 for nome in atest:
                     for d in atest[nome]:
                         if atest[nome][d] == 'Ginástica' and nome == i:
@@ -856,14 +842,12 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                 plan1.cell(column=cell.column, row=novalinha).fill = atestado
 
                 # aplica alterações de feriado
-                # [datas de feriado formato dt]
                 for dia in feriad:
                     if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dia, '%d/%m'):
                         plan1.cell(column=cell.column, row=novalinha).fill = feriado
                         plan1.cell(column=cell.column, row=novalinha).value = 0
 
                 # aplica alterações de escala
-                # {e.professor: {e.data: {e.departamento: e.horas}}}
                 for nome in escal:
                     for dia in escal[nome]:
                         for depart in escal[nome][dia]:
@@ -909,27 +893,24 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                         dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
                                     plan1.cell(column=cell.column, row=novalinha).fill = falta
                 # aplica alterações de substituição
-                # {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
-                for nome in subs:
-                    for substituto in subs[nome]:
-                        for depart in subs[nome][substituto]:
-                            for dia in subs[nome][substituto][depart]:
-                                if depart == 'Kids' and nome == i:
-                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
-                                            dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                        plan1.cell(column=cell.column, row=novalinha).fill = falta
-                                if depart == 'Kids' and substituto == i:
-                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
-                                            dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                        plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(
-                                            column=cell.column, row=novalinha).value + float(
-                                            str(subs[nome][substituto][depart][dia]).replace(',', '.'))
-                                        plan1.cell(column=cell.column, row=novalinha).fill = subst
+                for numb in subs:
+                    for nome in subs[numb]:
+                        for substituto in subs[numb][nome]:
+                            for depart in subs[numb][nome][substituto]:
+                                for dia in subs[numb][nome][substituto][depart]:
+                                    if depart == 'Kids' and nome == i:
+                                        if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                            plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                    if depart == 'Kids' and substituto == i:
+                                        if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                            plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(
+                                                column=cell.column, row=novalinha).value + float(
+                                                str(subs[numb][nome][substituto][depart][dia]).replace(',', '.'))
+                                            plan1.cell(column=cell.column, row=novalinha).fill = subst
 
                 # aplica alterações de desligamento
-                # {d.professor: {d.departamento: d.datadesligamento}}
-                # conferir se tem outras aulas ativas ou foi desligado de tudo
-                # se desligado de tudo, alterar status das aulas para inativas
                 for nome in dslg:
                     for depart in dslg[nome]:
                         if depart == 'Kids' and nome == i and dt.strptime(dslg[nome][depart], '%d/%m/%Y') <= fechamento:
@@ -946,7 +927,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                     plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
 
                 # aplica talterações de férias
-                # # {f.professor: {f.departamento: {f.inicio: f.fim}}}
                 for nome in fer:
                     for depart in fer[nome]:
                         for inic in fer[nome][depart]:
@@ -963,7 +943,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                         plan1.cell(column=cell.column, row=novalinha).value = 0
 
                 # aplica alterações de horas complementares
-                # {h.professor: {h.data: {h.departamento: h.horas}}}
                 for nome in complem:
                     for dia in complem[nome]:
                         for depart in complem[nome][dia]:
@@ -976,7 +955,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                     plan1.cell(column=cell.column, row=novalinha).fill = comple
 
                 # aplica alterações de atestados
-                # {a.professor: {a.data: a.departamento}}
                 for nome in atest:
                     for d in atest[nome]:
                         if atest[nome][d] == 'Kids' and nome == i:
@@ -985,14 +963,12 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                 plan1.cell(column=cell.column, row=novalinha).fill = atestado
 
                 # aplica alterações de feriado
-                # [datas de feriado formato dt]
                 for dia in feriad:
                     if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dia, '%d/%m'):
                         plan1.cell(column=cell.column, row=novalinha).fill = feriado
                         plan1.cell(column=cell.column, row=novalinha).value = 0
 
                 # aplica alterações de escala
-                # {e.professor: {e.data: {e.departamento: e.horas}}}
                 for nome in escal:
                     for dia in escal[nome]:
                         for depart in escal[nome][dia]:
@@ -1037,27 +1013,24 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                         dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
                                     plan1.cell(column=cell.column, row=novalinha).fill = falta
                 # aplica alterações de substituição
-                # {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
-                for nome in subs:
-                    for substituto in subs[nome]:
-                        for depart in subs[nome][substituto]:
-                            for dia in subs[nome][substituto][depart]:
-                                if depart == 'Esportes' and nome == i:
-                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
-                                            dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                        plan1.cell(column=cell.column, row=novalinha).fill = falta
-                                if depart == 'Esportes' and substituto == i:
-                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
-                                            dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                        plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(
-                                            column=cell.column, row=novalinha).value + float(
-                                            str(subs[nome][substituto][depart][dia]).replace(',', '.'))
-                                        plan1.cell(column=cell.column, row=novalinha).fill = subst
+                for numb in subs:
+                    for nome in subs[numb]:
+                        for substituto in subs[numb][nome]:
+                            for depart in subs[numb][nome][substituto]:
+                                for dia in subs[numb][nome][substituto][depart]:
+                                    if depart == 'Esportes' and nome == i:
+                                        if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                            plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                    if depart == 'Esportes' and substituto == i:
+                                        if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                            plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(
+                                                column=cell.column, row=novalinha).value + float(
+                                                str(subs[numb][nome][substituto][depart][dia]).replace(',', '.'))
+                                            plan1.cell(column=cell.column, row=novalinha).fill = subst
 
                 # aplica alterações de desligamento
-                # {d.professor: {d.departamento: d.datadesligamento}}
-                # conferir se tem outras aulas ativas ou foi desligado de tudo
-                # se desligado de tudo, alterar status das aulas para inativas
                 for nome in dslg:
                     for depart in dslg[nome]:
                         if depart == 'Esportes' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
@@ -1073,7 +1046,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                     plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
 
                 # aplica talterações de férias
-                # {f.professor: {f.departamento: {f.inicio: f.fim}}}
                 for nome in fer:
                     for depart in fer[nome]:
                         for inic in fer[nome][depart]:
@@ -1090,7 +1062,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                         plan1.cell(column=cell.column, row=novalinha).value = 0
 
                 # aplica alterações de horas complementares
-                # {h.professor: {h.data: {h.departamento: h.horas}}}
                 for nome in complem:
                     for dia in complem[nome]:
                         for depart in complem[nome][dia]:
@@ -1103,7 +1074,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                     plan1.cell(column=cell.column, row=novalinha).fill = comple
 
                 # aplica alterações de atestados
-                # {a.professor: {a.data: a.departamento}}
                 for nome in atest:
                     for d in atest[nome]:
                         if atest[nome][d] == 'Esportes' and nome == i:
@@ -1112,14 +1082,12 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                 plan1.cell(column=cell.column, row=novalinha).fill = atestado
 
                 # aplica alterações de feriado
-                # [datas de feriado formato dt]
                 for dia in feriad:
                     if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dia, '%d/%m'):
                         plan1.cell(column=cell.column, row=novalinha).fill = feriado
                         plan1.cell(column=cell.column, row=novalinha).value = 0
 
                 # aplica alterações de escala
-                # {e.professor: {e.data: {e.departamento: e.horas}}}
                 for nome in escal:
                     for dia in escal[nome]:
                         for depart in escal[nome][dia]:
@@ -1165,27 +1133,24 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                         dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
                                     plan1.cell(column=cell.column, row=novalinha).fill = falta
                 # aplica alterações de substituição
-                # {s.professorsubst: {s.substituto: {s.departamento: {s.data: s.horas}}}}
-                for nome in subs:
-                    for substituto in subs[nome]:
-                        for depart in subs[nome][substituto]:
-                            for dia in subs[nome][substituto][depart]:
-                                if depart == 'Cross Cia' and nome == i:
-                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
-                                            dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                        plan1.cell(column=cell.column, row=novalinha).fill = falta
-                                if depart == 'Cross Cia' and substituto == i:
-                                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
-                                            dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
-                                        plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(
-                                            column=cell.column, row=novalinha).value + float(
-                                            str(subs[nome][substituto][depart][dia]).replace(',', '.'))
-                                        plan1.cell(column=cell.column, row=novalinha).fill = subst
+                for numb in subs:
+                    for nome in subs[numb]:
+                        for substituto in subs[numb][nome]:
+                            for depart in subs[numb][nome][substituto]:
+                                for dia in subs[numb][nome][substituto][depart]:
+                                    if depart == 'Cross Cia' and nome == i:
+                                        if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                            plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                    if depart == 'Cross Cia' and substituto == i:
+                                        if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                            plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(
+                                                column=cell.column, row=novalinha).value + float(
+                                                str(subs[numb][nome][substituto][depart][dia]).replace(',', '.'))
+                                            plan1.cell(column=cell.column, row=novalinha).fill = subst
 
                 # aplica alterações de desligamento
-                # {d.professor: {d.departamento: d.datadesligamento}}
-                # conferir se tem outras aulas ativas ou foi desligado de tudo
-                # se desligado de tudo, alterar status das aulas para inativas
                 for nome in dslg:
                     for depart in dslg[nome]:
                         if depart == 'Cross Cia' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
@@ -1201,7 +1166,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                     plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
 
                 # aplica talterações de férias
-                # # {f.professor: {f.departamento: {f.inicio: f.fim}}}
                 for nome in fer:
                     for depart in fer[nome]:
                         for inic in fer[nome][depart]:
@@ -1218,7 +1182,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                         plan1.cell(column=cell.column, row=novalinha).value = 0
 
                 # aplica alterações de horas complementares
-                # {h.professor: {h.data: {h.departamento: h.horas}}}
                 for nome in complem:
                     for dia in complem[nome]:
                         for depart in complem[nome][dia]:
@@ -1231,7 +1194,6 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                     plan1.cell(column=cell.column, row=novalinha).fill = comple
 
                 # aplica alterações de atestados
-                # {a.professor: {a.data: a.departamento}}
                 for nome in atest:
                     for d in atest[nome]:
                         if atest[nome][d] == 'Cross Cia' and nome == i:
@@ -1240,14 +1202,12 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                                 plan1.cell(column=cell.column, row=novalinha).fill = atestado
 
                 # aplica alterações de feriado
-                # [datas de feriado formato dt]
                 for dia in feriad:
                     if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dia, '%d/%m'):
                         plan1.cell(column=cell.column, row=novalinha).fill = feriado
                         plan1.cell(column=cell.column, row=novalinha).value = 0
 
                 # aplica alterações de escala
-                # {e.professor: {e.data: {e.departamento: e.horas}}}
                 for nome in escal:
                     for dia in escal[nome]:
                         for depart in escal[nome][dia]:
