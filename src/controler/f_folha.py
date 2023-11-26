@@ -1,7 +1,9 @@
+import shutil
 from datetime import datetime as dt, timedelta as td
 import datetime
 from dateutil.relativedelta import relativedelta
 import holidays
+import hashlib
 import locale
 from openpyxl import load_workbook as l_w
 from openpyxl.styles import PatternFill, Font
@@ -12,7 +14,8 @@ import pyautogui as pa
 from src.models.modelsfolha import Aula, Folha, Aulas, Faltas, Ferias, Hrcomplement, Atestado, Desligados, \
     Escala, Substituicao, enginefolha
 from src.models.models import Colaborador, engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker,declarative_base
+from sqlalchemy import create_engine, MetaData, Column, Integer, String
 import tkinter.filedialog
 from tkinter import messagebox
 import tkinter.filedialog
@@ -1696,3 +1699,183 @@ def inativar_aulas(aulas: list):
         a.status = 'Inativa'
         session.commit()
     tkinter.messagebox.showinfo(title='Aulas inativas!',message='Aulas inativas com sucesso!')
+
+
+def backup_bancos(bancoapp: str, bancoautomacao: str, sentido: int):
+    """
+    Backup databases from different aplications.
+    :param bancoapp: db appCia
+    :param bancoautomacao: db AutomaçãoCia
+    :return:
+    """
+    # falta copiar todos os demais dados para ambos DB (faltas, atestados, subst, deslig, hrcompl etc)
+    if bancoapp == '' or bancoautomacao == '':
+        print(bancoapp)
+        print(bancoautomacao)
+        tkinter.messagebox.showinfo(title='Escolha os dois arquivos!', message='Um ou os dois arquivos não foram definidos!')
+    else:
+        # backup DB automaçao e DB app em pasta com hash e data
+        text = str(datetime.datetime.now())
+        hash_object = hashlib.sha1(text.encode())
+        shutil.copyfile(bancoapp, rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\bkp\aulas_appcia_bkp {dt.strftime(dt.today(),"%d.%m.%Y")} - {hash_object.hexdigest()}.db')
+        shutil.copyfile(bancoautomacao, rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\bkp\aulas_autom_bkp {dt.strftime(dt.today(), "%d.%m.%Y")} - {hash_object.hexdigest()}.db')
+
+        # conectar no DB appCia e passar informações para DB automação
+        arqf = os.path.abspath(bancoapp)
+        enginef = create_engine('sqlite+pysqlite:///' + arqf, echo=True, future=True)
+        metadata_obj = MetaData()
+        Base = declarative_base()
+
+        class Aulas(Base):
+            __tablename__ = "aulas"
+            numero = Column(Integer, primary_key=True)
+            nome = Column(String, nullable=False)
+            professor = Column(String, nullable=False)
+            matrprof = Column(Integer, nullable=False)
+            departamento = Column(String, nullable=False)
+            diadasemana = Column(String, nullable=False)
+            inicio = Column(String, nullable=False)
+            fim = Column(String, nullable=False)
+            valor = Column(String, nullable=False)
+            status = Column(String, nullable=False)
+            iniciograde = Column(String, nullable=False)
+            fimgrade = Column(String, nullable=True)
+
+        class Faltas(Base):
+            __tablename__ = "faltas"
+            numero = Column(Integer, primary_key=True)
+            professor = Column(String, nullable=False)
+            matrprof = Column(Integer, nullable=False)
+            departamento = Column(String, nullable=False)
+            data = Column(String, nullable=False)
+            horas = Column(String, nullable=False)
+
+        class Ferias(Base):
+            __tablename__ = 'ferias'
+            numero = Column(Integer, primary_key=True)
+            professor = Column(String, nullable=False)
+            matrprof = Column(Integer, nullable=False)
+            departamento = Column(String, nullable=False)
+            inicio = Column(String, nullable=False)
+            fim = Column(String, nullable=False)
+
+        class Atestado(Base):
+            __tablename__ = 'atestado'
+            numero = Column(Integer, primary_key=True)
+            professor = Column(String, nullable=False)
+            matrprof = Column(Integer, nullable=False)
+            departamento = Column(String, nullable=False)
+            data = Column(String, nullable=False)
+
+        class Substituicao(Base):
+            __tablename__ = 'substituicao'
+            numero = Column(Integer, primary_key=True)
+            professorsubst = Column(String, nullable=False)
+            matrprof = Column(Integer, nullable=False)
+            substituto = Column(String, nullable=False)
+            matrsubstituto = Column(String, nullable=False)
+            departamento = Column(String, nullable=False)
+            aula = Column(String, nullable=False)
+            data = Column(String, nullable=False)
+            horas = Column(String, nullable=False)
+
+        class Desligados(Base):
+            __tablename__ = 'desligados'
+            numero = Column(Integer, primary_key=True)
+            professor = Column(String, nullable=False)
+            matrprof = Column(Integer, nullable=False)
+            departamento = Column(String, nullable=False)
+            datadesligamento = Column(String, nullable=False)
+
+        class Escala(Base):
+            __tablename__ = 'escala'
+            numero = Column(Integer, primary_key=True)
+            professor = Column(String, nullable=False)
+            matrprof = Column(Integer, nullable=False)
+            departamento = Column(String, nullable=False)
+            aula = Column(String, nullable=False)
+            horas = Column(String, nullable=False)
+            data = Column(String, nullable=False)
+
+        class Hrcomplement(Base):
+            __tablename__ = 'hrcomplementar'
+            numero = Column(Integer, primary_key=True)
+            professor = Column(String, nullable=False)
+            matrprof = Column(Integer, nullable=False)
+            departamento = Column(String, nullable=False)
+            aula = Column(String, nullable=False)
+            horas = Column(String, nullable=False)
+            data = Column(String, nullable=False)
+
+        Base.metadata.create_all(enginef)
+        if sentido == 1:
+            # AppCia -> Automação
+            sessionsapp = sessionmaker(enginef)
+            sessionapp = sessionsapp()
+            
+            sessions = sessionmaker(enginefolha)
+            session = sessions()
+            
+            aulasapp = sessionapp.query(Aulas).all()
+            for aulapp in aulasapp:
+                aulaaut = session.query(Aulas).filter_by(numero=aulapp.numero).first()
+                if aulaaut:
+                    aulaaut.nome = aulapp.nome
+                    aulaaut.professor = aulapp.professor
+                    aulaaut.matrprof = aulapp.matrprof
+                    aulaaut.departamento = aulapp.departamento
+                    aulaaut.diadasemana = aulapp.diadasemana
+                    aulaaut.inicio = aulapp.inicio
+                    aulaaut.fim = aulapp.fim
+                    aulaaut.valor = aulapp.valor
+                    aulaaut.status = aulapp.status
+                    aulaaut.iniciograde = aulapp.iniciograde
+                    aulaaut.fimgrade = aulapp.fimgrade
+                    session.commit()
+                else:
+                    aula = Aulas(numero=aulapp.numero, nome=aulapp.nome, professor=aulapp.professor,
+                                 matrprof=aulapp.matrprof, departamento=aulapp.departamento,
+                                 diadasemana=aulapp.diadasemana, inicio=aulapp.inicio, fim=aulapp.fim,
+                                 valor=aulapp.valor, status=aulapp.status, iniciograde=aulapp.iniciograde,
+                                 fimgrade=aulapp.fimgrade)
+                    session.add(aula)
+                    session.commit()
+            session.close()
+            sessionapp.close()
+            tkinter.messagebox.showinfo(title='Download ok!', message='Aulas copiadas do AppCia para AutomaçãoCia!')
+        else:
+            # Automação -> AppCia
+            sessionsapp = sessionmaker(enginef)
+            sessionapp = sessionsapp()
+
+            sessions = sessionmaker(enginefolha)
+            session = sessions()
+
+            aulasaut = session.query(Aulas).all()
+            for aulaut in aulasaut:
+                aulaapp = sessionapp.query(Aulas).filter_by(numero=aulaut.numero).first()
+                if aulaapp:
+                    aulaapp.nome = aulaut.nome
+                    aulaapp.professor = aulaut.professor
+                    aulaapp.matrprof = aulaut.matrprof
+                    aulaapp.departamento = aulaut.departamento
+                    aulaapp.diadasemana = aulaut.diadasemana
+                    aulaapp.inicio = aulaut.inicio
+                    aulaapp.fim = aulaut.fim
+                    aulaapp.valor = aulaut.valor
+                    aulaapp.status = aulaut.status
+                    aulaapp.iniciograde = aulaut.iniciograde
+                    aulaapp.fimgrade = aulaut.fimgrade
+                    sessionapp.commit()
+                else:
+                    aula = Aulas(numero=aulaut.numero, nome=aulaut.nome, professor=aulaut.professor,
+                                 matrprof=aulaut.matrprof, departamento=aulaut.departamento,
+                                 diadasemana=aulaut.diadasemana, inicio=aulaut.inicio, fim=aulaut.fim,
+                                 valor=aulaut.valor, status=aulaut.status, iniciograde=aulaut.iniciograde,
+                                 fimgrade=aulaut.fimgrade)
+                    sessionapp.add(aula)
+                    sessionapp.commit()
+            session.close()
+            sessionapp.close()
+            tkinter.messagebox.showinfo(title='Upload ok!', message='Aulas copiadas do AutomaçãoCia para AppCia!')
+

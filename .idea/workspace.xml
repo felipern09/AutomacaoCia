@@ -5,9 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/controler/f_admiss.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_admiss.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/controler/f_folha.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_folha.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/view/00_janela_principal.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/00_janela_principal.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +39,7 @@
     &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Felipe/PycharmProjects/AutomacaoCia&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Felipe/PycharmProjects/appCia&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
@@ -54,7 +56,7 @@
       <recent name="C:\Users\Felipe\PycharmProjects\PersonalTrainer" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.cadastrar_bancoColaborador">
+  <component name="RunManager" selected="Python.00_janela_principal">
     <configuration name="00_janela_principal" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="AutomacaoCia" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -163,10 +165,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.00_janela_principal" />
+        <item itemvalue="Python.testes_diversos" />
         <item itemvalue="Python.cadastrar_bancoColaborador" />
         <item itemvalue="Python.alterar_bancoAulas" />
         <item itemvalue="Python.gerar_lancar_folha" />
-        <item itemvalue="Python.testes_diversos" />
       </list>
     </recent_temporary>
   </component>

@@ -317,3 +317,4 @@ cython_debug/
 /test/alterar_bancoPonto.py
 /src/models/static/files/~$CadastroAulas.xlsx
 /src/models/basevt.db
+/src/models/bkp/

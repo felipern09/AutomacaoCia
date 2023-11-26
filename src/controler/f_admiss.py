@@ -1467,7 +1467,6 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
             docx2pdf.convert(pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.docx',
                              pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.pdf')
             os.remove(pasta_contratuais + f'\\Carta Banco {str(cadastro["nome"]).split(" ")[0]}.docx')
-
             # set up smtpp connection
             s = smtplib.SMTP(host=host, port=port)
             s.starttls()
@@ -1479,8 +1478,9 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
             text = MIMEText(f'''Olá, {str(cadastro["nome"]).split(" ")[0]}!<br><br>
             Segue sua carta para abertura de conta bancária no Itaú.<br>
             Você deve abrir a conta antes de iniciar os trabalhos no estágio. Ok?<br><br>
-            Seu contrato já foi solicitado ao IF por e-mail, com você em cópia.<br>
-            Você já pode ir até o IF retirar seu contrato. Será necessário levar uma declaração de matrícula do seu curso.<br>
+            Seu contrato já foi solicitado ao Instituto Fecomércio por e-mail, com você em cópia.<br>
+            Verifique os dias e horários de funcionamento do IF e compareça no instituto para retirar seu contrato.<br>
+            Será necessário levar uma declaração de matrícula atual do seu curso.<br>
             Ao chegar no IF, caso eles não tenham recebido o pedido do seu contrato, favor encaminhar para eles o e-mail do pedido, que você está em cópia.<br><br>
             Atenciosamente,<br>
             <img src="cid:image1">''', 'html')
@@ -1537,7 +1537,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
             arquivo = pasta_contratuais + f'\\Pedido TCE {str(cadastro["nome"]).split(" ")[0]}.pdf'
             text = MIMEText(
                 f'''Olá!<br><br>Segue pedido de TCE do(a) estagiário(a) {cadastro["nome"]}.<br>
-                O estagiário está em cópia e pode encaminhar o anexo no momento que for retirar o contrato.
+                Caso não recebam o anexo, o estagiário está em cópia e pode encaminhar no momento da retirada do TCE.
                 <br><br>Atenciosamente,<br><img src="cid:image1">''',
                 'html')
             msg.attach(text)

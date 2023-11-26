@@ -1,8 +1,6 @@
 import tkinter as tk
-from src.controler.f_folha import confirma_grade, lancar_folha_no_dexion
 from tkinter import ttk
 from tkinter import *
-import sys
 import os
 
 
@@ -80,7 +78,7 @@ class Frame1(ttk.Frame):
         super().__init__()
         # gerar folha da competencia selecionada
         self.botaoadmiss = ttk.Button(self, text="\n  Admissão e Desligamento  \n",
-                                     command=lambda: [admiss()])
+                                      command=lambda: [admiss()])
         self.botaoadmiss.grid(column=1, row=1, padx=20, pady=20, sticky=W)
         self.botaofolha = ttk.Button(self, width=20, text="\n  Alterações Folha  \n",
                                      command=lambda: [altera_folha()])
@@ -117,10 +115,13 @@ class Frame1(ttk.Frame):
         self.botaogerar = ttk.Button(self, width=20, text="\n  Uniformes  \n",
                                      command=lambda: [unif()])
         self.botaogerar.grid(column=3, row=4, padx=20, pady=20, sticky=W)
+        self.labeldb = ttk.Label(self, text='Sincronizar Bancos de Dados.')
+        self.labeldb.grid(column=3, row=5, padx=60, pady=5)
+        self.labeldb.bind('<Button-1>', dbapp)
 
 
-
-
+def dbapp(arg):
+    os.system('bacukp_bancos.py')
 
 
 if __name__ == '__main__':
