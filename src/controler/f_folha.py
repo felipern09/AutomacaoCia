@@ -1689,6 +1689,25 @@ def salvar_banco_aulas():
     sh[f'I1'].value = 'Início Grade'
     sh[f'J1'].value = 'Matrícula'
     wb.save(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\CadastroAulas.xlsx')
+    tkinter.messagebox.showinfo('Banco de aulas atualizado!', 'Aulas ativas salvas em excel com sucesso!')
+
+
+def salvar_plan_lancamentos(comp):
+    wb = l_w(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Plan.xlsx', read_only=False)
+    del wb['Planilha1']
+    wb.create_sheet('Fluxo')
+    wb.create_sheet('DeletarFerias')
+    wb.create_sheet('Faltas')
+    wb.create_sheet('Compl Est')
+    wb.create_sheet('Horistas')
+    wb.create_sheet('Comissoes')
+    wb.create_sheet('Plano')
+    wb.create_sheet('Adiantamento')
+    wb.create_sheet('DescontoVT')
+
+    wb.save(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Lancamentos - {comp}.xlsx')
+
+    tkinter.messagebox.showinfo('Planilha ok!', f'Planilha "Lançamentos" mês {comp} salva com sucesso.')
 
 
 def inativar_aulas(aulas: list):

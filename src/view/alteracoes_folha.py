@@ -1,7 +1,8 @@
 import datetime
 import tkinter as tk
 from src.controler.f_folha import lancar_ferias, lancar_atestado, lancar_desligamento, lancar_substit, \
-    lancar_hrscomple, lancar_faltas, lancar_escala, lancar_novaaula, salvar_banco_aulas, inativar_aulas
+    lancar_hrscomple, lancar_faltas, lancar_escala, lancar_novaaula, salvar_banco_aulas, inativar_aulas, \
+    salvar_plan_lancamentos
 from tkinter import ttk
 from tkinter import *
 from src.models.models import Colaborador, engine
@@ -443,7 +444,12 @@ class Escala(ttk.Frame):
         self.botaogerar = ttk.Button(self, width=20, text="Lançar Escala.", command=lambda: [
             lancar_escala(self.combonome.get(), self.combodepto.get(), self.comboaula.get(),
                           self.entrydt.get(), float(str(self.entryhr.get()).replace(',','.')))])
-        self.botaogerar.grid(column=1, row=30, padx=190, pady=1, sticky=W)
+        self.combomes = ttk.Combobox(self, width=8, values=list(range(1, 13)))
+        self.combomes.grid(column=1, row=31, padx=385, pady=2, sticky=W)
+        self.botaogerar.grid(column=1, row=30, padx=180, pady=1, sticky=W)
+        self.botaoplan = ttk.Button(self, width=12, text="Salvar Plan", command=lambda: [
+            salvar_plan_lancamentos(self.combomes.get())])
+        self.botaoplan.grid(column=1, row=31, padx=460, pady=1, sticky=W)
 
 
 class NovaAula(ttk.Frame):
