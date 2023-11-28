@@ -1397,122 +1397,126 @@ def gerar_pedido_pgto_por_arquivo(data: str, caminho_arq1: str, caminho_arq2='',
     :param caminho_arq3: file path to arq 3
     :param caminho_arq4: file path to arq 4
     """
-    somas = {}
-    sig = signature(gerar_pedido_pgto_por_arquivo)
-    params = sig.parameters
+    if caminho_arq1 == '':
+        tkinter.messagebox.showinfo('Selecione arquivo!', 'Selecione pelo menos um arquivo!')
+    else:
+        if caminho_arq2 == '' and caminho_arq3 == '' and caminho_arq4 == '':
+            quantidade_arquivos = 1
+        if caminho_arq2 != '' and caminho_arq3 == '' and caminho_arq4 == '':
+            quantidade_arquivos = 2
+        if caminho_arq2 != '' and caminho_arq3 != '' and caminho_arq4 == '':
+            quantidade_arquivos = 3
+        if caminho_arq2 != '' and caminho_arq3 != '' and caminho_arq4 != '':
+            quantidade_arquivos = 4
+        somas = {}
+        nomepgto = {
+            1: 'Salário',
+            2: 'Férias',
+            3: 'Vale Transporte',
+            4: 'Vale Alimentação',
+            5: 'Comissão',
+            6: '13º salário',
+            7: 'Bolsa Estágio',
+            8: 'Bônus',
+            9: 'Adiantamento Salarial',
+            10: 'Rescisão',
+            11: 'Bolsa Auxílio',
+            12: 'Pensão Alimentícia',
+            13: 'Pgto em C/C',
+            14: 'Remuneração'
+        }
 
-    nomepgto = {
-        1: 'Salário',
-        2: 'Férias',
-        3: 'Vale Transporte',
-        4: 'Vale Alimentação',
-        5: 'Comissão',
-        6: '13º salário',
-        7: 'Bolsa Estágio',
-        8: 'Bônus',
-        9: 'Adiantamento Salarial',
-        10: 'Rescisão',
-        11: 'Bolsa Auxílio',
-        12: 'Pensão Alimentícia',
-        13: 'Pgto em C/C',
-        14: 'Remuneração'
-    }
+        if quantidade_arquivos == 1:
+            plan1 = l_w(caminho_arq1, read_only=False)
+            sh1 = plan1['Planilha1']
+            for item in sh1['F']:
+                if nomepgto[item.value] in somas:
+                    somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh1[f'G{item.row}'].value
+                else:
+                    somas[nomepgto[item.value]] = sh1[f'G{item.row}'].value
 
-    quantidade_arquivos = -2
-    for par in params:
-        if params[par] != '':
-            quantidade_arquivos += 1
-    if quantidade_arquivos == 1:
-        plan1 = l_w(caminho_arq1, read_only=False)
-        sh1 = plan1['Planilha1']
-        for item in sh1['F']:
-            if nomepgto[item.value] in somas:
-                somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh1[f'G{item.row}'].value
-            else:
-                somas[nomepgto[item.value]] = sh1[f'G{item.row}'].value
-
-    if quantidade_arquivos == 2:
-        plan1 = l_w(caminho_arq1, read_only=False)
-        sh1 = plan1['Planilha1']
-        plan2 = l_w(caminho_arq2, read_only=False)
-        sh2 = plan2['Planilha1']
-        for item in sh1['F']:
-            if nomepgto[item.value] in somas:
-                somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh1[f'G{item.row}'].value
-            else:
-                somas[nomepgto[item.value]] = sh1[f'G{item.row}'].value
-        for item in sh2['F']:
-            if nomepgto[item.value] in somas:
-                somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh2[f'G{item.row}'].value
-            else:
-                somas[nomepgto[item.value]] = sh2[f'G{item.row}'].value
-    if quantidade_arquivos == 3:
-        plan1 = l_w(caminho_arq1, read_only=False)
-        sh1 = plan1['Planilha1']
-        plan2 = l_w(caminho_arq2, read_only=False)
-        sh2 = plan2['Planilha1']
-        plan3 = l_w(caminho_arq3, read_only=False)
-        sh3 = plan3['Planilha1']
-        for item in sh1['F']:
-            if nomepgto[item.value] in somas:
-                somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh1[f'G{item.row}'].value
-            else:
-                somas[nomepgto[item.value]] = sh1[f'G{item.row}'].value
-        for item in sh2['F']:
-            if nomepgto[item.value] in somas:
-                somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh2[f'G{item.row}'].value
-            else:
-                somas[nomepgto[item.value]] = sh2[f'G{item.row}'].value
-        for item in sh3['F']:
-            if nomepgto[item.value] in somas:
-                somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh3[f'G{item.row}'].value
-            else:
-                somas[nomepgto[item.value]] = sh3[f'G{item.row}'].value
-    if quantidade_arquivos == 4:
-        plan1 = l_w(caminho_arq1, read_only=False)
-        sh1 = plan1['Planilha1']
-        plan2 = l_w(caminho_arq2, read_only=False)
-        sh2 = plan2['Planilha1']
-        plan3 = l_w(caminho_arq3, read_only=False)
-        sh3 = plan3['Planilha1']
-        plan4 = l_w(caminho_arq4, read_only=False)
-        sh4 = plan4['Planilha1']
-        for item in sh1['F']:
-            if nomepgto[item.value] in somas:
-                somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh1[f'G{item.row}'].value
-            else:
-                somas[nomepgto[item.value]] = sh1[f'G{item.row}'].value
-        for item in sh2['F']:
-            if nomepgto[item.value] in somas:
-                somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh2[f'G{item.row}'].value
-            else:
-                somas[nomepgto[item.value]] = sh2[f'G{item.row}'].value
-        for item in sh3['F']:
-            if nomepgto[item.value] in somas:
-                somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh3[f'G{item.row}'].value
-            else:
-                somas[nomepgto[item.value]] = sh3[f'G{item.row}'].value
-        for item in sh1['F']:
-            if nomepgto[item.value] in somas:
-                somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh1[f'G{item.row}'].value
-            else:
-                somas[nomepgto[item.value]] = sh1[f'G{item.row}'].value
-    quantidade_de_pgtos = len(somas)
-    total = 0
-    for item in somas:
-        total += somas[item]
-    somas['Total'] = total
-    for item in somas:
-        somas[item] = '{0:,.2f}'.format(somas[item])
-    qtidades = {
-        1: umpgto,
-        2: doispgtos,
-        3: trespgtos,
-        4: quatropgtos,
-        5: cincopgtos,
-        6: seispgtos,
-        7: setepgtos
-    }
-    qtidades[quantidade_de_pgtos](somas, data)
-    tkinter.messagebox.showinfo('Pagamento enviado!', 'Pagamento enviado ao financeiro com sucesso!')
+        if quantidade_arquivos == 2:
+            plan1 = l_w(caminho_arq1, read_only=False)
+            sh1 = plan1['Planilha1']
+            plan2 = l_w(caminho_arq2, read_only=False)
+            sh2 = plan2['Planilha1']
+            for item in sh1['F']:
+                if nomepgto[item.value] in somas:
+                    somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh1[f'G{item.row}'].value
+                else:
+                    somas[nomepgto[item.value]] = sh1[f'G{item.row}'].value
+            for item in sh2['F']:
+                if nomepgto[item.value] in somas:
+                    somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh2[f'G{item.row}'].value
+                else:
+                    somas[nomepgto[item.value]] = sh2[f'G{item.row}'].value
+        if quantidade_arquivos == 3:
+            plan1 = l_w(caminho_arq1, read_only=False)
+            sh1 = plan1['Planilha1']
+            plan2 = l_w(caminho_arq2, read_only=False)
+            sh2 = plan2['Planilha1']
+            plan3 = l_w(caminho_arq3, read_only=False)
+            sh3 = plan3['Planilha1']
+            for item in sh1['F']:
+                if nomepgto[item.value] in somas:
+                    somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh1[f'G{item.row}'].value
+                else:
+                    somas[nomepgto[item.value]] = sh1[f'G{item.row}'].value
+            for item in sh2['F']:
+                if nomepgto[item.value] in somas:
+                    somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh2[f'G{item.row}'].value
+                else:
+                    somas[nomepgto[item.value]] = sh2[f'G{item.row}'].value
+            for item in sh3['F']:
+                if nomepgto[item.value] in somas:
+                    somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh3[f'G{item.row}'].value
+                else:
+                    somas[nomepgto[item.value]] = sh3[f'G{item.row}'].value
+        if quantidade_arquivos == 4:
+            plan1 = l_w(caminho_arq1, read_only=False)
+            sh1 = plan1['Planilha1']
+            plan2 = l_w(caminho_arq2, read_only=False)
+            sh2 = plan2['Planilha1']
+            plan3 = l_w(caminho_arq3, read_only=False)
+            sh3 = plan3['Planilha1']
+            plan4 = l_w(caminho_arq4, read_only=False)
+            sh4 = plan4['Planilha1']
+            for item in sh1['F']:
+                if nomepgto[item.value] in somas:
+                    somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh1[f'G{item.row}'].value
+                else:
+                    somas[nomepgto[item.value]] = sh1[f'G{item.row}'].value
+            for item in sh2['F']:
+                if nomepgto[item.value] in somas:
+                    somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh2[f'G{item.row}'].value
+                else:
+                    somas[nomepgto[item.value]] = sh2[f'G{item.row}'].value
+            for item in sh3['F']:
+                if nomepgto[item.value] in somas:
+                    somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh3[f'G{item.row}'].value
+                else:
+                    somas[nomepgto[item.value]] = sh3[f'G{item.row}'].value
+            for item in sh4['F']:
+                if nomepgto[item.value] in somas:
+                    somas[nomepgto[item.value]] = somas[nomepgto[item.value]] + sh4[f'G{item.row}'].value
+                else:
+                    somas[nomepgto[item.value]] = sh4[f'G{item.row}'].value
+        quantidade_de_pgtos = len(somas)
+        total = 0
+        for item in somas:
+            total += somas[item]
+        somas['Total'] = total
+        for item in somas:
+            somas[item] = '{0:,.2f}'.format(somas[item])
+        qtidades = {
+            1: umpgto,
+            2: doispgtos,
+            3: trespgtos,
+            4: quatropgtos,
+            5: cincopgtos,
+            6: seispgtos,
+            7: setepgtos
+        }
+        qtidades[quantidade_de_pgtos](somas, data)
+        tkinter.messagebox.showinfo('Pagamento enviado!', 'Pagamento enviado ao financeiro com sucesso!')
 
