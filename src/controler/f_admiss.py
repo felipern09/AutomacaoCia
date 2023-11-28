@@ -1065,10 +1065,10 @@ def enviar_emails_contratacao(caminho: str, nome: str, departamento: str, cargo:
         os.remove(p_contr + '\\Ficha Cadastral.docx')
 
         # Alterar Código de Ética e salvar na pasta
-        codetic.paragraphs[535].text = str(codetic.paragraphs[534].text).replace('#nome_completo', nome)
-        codetic.paragraphs[536].text = str(codetic.paragraphs[535].text).replace('#func', cargo)
-        codetic.paragraphs[538].text = str(codetic.paragraphs[537].text).replace('#nome_completo', nome)
-        codetic.paragraphs[542].text = str(codetic.paragraphs[541].text).replace('#admiss', admissao)
+        codetic.paragraphs[535].text = str(codetic.paragraphs[535].text).replace('#nome_completo', nome)
+        codetic.paragraphs[536].text = str(codetic.paragraphs[536].text).replace('#func', cargo)
+        codetic.paragraphs[538].text = str(codetic.paragraphs[538].text).replace('#nome_completo', nome)
+        codetic.paragraphs[542].text = str(codetic.paragraphs[542].text).replace('#admiss', admissao)
         codetic.save(p_contr + '\\Cod Etica.docx')
         docx2pdf.convert(p_contr + '\\Cod Etica.docx', p_contr + '\\Cod Etica.pdf')
         os.remove(p_contr + '\\Cod Etica.docx')

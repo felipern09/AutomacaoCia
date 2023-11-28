@@ -1693,6 +1693,13 @@ def salvar_banco_aulas():
 
 
 def salvar_plan_lancamentos(comp):
+    hj = dt.today()
+    mes = str(comp).zfill(2)
+    ano = hj.year
+    mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
+              '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
+    pasta_pgto = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Grades e Comissões'
+
     wb = l_w(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Plan.xlsx', read_only=False)
     del wb['Planilha1']
     wb.create_sheet('Fluxo')
@@ -1704,8 +1711,7 @@ def salvar_plan_lancamentos(comp):
     wb.create_sheet('Plano')
     wb.create_sheet('Adiantamento')
     wb.create_sheet('DescontoVT')
-
-    wb.save(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Lancamentos - {comp}.xlsx')
+    wb.save(pasta_pgto + rf'\Lancamentos - {comp}.xlsx')
 
     tkinter.messagebox.showinfo('Planilha ok!', f'Planilha "Lançamentos" mês {comp} salva com sucesso.')
 

@@ -747,16 +747,19 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str, estag: int):
             '#data2', dt.strftime(datafim, '%d/%m/%Y'))
         ponto.paragraphs[2].text = str(ponto.paragraphs[2].text).replace('#emissao',
                                                                          dt.strftime(dt.today(), '%d/%m/%Y'))
-        ponto.tables[0].rows[3].cells[1].paragraphs[0].text = str(
-            ponto.tables[0].rows[3].cells[1].paragraphs[0].text).replace('#nome', planbase[str(matricula)])
-        ponto.tables[0].rows[4].cells[1].paragraphs[0].text = str(
-            ponto.tables[0].rows[4].cells[1].paragraphs[0].text).replace('#cod', str(matricula))
-        ponto.tables[0].rows[5].cells[1].paragraphs[0].text = str(
-            ponto.tables[0].rows[5].cells[1].paragraphs[0].text).replace('#mat', str(planmat[str(matricula)]))
-        ponto.tables[0].rows[6].cells[1].paragraphs[0].text = str(
-            ponto.tables[0].rows[6].cells[1].paragraphs[0].text).replace('#func', planfunc[str(matricula)])
-        ponto.tables[0].rows[7].cells[1].paragraphs[0].text = str(
-            ponto.tables[0].rows[7].cells[1].paragraphs[0].text).replace('#depto', plandept[str(matricula)])
+        try:
+            ponto.tables[0].rows[3].cells[1].paragraphs[0].text = str(
+                ponto.tables[0].rows[3].cells[1].paragraphs[0].text).replace('#nome', planbase[str(matricula)])
+            ponto.tables[0].rows[4].cells[1].paragraphs[0].text = str(
+                ponto.tables[0].rows[4].cells[1].paragraphs[0].text).replace('#cod', str(matricula))
+            ponto.tables[0].rows[5].cells[1].paragraphs[0].text = str(
+                ponto.tables[0].rows[5].cells[1].paragraphs[0].text).replace('#mat', str(planmat[str(matricula)]))
+            ponto.tables[0].rows[6].cells[1].paragraphs[0].text = str(
+                ponto.tables[0].rows[6].cells[1].paragraphs[0].text).replace('#func', planfunc[str(matricula)])
+            ponto.tables[0].rows[7].cells[1].paragraphs[0].text = str(
+                ponto.tables[0].rows[7].cells[1].paragraphs[0].text).replace('#depto', plandept[str(matricula)])
+        except KeyError:
+            pass
         # ponto.tables[0].rows[5].cells[4].paragraphs[0].text = 'HH:MM'
         style = ponto.styles['Normal']
         font = style.font
