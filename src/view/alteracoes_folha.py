@@ -42,8 +42,8 @@ class MainApplication(tk.Tk):
         self.notebook.add(self.Frame5, text='Desligamentos')
         self.notebook.add(self.Frame6, text='Atestados')
         self.notebook.add(self.Frame7, text='Esacala')
-        self.notebook.add(self.Frame8, text='Nova Aula')
-        self.notebook.add(self.Frame9, text='Inativar Aula')
+        self.notebook.add(self.Frame8, text='Nova Hr')
+        self.notebook.add(self.Frame9, text='Inativar Hr')
         self.notebook.pack()
 
 
@@ -444,12 +444,12 @@ class Escala(ttk.Frame):
         self.botaogerar = ttk.Button(self, width=20, text="Lançar Escala.", command=lambda: [
             lancar_escala(self.combonome.get(), self.combodepto.get(), self.comboaula.get(),
                           self.entrydt.get(), float(str(self.entryhr.get()).replace(',','.')))])
-        self.combomes = ttk.Combobox(self, width=8, values=list(range(1, 13)))
-        self.combomes.grid(column=1, row=31, padx=385, pady=2, sticky=W)
         self.botaogerar.grid(column=1, row=30, padx=180, pady=1, sticky=W)
-        self.botaoplan = ttk.Button(self, width=12, text="Salvar Plan", command=lambda: [
+        self.combomes = ttk.Combobox(self, width=8, values=list(range(1, 13)))
+        self.combomes.grid(column=1, row=31, padx=325, pady=5, sticky=W)
+        self.botaoplan = ttk.Button(self, text="Salvar Plan 'Lançamentos'", command=lambda: [
             salvar_plan_lancamentos(self.combomes.get())])
-        self.botaoplan.grid(column=1, row=31, padx=460, pady=1, sticky=W)
+        self.botaoplan.grid(column=1, row=31, padx=400, pady=5, sticky=W)
 
 
 class NovaAula(ttk.Frame):
@@ -523,12 +523,12 @@ class NovaAula(ttk.Frame):
         self.entryvalor = ttk.Entry(self, width=20)
         self.entryvalor.grid(column=1, row=10, padx=95, pady=2, sticky=W)
         # gerar folha da competencia selecionada
-        self.botaogerar = ttk.Button(self, width=20, text="Lançar Nova Aula", command=lambda: [
+        self.botaogerar = ttk.Button(self, width=20, text="Lançar Novo Horário", command=lambda: [
             lancar_novaaula(self.combonome.get(), self.combodepto.get(), self.comboaula.get(),
                             self.combodias.get(), self.entryiniciohr.get(), self.entryfimhr.get(),
                             self.entryvalor.get())])
         self.botaogerar.grid(column=1, row=30, padx=190, pady=1, sticky=W)
-        self.botaosalvar = ttk.Button(self, width=20, text="Salvar Banco de Aulas", command=lambda: [
+        self.botaosalvar = ttk.Button(self, width=20, text="Salvar Banco de Hrs", command=lambda: [
             salvar_banco_aulas()])
         self.botaosalvar.grid(column=1, row=30, padx=350, pady=1, sticky=W)
 

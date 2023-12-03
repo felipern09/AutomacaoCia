@@ -2,6 +2,11 @@ import shutil
 from datetime import datetime as dt, timedelta as td
 import datetime
 from dateutil.relativedelta import relativedelta
+from email import encoders
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from email.mime.base import MIMEBase
 import holidays
 import hashlib
 import locale
@@ -10,16 +15,25 @@ from openpyxl.styles import PatternFill, Font
 import openpyxl.utils.cell
 import os
 import pandas as pd
+from PIL import ImageGrab
 import pyautogui as pa
 from src.models.modelsfolha import Aula, Folha, Aulas, Faltas, Ferias, Hrcomplement, Atestado, Desligados, \
     Escala, Substituicao, enginefolha
+import smtplib
+from src.models.dados_servd import em_rem, em_ti, em_if, k1, host, port, rede, em_fin, em_lgpd, pasta_dexion, \
+    pasta_estag, pasta_func
 from src.models.models import Colaborador, engine
 from sqlalchemy.orm import sessionmaker,declarative_base
 from sqlalchemy import create_engine, MetaData, Column, Integer, String
+import zipfile
 import tkinter.filedialog
 from tkinter import messagebox
 import tkinter.filedialog
 import time as t
+import win32com.client as client
+from pdf2image import convert_from_path
+from PIL import Image, ImageDraw, ImageFont, ImageOps
+from fpdf import FPDF
 
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
 locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
@@ -435,6 +449,13 @@ def consultar_ferias(comp) -> dict:
             else:
                 d2 = {f.professor: {f.departamento: {f.inicio: f.fim}}}
                 dic = {**dic, **d2}
+        if inicio <= dt.strptime(f.fim, '%d/%m/%Y') <= fim:
+            if f.professor in dic:
+                d2 = {f.professor: {f.departamento: {f.inicio: f.fim}}}
+                dic[f.professor] = {**dic[f.professor], **d2[f.professor]}
+            else:
+                d2 = {f.professor: {f.departamento: {f.inicio: f.fim}}}
+                dic = {**dic, **d2}
     session.close()
     return dic
 
@@ -576,28 +597,32 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
     def intervalo(inicio, fechamento):
         for n in range(int((fechamento - inicio).days) + 1):
             yield dt.strftime(inicio + td(n), '%d/%m/%Y')
+
+    def descobrir_ano(diadt: str):
+        ddt, m = diadt.split('/')
+        if int(ddt) > fechamento.day:
+            anodt = inicio.year
+        else:
+            anodt = fechamento.year
+        return anodt
+
     # inserir data no cabeçalho da grade
     col = 3
     for item in list(intervalo(inicio, fechamento)):
         plan1.cell(column=col, row=3, value=dt.strftime(dt.strptime(item, '%d/%m/%Y'), '%a'))
         plan1.cell(column=col, row=4, value=dt.strftime(dt.strptime(item, '%d/%m/%Y'), '%d/%m'))
         col += 1
-    # indesir total na coluna ao final das datas
+    # insesir total na coluna ao final das datas
     plan1.cell(column=col, row=3, value='Total')
-    # formatar coloração de fds
-    for itens in plan1.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
-        for cell in itens:
-            if cell.value != 'Total':
-                if cell.value == 'sáb' or cell.value == 'dom':
-                    letras = openpyxl.utils.cell.get_column_letter(cell.column)
-                    for numero in range(3, 150):
-                        plan1[f'{letras}{numero}'].fill = fds
+
     # separar cada prof de cada depto
     musculacao = []
     ginastica = []
     esportes = []
     kids = []
     cross = []
+    mensalistas = []
+    pnt = []
     for i in dic:
         for sub in dic[i]:
             if dic[i][sub] == {}:
@@ -618,6 +643,12 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
                 if sub == 'Cross Cia':
                     cross.append(i)
                     cross.sort()
+                if sub == 'PNT':
+                    pnt.append(i)
+                    pnt.sort()
+                if sub == 'Mensalistas':
+                    mensalistas.append(i)
+                    mensalistas.sort()
 
     plan1['A5'].value = 'Musculação'
     novalinha = 6
@@ -626,19 +657,19 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
             for cell in row:
                 if cell.value != 'Total':
                     if cell.value == 'seg':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_segunda(i, 'Musculação'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_segunda(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Musculação'))
                     if cell.value == 'ter':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_terca(i, 'Musculação'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_terca(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Musculação'))
                     if cell.value == 'qua':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quarta(i, 'Musculação'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quarta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Musculação'))
                     if cell.value == 'qui':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quinta(i, 'Musculação'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quinta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Musculação'))
                     if cell.value == 'sex':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sexta(i, 'Musculação'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sexta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Musculação'))
                     if cell.value == 'sáb':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sabado(i, 'Musculação'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sabado(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Musculação'))
                     if cell.value == 'dom':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_domingo(i, 'Musculação'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_domingo(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Musculação'))
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
@@ -751,19 +782,19 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
             for cell in row:
                 if cell.value != 'Total':
                     if cell.value == 'seg':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_segunda(i, 'Ginástica'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_segunda(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Ginástica'))
                     if cell.value == 'ter':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_terca(i, 'Ginástica'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_terca(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Ginástica'))
                     if cell.value == 'qua':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quarta(i, 'Ginástica'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quarta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Ginástica'))
                     if cell.value == 'qui':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quinta(i, 'Ginástica'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quinta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Ginástica'))
                     if cell.value == 'sex':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sexta(i, 'Ginástica'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sexta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Ginástica'))
                     if cell.value == 'sáb':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sabado(i, 'Ginástica'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sabado(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Ginástica'))
                     if cell.value == 'dom':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_domingo(i, 'Ginástica'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_domingo(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Ginástica'))
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
@@ -871,19 +902,19 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
             for cell in row:
                 if cell.value != 'Total':
                     if cell.value == 'seg':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_segunda(i, 'Kids'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_segunda(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Kids'))
                     if cell.value == 'ter':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_terca(i, 'Kids'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_terca(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Kids'))
                     if cell.value == 'qua':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quarta(i, 'Kids'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quarta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Kids'))
                     if cell.value == 'qui':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quinta(i, 'Kids'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quinta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Kids'))
                     if cell.value == 'sex':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sexta(i, 'Kids'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sexta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Kids'))
                     if cell.value == 'sáb':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sabado(i, 'Kids'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sabado(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Kids'))
                     if cell.value == 'dom':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_domingo(i, 'Kids'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_domingo(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Kids'))
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
@@ -991,19 +1022,19 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
             for cell in row:
                 if cell.value != 'Total':
                     if cell.value == 'seg':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_segunda(i, 'Esportes'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_segunda(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Esportes'))
                     if cell.value == 'ter':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_terca(i, 'Esportes'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_terca(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Esportes'))
                     if cell.value == 'qua':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quarta(i, 'Esportes'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quarta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Esportes'))
                     if cell.value == 'qui':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quinta(i, 'Esportes'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quinta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Esportes'))
                     if cell.value == 'sex':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sexta(i, 'Esportes'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sexta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Esportes'))
                     if cell.value == 'sáb':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sabado(i, 'Esportes'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sabado(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Esportes'))
                     if cell.value == 'dom':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_domingo(i, 'Esportes'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_domingo(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Esportes'))
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
@@ -1111,19 +1142,19 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
             for cell in row:
                 if cell.value != 'Total':
                     if cell.value == 'seg':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_segunda(i, 'Cross Cia'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_segunda(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Cross Cia'))
                     if cell.value == 'ter':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_terca(i, 'Cross Cia'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_terca(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Cross Cia'))
                     if cell.value == 'qua':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quarta(i, 'Cross Cia'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quarta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Cross Cia'))
                     if cell.value == 'qui':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quinta(i, 'Cross Cia'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quinta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Cross Cia'))
                     if cell.value == 'sex':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sexta(i, 'Cross Cia'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sexta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Cross Cia'))
                     if cell.value == 'sáb':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sabado(i, 'Cross Cia'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sabado(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Cross Cia'))
                     if cell.value == 'dom':
-                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_domingo(i, 'Cross Cia'))
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_domingo(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Cross Cia'))
                 else:
                     letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
                     plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
@@ -1224,6 +1255,245 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
         plan1.cell(column=2, row=novalinha, value=i)
         novalinha += 1
 
+    plan1[f'A{novalinha}'].value = 'PNT'
+    novalinha += 1
+    for i in pnt:
+        for row in plan1.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
+            for cell in row:
+                if cell.value != 'Total':
+                    if cell.value == 'seg':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_segunda(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'PNT'))
+                    if cell.value == 'ter':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_terca(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'PNT'))
+                    if cell.value == 'qua':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quarta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'PNT'))
+                    if cell.value == 'qui':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quinta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'PNT'))
+                    if cell.value == 'sex':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sexta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'PNT'))
+                    if cell.value == 'sáb':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sabado(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'PNT'))
+                    if cell.value == 'dom':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_domingo(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'PNT')/2)
+                else:
+                    letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
+                    plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
+                # aplica cor de falta
+                for nome in flt:
+                    for dia in flt[nome]:
+                        for depart in flt[nome][dia]:
+                            if depart == 'PNT' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                        dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
+                # aplica alterações de substituição
+                for numb in subs:
+                    for nome in subs[numb]:
+                        for substituto in subs[numb][nome]:
+                            for depart in subs[numb][nome][substituto]:
+                                for dia in subs[numb][nome][substituto][depart]:
+                                    if depart == 'PNT' and nome == i:
+                                        if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                            plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                    if depart == 'PNT' and substituto == i:
+                                        if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                            plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(
+                                                column=cell.column, row=novalinha).value + float(
+                                                str(subs[numb][nome][substituto][depart][dia]).replace(',', '.'))
+                                            plan1.cell(column=cell.column, row=novalinha).fill = subst
+
+                # aplica alterações de desligamento
+                for nome in dslg:
+                    for depart in dslg[nome]:
+                        if depart == 'PNT' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(
+                                        str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]),
+                                                                      month=int(str(plan1.cell(column=cell.column,
+                                                                                               row=cell.row + 1).value).split(
+                                                                              '/')[1]),
+                                                                      year=dt.today().year) <= fechamento:
+                                    plan1.cell(column=cell.column, row=novalinha).value = 0
+                                    plan1.cell(column=cell.column, row=novalinha).fill = deslig
+                                    plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
+
+                # aplica talterações de férias
+                for nome in fer:
+                    for depart in fer[nome]:
+                        for inic in fer[nome][depart]:
+                            if depart == 'PNT' and nome == i and dt.strptime(inic, '%d/%m/%Y') <= fechamento:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                    if dt.strptime(inic, '%d/%m/%Y') <= dt(day=int(
+                                            str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]),
+                                                                           month=int(str(plan1.cell(column=cell.column,
+                                                                                                    row=cell.row + 1).value).split(
+                                                                                   '/')[1]),
+                                                                           year=dt.today().year) <= dt.strptime(
+                                            fer[nome][depart][inic], '%d/%m/%Y'):
+                                        plan1.cell(column=cell.column, row=novalinha).fill = ferias
+                                        plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica alterações de horas complementares
+                for nome in complem:
+                    for dia in complem[nome]:
+                        for depart in complem[nome][dia]:
+                            if depart == 'PNT' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                        dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column,
+                                                                                                     row=novalinha).value + float(
+                                        str(complem[nome][dia][depart]).replace(',', '.'))
+                                    plan1.cell(column=cell.column, row=novalinha).fill = comple
+
+                # aplica alterações de atestados
+                for nome in atest:
+                    for d in atest[nome]:
+                        if atest[nome][d] == 'PNT' and nome == i:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                    dt.strptime(d, '%d/%m/%Y'), '%d/%m'):
+                                plan1.cell(column=cell.column, row=novalinha).fill = atestado
+
+                # aplica alterações de feriado
+                for dia in feriad:
+                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dia, '%d/%m'):
+                        plan1.cell(column=cell.column, row=novalinha).fill = feriado
+                        plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica alterações de escala
+                for nome in escal:
+                    for dia in escal[nome]:
+                        for depart in escal[nome][dia]:
+                            if depart == 'PNT' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                        dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column,
+                                                                                                     row=novalinha).value + float(
+                                        str(escal[nome][dia][depart]).replace(',', '.'))
+
+        plan1.cell(column=2, row=novalinha, value=i)
+        novalinha += 1
+    
+    plan1[f'A{novalinha}'].value = 'Mensalistas'
+    novalinha += 1
+    for i in mensalistas:
+        for row in plan1.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
+            for cell in row:
+                if cell.value != 'Total':
+                    if cell.value == 'seg':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_segunda(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Mensalistas'))
+                    if cell.value == 'ter':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_terca(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Mensalistas'))
+                    if cell.value == 'qua':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quarta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Mensalistas'))
+                    if cell.value == 'qui':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_quinta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Mensalistas'))
+                    if cell.value == 'sex':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sexta(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Mensalistas'))
+                    if cell.value == 'sáb':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_sabado(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Mensalistas'))
+                    if cell.value == 'dom':
+                        plan1.cell(column=cell.column, row=novalinha, value=somar_aulas_de_domingo(str(plan1.cell(column=cell.column, row=4).value) + f'/{descobrir_ano(str(plan1.cell(column=cell.column, row=4).value))}', i, 'Mensalistas')/2)
+                else:
+                    letra = openpyxl.utils.cell.get_column_letter(cell.column - 1)
+                    plan1.cell(column=cell.column, row=novalinha, value=f'=SUM(C{novalinha}:{letra}{novalinha})')
+                # aplica cor de falta
+                for nome in flt:
+                    for dia in flt[nome]:
+                        for depart in flt[nome][dia]:
+                            if depart == 'Mensalistas' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                        dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).fill = falta
+                # aplica alterações de substituição
+                for numb in subs:
+                    for nome in subs[numb]:
+                        for substituto in subs[numb][nome]:
+                            for depart in subs[numb][nome][substituto]:
+                                for dia in subs[numb][nome][substituto][depart]:
+                                    if depart == 'Mensalistas' and nome == i:
+                                        if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                            plan1.cell(column=cell.column, row=novalinha).fill = falta
+                                    if depart == 'Mensalistas' and substituto == i:
+                                        if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                                dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                            plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(
+                                                column=cell.column, row=novalinha).value + float(
+                                                str(subs[numb][nome][substituto][depart][dia]).replace(',', '.'))
+                                            plan1.cell(column=cell.column, row=novalinha).fill = subst
+
+                # aplica alterações de desligamento
+                for nome in dslg:
+                    for depart in dslg[nome]:
+                        if depart == 'Mensalistas' and nome == i and dt.strptime(dia, '%d/%m/%Y') <= fechamento:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                if dt.strptime(dia, '%d/%m/%Y') <= dt(day=int(
+                                        str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]),
+                                                                      month=int(str(plan1.cell(column=cell.column,
+                                                                                               row=cell.row + 1).value).split(
+                                                                              '/')[1]),
+                                                                      year=dt.today().year) <= fechamento:
+                                    plan1.cell(column=cell.column, row=novalinha).value = 0
+                                    plan1.cell(column=cell.column, row=novalinha).fill = deslig
+                                    plan1.cell(column=cell.column, row=novalinha).font = Font(color='FFFFFF')
+
+                # aplica talterações de férias
+                for nome in fer:
+                    for depart in fer[nome]:
+                        for inic in fer[nome][depart]:
+                            if depart == 'Mensalistas' and nome == i and dt.strptime(inic, '%d/%m/%Y') <= fechamento:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value is not None:
+                                    if dt.strptime(inic, '%d/%m/%Y') <= dt(day=int(
+                                            str(plan1.cell(column=cell.column, row=cell.row + 1).value).split('/')[0]),
+                                                                           month=int(str(plan1.cell(column=cell.column,
+                                                                                                    row=cell.row + 1).value).split(
+                                                                                   '/')[1]),
+                                                                           year=dt.today().year) <= dt.strptime(
+                                            fer[nome][depart][inic], '%d/%m/%Y'):
+                                        plan1.cell(column=cell.column, row=novalinha).fill = ferias
+                                        plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica alterações de horas complementares
+                for nome in complem:
+                    for dia in complem[nome]:
+                        for depart in complem[nome][dia]:
+                            if depart == 'Mensalistas' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                        dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column,
+                                                                                                     row=novalinha).value + float(
+                                        str(complem[nome][dia][depart]).replace(',', '.'))
+                                    plan1.cell(column=cell.column, row=novalinha).fill = comple
+
+                # aplica alterações de atestados
+                for nome in atest:
+                    for d in atest[nome]:
+                        if atest[nome][d] == 'Mensalistas' and nome == i:
+                            if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                    dt.strptime(d, '%d/%m/%Y'), '%d/%m'):
+                                plan1.cell(column=cell.column, row=novalinha).fill = atestado
+
+                # aplica alterações de feriado
+                for dia in feriad:
+                    if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(dia, '%d/%m'):
+                        plan1.cell(column=cell.column, row=novalinha).fill = feriado
+                        plan1.cell(column=cell.column, row=novalinha).value = 0
+
+                # aplica alterações de escala
+                for nome in escal:
+                    for dia in escal[nome]:
+                        for depart in escal[nome][dia]:
+                            if depart == 'Mensalistas' and nome == i:
+                                if plan1.cell(column=cell.column, row=cell.row + 1).value == dt.strftime(
+                                        dt.strptime(dia, '%d/%m/%Y'), '%d/%m'):
+                                    plan1.cell(column=cell.column, row=novalinha).value = plan1.cell(column=cell.column,
+                                                                                                     row=novalinha).value + float(
+                                        str(escal[nome][dia][depart]).replace(',', '.'))
+        plan1.cell(column=2, row=novalinha, value=i)
+        novalinha += 1
+
     for i, coluna in enumerate(plan1.columns):
         max_length = 0
         column = coluna[0].column_letter
@@ -1240,6 +1510,20 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
         for cell in row:
             if plan1.cell(column=cell.column, row=cell.row).value == 'Total':
                 plan1.column_dimensions[openpyxl.utils.cell.get_column_letter(cell.column)].width = 8
+
+    # formatar coloração de fds
+    for row in plan1.iter_cols(min_row=6, min_col=2, max_row=150, max_col=2):
+        for cell in row:
+            if cell.value is None and plan1.cell(column=cell.column, row=cell.row - 1).value is not None:
+                    ultima_linha = cell.row
+
+    for itens in plan1.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
+        for cell in itens:
+            if cell.value != 'Total':
+                if cell.value == 'sáb' or cell.value == 'dom':
+                    letras = openpyxl.utils.cell.get_column_letter(cell.column)
+                    for numero in range(3, ultima_linha):
+                        plan1[f'{letras}{numero}'].fill = fds
 
     plan1['C1'].fill = atestado
     plan1['D1'].value = 'Atestado'
@@ -1258,107 +1542,163 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
     grade.save(pasta_pgto + f'\\Grade {fechamento.month}-{fechamento.year}.xlsx')
 
 
-def somar_aulas_de_segunda(nome: str, depto: str) -> float:
+def somar_aulas_de_segunda(diaplan: str, nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulasseg = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Segunda') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulasseg:
-        hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
-        somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
-        somadia = round(somadia, 2)
-        somas += somadia
+        if aula.fimgrade is not None:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y') < dt.strptime(aula.fimgrade, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
+        else:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
     session.close()
     return somas
 
 
-def somar_aulas_de_terca(nome: str, depto: str) -> float:
+def somar_aulas_de_terca(diaplan: str, nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulaster = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Terça') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulaster:
-        hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
-        somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
-        somadia = round(somadia, 2)
-        somas += somadia
+        if aula.fimgrade is not None:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y') < dt.strptime(aula.fimgrade, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
+        else:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
     session.close()
     return somas
 
 
-def somar_aulas_de_quarta(nome: str, depto: str) -> float:
+def somar_aulas_de_quarta(diaplan: str, nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulasqua = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Quarta') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulasqua:
-        hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
-        somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
-        somadia = round(somadia, 2)
-        somas += somadia
+        if aula.fimgrade is not None:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y') < dt.strptime(aula.fimgrade, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
+        else:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
     session.close()
     return somas
 
 
-def somar_aulas_de_quinta(nome: str, depto: str) -> float:
+def somar_aulas_de_quinta(diaplan: str, nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulasqui = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Quinta') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulasqui:
-        hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
-        somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
-        somadia = round(somadia, 2)
-        somas += somadia
+        if aula.fimgrade is not None:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y') < dt.strptime(aula.fimgrade, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
+        else:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
     session.close()
     return somas
 
 
-def somar_aulas_de_sexta(nome: str, depto: str) -> float:
+def somar_aulas_de_sexta(diaplan: str, nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulassex = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Sexta') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulassex:
-        hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
-        somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
-        somadia = round(somadia, 2)
-        somas += somadia
+        if aula.fimgrade is not None:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y') < dt.strptime(aula.fimgrade, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
+        else:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
     session.close()
     return somas
 
 
-def somar_aulas_de_sabado(nome: str, depto: str) -> float:
+def somar_aulas_de_sabado(diaplan: str, nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulassab = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Sábado') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulassab:
-        hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
-        somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
-        somadia = round(somadia, 2)
-        somas += somadia
+        if aula.fimgrade is not None:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y') < dt.strptime(aula.fimgrade, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
+        else:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
     session.close()
     return somas
 
 
-def somar_aulas_de_domingo(nome: str, depto: str) -> float:
+def somar_aulas_de_domingo(diaplan: str, nome: str, depto: str) -> float:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     aulasdom = session.query(Aulas).filter_by(professor=nome).filter_by(status='Ativa').filter_by(diadasemana='Domingo') \
         .filter_by(departamento=depto).all()
     somas = 0
     for aula in aulasdom:
-        hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
-        somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
-        somadia = round(somadia, 2)
-        somas += somadia
+        if aula.fimgrade is not None:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y') < dt.strptime(aula.fimgrade, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
+        else:
+            if dt.strptime(aula.iniciograde, '%d/%m/%Y') <= dt.strptime(diaplan, '%d/%m/%Y'):
+                hr, minut, seg = str(dt.strptime(aula.fim, '%H:%M:%S') - dt.strptime(aula.inicio, '%H:%M:%S')).split(':')
+                somadia = int(hr) + int(minut) / 60 + int(seg) / 60 * 60
+                somadia = round(somadia, 2)
+                somas += somadia
     session.close()
     return somas * 2
 
@@ -1377,6 +1717,8 @@ def salvar_planilha_soma_final(compet: int):
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     folhadehoje = Folha(compet, list(listar_aulas_ativas(compet)), listar_departamentos_ativos())
+
+    # criar dicionario somaaulas[professor][departamento][aulanome+valor][somadeaulas] que será usado na planilha de total
     somaaulas = {}
     for i in listar_professores_ativos():
         somaaulas[i] = {}
@@ -1408,8 +1750,6 @@ def salvar_planilha_soma_final(compet: int):
                     folha[f'C{x}'].value = str(sub2)
                     folha[f'D{x}'].value = float(str(somafinal[i][sub][sub2]))
                     x += 1
-    # folha['F1'].value = 'Total Bruto - Professores'
-    # folha['G1'].value = locale.currency(totaldafolha(folhadehoje), grouping=True)
     plan.save(pasta_pgto + f'\\Somafinal mes {compet}.xlsx')
     salvar_planilha_grade_horaria(somafinal, compet)
     substitutos = {}
@@ -1418,7 +1758,7 @@ def salvar_planilha_soma_final(compet: int):
     desligadosl = {}
     planilha = l_w(pasta_pgto + f'\\Grade {compet}-2023.xlsx')
     aba = planilha['Planilha1']
-    for row in aba.iter_cols(min_row=3, min_col=3, max_row=115, max_col=35):
+    for row in aba.iter_cols(min_row=3, min_col=3, max_row=150, max_col=35):
         for cell in row:
             if cell.fill == ferias:
                 for i in range(1, 150):
@@ -1511,23 +1851,56 @@ def salvar_planilha_soma_final(compet: int):
         adjusted_width = max_length + 1
         aba2.column_dimensions[column].width = adjusted_width
     planilha2.save(pasta_pgto + f'\\Somafinal mes {compet}.xlsx')
-    planilha3 = l_w(pasta_pgto + f'\\Grade {compet}-2023.xlsx', read_only=False)
+
+    planilha3 = l_w(pasta_pgto + f'\\Grade {compet}-{ano}.xlsx', read_only=False)
     aba3 = planilha3['Planilha1']
-    for row in aba3.iter_cols(min_row=3, min_col=3, max_row=120, max_col=35):
+    for row in aba3.iter_cols(min_row=6, min_col=2, max_row=150, max_col=2):
+        for cell in row:
+            if cell.value is None and aba3.cell(column=cell.column, row=cell.row - 1).value is not None:
+                    ultima_linha = cell.row - 1
+
+    for row in aba3.iter_cols(min_row=6, min_col=3, max_row=ultima_linha, max_col=35):
         for cell in row:
             if cell.value == 0:
                 cell.value = ''
 
-    planilha3.save(pasta_pgto + f'\\Grade {compet}-2023.xlsx')
+    for linha_dptos in aba3.iter_cols(min_row=4, min_col=1, max_row=ultima_linha, max_col=1):
+        for celula in linha_dptos:
+            if celula.value == 'Mensalistas':
+                linha_mensalistas = int(celula.row)
+
+    for linha_tt in aba3.iter_cols(min_row=3, min_col=3, max_row=3, max_col=35):
+        for celula in linha_tt:
+            if celula.value == 'Total':
+                coluna_total = int(celula.column)
+                letratt = openpyxl.utils.cell.get_column_letter(celula.column - 1)
+
+    for row in aba3.iter_cols(min_row=linha_mensalistas + 1, min_col=3, max_row=ultima_linha, max_col=coluna_total):
+        for c in row:
+            if c.value != '':
+                if aba3.cell(column=c.column, row=3).value == 'Total':
+                    aba3.cell(column=c.column, row=c.row, value=f'=COUNTA(C{c.row}:{letratt}{c.row})')
+                else:
+                    c.value = 'P'
+            if c.fill == ferias:
+                c.value = 'F'
+            if c.fill == atestado:
+                c.value = 'A'
+            if c.fill == deslig:
+                c.value = ''
+            if c.fill == subst:
+                c.value = 'D'
+            if c.fill == comple:
+                c.value = 'D'
+            if c.fill == falta:
+                c.value = 'F'
+    top_rows = aba3['AJ5']
+    aba3.freeze_panes = top_rows
+    planilha3.save(pasta_pgto + f'\\Grade {compet}-{ano}.xlsx')
     tkinter.messagebox.showinfo(
         title='Grade ok!',
         message=f'Grade do mês {compet} salva com sucesso!'
     )
-
-    print('Férias \n', feriasl)
-    print('Desligados \n', desligadosl)
-    print('Substitutos \n', substitutos)
-    print('Hrs Complementares \n', complementares)
 
 
 def lancar_ferias(nome, depto, inicio, fim):
@@ -1642,7 +2015,7 @@ def lancar_novaaula(nomeprof, depto, nomeaula, diasemana, inicio, fim, valor):
     session.add(aula)
     session.commit()
     session.close()
-    tkinter.messagebox.showinfo('Aula Salva!', 'Aula lançada com sucesso!')
+    tkinter.messagebox.showinfo('Horário Salvo!', 'Novo horário lançado com sucesso!')
 
 
 def lancar_escala(nome, departamento, aula, data, horas):
@@ -1904,3 +2277,183 @@ def backup_bancos(bancoapp: str, bancoautomacao: str, sentido: int):
             sessionapp.close()
             tkinter.messagebox.showinfo(title='Upload ok!', message='Aulas copiadas do AutomaçãoCia para AppCia!')
 
+
+def previa_folha():
+    """
+    Email workers with a preview of payment calculations.
+    :return:
+    """
+    mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
+              '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
+
+    # deletar todos arquivos zip destinatarios
+    for arquivo_destinatario in os.listdir(pasta_dexion):
+        apagar = os.path.join(pasta_dexion, arquivo_destinatario)
+        if os.path.isfile(apagar):
+            if 'destinatario' in arquivo_destinatario:
+                os.remove(os.path.join(pasta_dexion, arquivo_destinatario))
+
+    # set up smtp connection
+    email_remetente = em_rem
+    senha = k1
+    smtp = smtplib.SMTP(host=host, port=port)
+    smtp.starttls()
+    smtp.login(email_remetente, senha)
+
+    # connect db
+    sessions = sessionmaker(engine)
+    session = sessions()
+
+    # Excel
+    excel = client.Dispatch('Excel.Application')
+    excel.visible = 0
+
+    # deletar pasta Protocolos
+    try:
+        shutil.rmtree(pasta_dexion + r'\Protocolos')
+    except FileNotFoundError:
+        pass
+
+    # descompactar arquivo do contracheque
+    caminho = pasta_dexion
+    for filename in os.listdir(caminho):
+        cam_arq = os.path.join(caminho, filename)
+        file = filename.replace('.zip', '').replace('.pdf', '')
+        filepdf = filename.replace('.zip', '.pdf')
+        if os.path.isfile(cam_arq) and filename.endswith('.zip'):
+            cam, competencia, data_pgto, matricula = cam_arq.split(',')
+            data_pgto = data_pgto.strip()
+            mes, ano = competencia.split('-')
+            mes = mes.strip()
+            ano = ano.strip()
+            matricula = matricula.replace(').zip', '')
+            matricula = int(matricula)
+            with zipfile.ZipFile(cam_arq, 'r') as zip_ref:
+                zip_ref.extract(filepdf, caminho)
+
+        # converter pdf em imagem
+        images = convert_from_path(os.path.join(caminho, filepdf))
+        for i in range(len(images)):
+            images[i].save(os.path.join(caminho, file) + '.jpg', 'JPEG')
+        os.remove(os.path.join(caminho, filepdf))
+
+        # cortar a imagem e salvar img ajustada
+        rect_size = (875, 88)
+        rect_pos = (9, 660)
+        im = Image.open(os.path.join(caminho, file + '.jpg'))
+        area = (72, 304, 1370, 1063)
+        img = im.crop(area)
+        im.close()
+        img.save(os.path.join(caminho, file + ' cortada' + '.jpg'))
+
+        # escrever na imagem cortada
+        img = Image.open(os.path.join(caminho, file + ' cortada' + '.jpg')).convert("RGBA")
+        rect = Image.new("RGBA", rect_size, (255, 255, 255, 255))
+        img.paste(rect, rect_pos)
+        f = ImageFont.truetype("arial.ttf", 150)
+        font2 = ImageFont.truetype("arial.ttf", 30)
+        txt = Image.new('L', (1000, 1400))
+        d = ImageDraw.Draw(txt)
+        d.text((0, -20), f'      PRÉVIA\n         DE\n PAGAMENTO', font=f, fill=125)
+        w = txt.rotate(20, expand=True)
+        drawing = ImageDraw.Draw(img)
+        drawing.text((9, 570), 'Esse documento não é o contracheque oficial.\nRelatório para simples conferência.', (255, 0, 0),
+                     font=font2)
+        img.paste(w, (120, -20), w)
+        imagem = img.convert('RGB')
+        img.close()
+        imagem.save(os.path.join(caminho, file + '.jpg'))
+        os.remove(os.path.join(caminho, file + ' cortada' + '.jpg'))
+
+        # # printar planilha de grade com as hrs
+        competencia = str(mes).zfill(2) + '-' + str(dt.today().year)
+        pagamento = dt.strftime(dt.strptime(data_pgto, '%d-%m-%Y'), '%d-%m-%Y')
+        planfolha = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Grades e Comissões\Grade {mes}-{ano}.xlsx'
+        pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
+        plan = excel.Workbooks.Open(planfolha)
+        folha = plan.Sheets['Planilha1']
+        # salvar linhas e colunas bases das datas de folha
+        copyrange = folha.Range('C1:AI4')
+        copyrange.CopyPicture(Format=2)
+        ImageGrab.grabclipboard().save(pasta_dexion + rf'\Grade (A - Mensal, {mes}-{ano}, {data_pgto}, {str(matricula).zfill(6)}).jpg')
+        # descobrir a linha (ou linhas) que está o nome e incluir em lista
+        linhas = []
+        plan = l_w(planfolha)
+        sh = plan['Planilha1']
+        for row in sh.iter_rows(min_row=1, min_col=2, max_row=150, max_col=2):
+            for cell in row:
+                if cell.value == pessoa.nome:
+                    linhas.append(sh.cell(row=cell.row, column=cell.column).row)
+        size = 81
+        for linha in linhas:
+            copyrange = folha.Range(f'C{linha}:AI{linha}')
+            copyrange.CopyPicture(Format=2)
+            ImageGrab.grabclipboard().save(pasta_dexion + rf"\Grade {pessoa.nome} {linha}.jpg")
+            image1 = Image.open(pasta_dexion + rf'\Grade (A - Mensal, {mes}-{ano}, {data_pgto}, {str(matricula).zfill(6)}).jpg')
+            image2 = Image.open(pasta_dexion + rf"\Grade {pessoa.nome} {linha}.jpg")
+            new_image = Image.new('RGB', (1772, 150), (250, 250, 250))
+            new_image.paste(image1, (0, 0))
+            new_image.paste(image2, (0, size))
+            new_image.save(pasta_dexion + rf'\Grade (A - Mensal, {mes}-{ano}, {data_pgto}, {str(matricula).zfill(6)}).jpg')
+            os.remove(pasta_dexion + rf"\Grade {pessoa.nome} {linha}.jpg")
+            size += 21
+        excel.Quit()
+        # apagar arquivo zip:
+        os.remove(os.path.join(caminho, filename))
+
+        # # fazer pdf com os dois prints
+        pdf = FPDF()
+        imagelist = [os.path.join(caminho, file + '.jpg'),
+                     pasta_dexion + rf'\Grade (A - Mensal, {mes}-{ano}, {data_pgto}, {str(matricula).zfill(6)}).jpg']
+        pdf.add_page()
+        pdf.image(imagelist[0], 0, 0, 200, 100)
+        pdf.image(imagelist[1], 5, 110, 255, 20)
+        pdf.output(os.path.join(caminho, f'Prévia Folha - {pessoa.nome.title()}.pdf'))
+
+        # deletar imagens
+        os.remove(os.path.join(caminho, file + '.jpg'))
+        os.remove(pasta_dexion + rf'\Grade (A - Mensal, {mes}-{ano}, {data_pgto}, {str(matricula).zfill(6)}).jpg')
+
+        # enviar arquivo pdf por e-mail
+        msg = MIMEMultipart('alternative')
+        msg['From'] = email_remetente
+        msg['To'] = pessoa.email
+        msg['Subject'] = 'Prévia de Pagamento'
+        arquivo = os.path.join(caminho, f'Prévia Folha - {pessoa.nome.title()}.pdf')
+        if pessoa.tipo_contr == 'Horista':
+            text = MIMEText(f'''Olá, {str(pessoa.nome).title().split(" ")[0]}!<br><br>
+            Segue anexo pdf com a prévia do seu pagamento do próximo mês.<br>
+            Confira todas as rubricas lançadas, o total de horas, os valores e a grade abaixo da prévia.<br>
+            As alterações na prévia podem ser feitas até o dia 25 desse mês.<br>
+            Qualquer dúvida, estou à disposição.<br><br>
+            Atenciosamente,<br>
+            <img src="cid:image1">''', 'html')
+        else:
+            text = MIMEText(f'''Olá, {str(pessoa.nome).title().split(" ")[0]}!<br><br>
+            Segue anexo pdf com a prévia do seu pagamento da folha desse mês.<br>
+            Confira o total de dias, as faltas, os valores lançados e a grade abaixo da prévia.<br>
+            As alterações na prévia podem ser feitas até o dia 25 desse mês.<br>
+            Qualquer dúvida, estou à disposição.<br><br>
+            Atenciosamente,<br>
+            <img src="cid:image1">''', 'html')
+        # set up the parameters of the message
+        msg.attach(text)
+        image = MIMEImage(
+            open(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\imgs\assinatura.png',
+                 'rb').read())
+        image.add_header('Content-ID', '<image1>')
+        msg.attach(image)
+        # attach pdf file
+        part = MIMEBase('application', "octet-stream")
+        part.set_payload(open(arquivo, "rb").read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', 'attachment',
+                        filename='Prévia de pagamento.pdf')
+        msg.attach(part)
+        smtp.sendmail(email_remetente, pessoa.email, msg.as_string())
+        del msg
+
+        # deletar todos arquivos criados e arquivo zip e da pasta do dexion
+        os.remove(os.path.join(caminho, f'Prévia Folha - {pessoa.nome.title()}.pdf'))
+    smtp.quit()
+    tkinter.messagebox.showinfo(title='Prévias enviadas!', message='Prévias da folha enviadas com sucesso!')

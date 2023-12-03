@@ -1,5 +1,5 @@
 import tkinter as tk
-from src.controler.f_folha import confirma_grade, lancar_folha_no_dexion
+from src.controler.f_folha import confirma_grade, lancar_folha_no_dexion, previa_folha
 from tkinter import ttk
 from tkinter import *
 
@@ -20,9 +20,11 @@ class MainApplication(tk.Tk):
 
         self.Frame1 = Frame1(self.notebook)
         self.Frame2 = Frame2(self.notebook)
+        self.Frame3 = Frame3(self.notebook)
 
         self.notebook.add(self.Frame1, text='Gerar Folha')
         self.notebook.add(self.Frame2, text='Lançar Folha no Dexion')
+        self.notebook.add(self.Frame3, text='Enviar Prévia da Folha')
 
         self.notebook.pack()
 
@@ -59,7 +61,22 @@ class Frame2(ttk.Frame):
         self.botaolancar.grid(column=1, row=3, padx=190, pady=1, sticky=W)
 
 
-# implementar a aba lançamento de folha
+class Frame3(ttk.Frame):
+    def __init__(self, container):
+        super().__init__()
+        self.competencia = IntVar()
+        self.competencias = list(range(1, 13))
+        # aparecer dropdown com nomes da plan
+        self.labelcomp = ttk.Label(self, width=60, text='Para enviar prévia da folha siga os passos:')
+        self.labelcomp.grid(column=1, row=1, padx=25, pady=20, sticky=W)
+        self.label1 = ttk.Label(self, width=60, text='1º - Gere os contracheques da competência no Dexion.')
+        self.label1.grid(column=1, row=2, padx=25, pady=2, sticky=W)
+        self.label2 = ttk.Label(self, width=60, text='2º - Clique em enviar prévias.')
+        self.label2.grid(column=1, row=3, padx=25, pady=2, sticky=W)
+        # gerar folha da competencia selecionada
+        self.botaolancar = ttk.Button(self, width=20, text='Enviar prévias da folha', command=lambda: [previa_folha()])
+        self.botaolancar.grid(column=1, row=4, padx=190, pady=1, sticky=W)
+
 
 if __name__ == '__main__':
     app = MainApplication()

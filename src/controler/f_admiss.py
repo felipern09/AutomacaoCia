@@ -1592,7 +1592,7 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                             matricula=matricula, nome=name.upper(), admiss=admissao,
                             nascimento=str(sh[f'D{linha}'].value),
                             cpf=str(sh[f'V{linha}'].value).replace('.', '').replace('-', '').zfill(11),
-                            rg=str(int(sh[f'W{linha}'].value)),
+                            rg=str(int(str(sh[f'W{linha}'].value).replace('.','').replace('-',''))),
                             emissor='SSP/DF', email=str(sh[f'B{linha}'].value),
                             genero=str(sh[f'E{linha}'].value),
                             estado_civil=str(sh[f'F{linha}'].value), cor='9',
