@@ -22,6 +22,7 @@ import smtplib
 from src.models.dados_servd import em_rem, em_ti, em_if, em_pnt, k1, host, port, rede, elidermusc, eliderkids, elidernat, \
     elidercross, elidergin, egerentevend, egerenterh, egerentemanut, egerentetec, lidermusc, liderkids, lidernat, lidercross,\
     lidergin, gerentevend, gerenterh, gerentemanut, gerentetec, liderpnt
+from src.controler.f_folha import lancar_novaaula
 import tkinter.filedialog
 from tkinter import messagebox
 import tkinter.filedialog
@@ -1272,7 +1273,7 @@ def apenas_registrar_estagiario(solicitar_contr=0, caminho='', editar=0, ondesto
 
 def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nome='', matricula='', admissao='',
                         cargo='', depto='', tipo_contr='Mensalista',
-                        hrsem='25', hrmens='100', agencia='', conta='', digito='', tce=''):
+                        hrsem='25', hrmens='100', agencia='', conta='', digito='', tce='', hrin='', hrf=''):
     sessions = sessionmaker(bind=engine)
     session = sessions()
     pa.FAILSAFE = False
@@ -1781,6 +1782,11 @@ def cadastro_estagiario(solicitar_contr=0, caminho='', editar=0, ondestou=0, nom
                             break
                         else:
                             t.sleep(5)
+                    lancar_novaaula(pessoa.nome, 'PNT', pessoa.depto, 'Segunda', hrin, hrf, '0')
+                    lancar_novaaula(pessoa.nome, 'PNT', pessoa.depto, 'Terça', hrin, hrf, '0')
+                    lancar_novaaula(pessoa.nome, 'PNT', pessoa.depto, 'Quarta', hrin, hrf, '0')
+                    lancar_novaaula(pessoa.nome, 'PNT', pessoa.depto, 'Quinta', hrin, hrf, '0')
+                    lancar_novaaula(pessoa.nome, 'PNT', pessoa.depto, 'Sexta', hrin, hrf, '0')
                     tkinter.messagebox.showinfo(
                         title='Cadastro ok!',
                         message='Cadastro realizado com sucesso!'

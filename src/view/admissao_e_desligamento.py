@@ -221,6 +221,8 @@ class CadastrarEst(ttk.Frame):
         self.caminhoest = StringVar()
         self.caminhotce = StringVar()
         self.nomeest = StringVar()
+        self.hrin = StringVar()
+        self.hrf = StringVar()
         self.horarioest = StringVar()
         self.cargoest = StringVar()
         self.departamentoest = StringVar()
@@ -250,6 +252,14 @@ class CadastrarEst(ttk.Frame):
         self.labeldeptoest.grid(column=1, row=19, padx=25, pady=1, sticky=W)
         self.combodeptoest = ttk.Combobox(self, values=departamentos, textvariable=self.departamentoest, width=50)
         self.combodeptoest.grid(column=1, row=19, padx=125, pady=1, sticky=W)
+        self.labelhorario = ttk.Label(self, width=20, text="Horários:")
+        self.labelhorario.grid(column=1, row=20, padx=25, pady=1, sticky=W)
+        self.entryhrin = ttk.Entry(self, width=10, textvariable=self.hrin)
+        self.entryhrin.grid(column=1, row=20, padx=125, pady=1, sticky=W)
+        self.labelhorario = ttk.Label(self, width=20, text="até")
+        self.labelhorario.grid(column=1, row=20, padx=205, pady=1, sticky=W)
+        self.entryhrf = ttk.Entry(self, width=10, textvariable=self.hrf)
+        self.entryhrf.grid(column=1, row=20, padx=240, pady=1, sticky=W)
         self.agenciaest = StringVar()
         self.contaest = StringVar()
         self.digitoest = StringVar()
@@ -295,7 +305,9 @@ class CadastrarEst(ttk.Frame):
                                                     self.agenciaest.get(),
                                                     self.contaest.get(),
                                                     self.digitoest.get(),
-                                                    self.caminhotce.get()
+                                                    self.caminhotce.get(),
+                                                    self.hrin.get(),
+                                                    self.hrf.get()
                                                 )
                                             ]
                                             )
