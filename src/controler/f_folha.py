@@ -1908,7 +1908,7 @@ def lancar_ferias(nome, depto, inicio, fim):
     session = sessions()
     sessionscol = sessionmaker(bind=engine)
     sessioncol = sessionscol()
-    pessoa = sessioncol.query(Colaborador).filter_by(nome=nome).first()
+    pessoa = sessioncol.query(Colaborador).filter_by(nome=nome).order_by(Colaborador.matricula.desc()).first()
     matricula = pessoa.matricula
 
     fer = Ferias(professor=nome, matrprof=matricula, departamento=depto, inicio=inicio, fim=fim)
@@ -1924,7 +1924,7 @@ def lancar_atestado(nome, depto, data):
     sessionscol = sessionmaker(bind=engine)
     sessioncol = sessionscol()
 
-    professor = sessioncol.query(Colaborador).filter_by(nome=nome).first()
+    professor = sessioncol.query(Colaborador).filter_by(nome=nome).order_by(Colaborador.matricula.desc()).first()
     matricula = professor.matricula
 
     atest = Atestado(professor=nome, matrprof=matricula, departamento=depto, data=data)
@@ -1941,7 +1941,7 @@ def lancar_desligamento(nome, depto, data):
     sessionscol = sessionmaker(bind=engine)
     sessioncol = sessionscol()
 
-    professor = sessioncol.query(Colaborador).filter_by(nome=nome).first()
+    professor = sessioncol.query(Colaborador).filter_by(nome=nome).order_by(Colaborador.matricula.desc()).first()
     matricula = professor.matricula
 
     deslig = Desligados(professor=nome, matrprof=matricula, departamento=depto, datadesligamento=data)
@@ -1956,9 +1956,9 @@ def lancar_desligamento(nome, depto, data):
 def lancar_substit(substituido, substituto, departamento, aula, data, horas):
     sessionscol = sessionmaker(bind=engine)
     sessioncol = sessionscol()
-    profsubstituido = sessioncol.query(Colaborador).filter_by(nome=substituido).first()
+    profsubstituido = sessioncol.query(Colaborador).filter_by(nome=substituido).order_by(Colaborador.matricula.desc()).first()
     matrsubsido = profsubstituido.matricula
-    profsubstituto = sessioncol.query(Colaborador).filter_by(nome=substituto).first()
+    profsubstituto = sessioncol.query(Colaborador).filter_by(nome=substituto).order_by(Colaborador.matricula.desc()).first()
     matrsubstuto = profsubstituto.matricula
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
@@ -1974,7 +1974,7 @@ def lancar_substit(substituido, substituto, departamento, aula, data, horas):
 def lancar_hrscomple(nome, departamento, aula, data, horas):
     sessionscol = sessionmaker(bind=engine)
     sessioncol = sessionscol()
-    pessoa = sessioncol.query(Colaborador).filter_by(nome=nome).first()
+    pessoa = sessioncol.query(Colaborador).filter_by(nome=nome).order_by(Colaborador.matricula.desc()).first()
     matricula = pessoa.matricula
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
@@ -1990,7 +1990,7 @@ def lancar_faltas(nome, depto, data, hrs):
     session = sessions()
     sessionscol = sessionmaker(bind=engine)
     sessioncol = sessionscol()
-    pessoa = sessioncol.query(Colaborador).filter_by(nome=nome).first()
+    pessoa = sessioncol.query(Colaborador).filter_by(nome=nome).order_by(Colaborador.matricula.desc()).first()
     matricula = pessoa.matricula
 
     falt = Faltas(professor=nome, matrprof=matricula, departamento=depto, data=data, horas=hrs)
@@ -2007,7 +2007,7 @@ def lancar_novaaula(nomeprof, depto, nomeaula, diasemana, inicio, fim, valor):
     fim = fim + ':00'
     sessionscol = sessionmaker(bind=engine)
     sessioncol = sessionscol()
-    pessoa = sessioncol.query(Colaborador).filter_by(nome=nomeprof).first()
+    pessoa = sessioncol.query(Colaborador).filter_by(nome=nomeprof).order_by(Colaborador.matricula.desc()).first()
     matricula = pessoa.matricula
     hj = dt.today()
     aula = Aulas(nome=nomeaula, professor=nomeprof, departamento=depto, diadasemana=diasemana, inicio=inicio,
@@ -2021,7 +2021,7 @@ def lancar_novaaula(nomeprof, depto, nomeaula, diasemana, inicio, fim, valor):
 def lancar_escala(nome, departamento, aula, data, horas):
     sessionscol = sessionmaker(bind=engine)
     sessioncol = sessionscol()
-    pessoa = sessioncol.query(Colaborador).filter_by(nome=nome).first()
+    pessoa = sessioncol.query(Colaborador).filter_by(nome=nome).order_by(Colaborador.matricula.desc()).first()
     matricula = pessoa.matricula
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
@@ -2369,7 +2369,7 @@ def previa_folha():
         competencia = str(mes).zfill(2) + '-' + str(dt.today().year)
         pagamento = dt.strftime(dt.strptime(data_pgto, '%d-%m-%Y'), '%d-%m-%Y')
         planfolha = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Grades e Comissões\Grade {mes}-{ano}.xlsx'
-        pessoa = session.query(Colaborador).filter_by(matricula=matricula).first()
+        pessoa = session.query(Colaborador).filter_by(matricula=matricula).order_by(Colaborador.matricula.desc()).first()
         plan = excel.Workbooks.Open(planfolha)
         folha = plan.Sheets['Planilha1']
         # salvar linhas e colunas bases das datas de folha

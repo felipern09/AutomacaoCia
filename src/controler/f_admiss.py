@@ -962,7 +962,7 @@ def enviar_emails_contratacao(caminho: str, nome: str, departamento: str, cargo:
         p_pessoa = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
                    r'\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}'.format(nome)
         p_atestado = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
-                     r'\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Atestado'.format(nome)
+                     r'\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Atestados'.format(nome)
         p_contr = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \
                   r'\000 - Pastas Funcionais\00 - ATIVOS\1 - Ainda nao iniciaram\{}\Contratuais'.format(nome)
         p_diversos = r'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\02 - Funcionários, Departamentos e Férias' \

@@ -40,8 +40,8 @@ class Salvar(ttk.Frame):
         self.labeldescr.grid(column=1, row=1, padx=10, pady=5, sticky=W)
         self.labeldescr1 = ttk.Label(self, width=100,
                                     text="1º - Gerar Contracheques no Dexion (procedimentos automat.)"
-                                         "\n2º - Salvar Contracheques Nas Pastas Pessoais"
-                                         "\n3º - Anexar Grades"
+                                         "\n2º - Salvar Contracheques (botão 'Salvar' dessa aba)"
+                                         "\n3º - Anexar Grades (aba seguinte)"
                                          "\n4º - Enviar Contracheques Pelo Dexion")
         self.labeldescr1.grid(column=1, row=2, padx=10, pady=8, sticky=W)
         # aparecer dropdown com nomes da plan
