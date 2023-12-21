@@ -804,31 +804,60 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str, estag: int):
         ponto.tables[1].rows[0].cells[6].paragraphs[0].alignment = 1
 
         y = len(fl['A']) + 1
-        fl[f'A{y}'].value = planbase[str(matricula)]
-        fl[f'B{y}'].value = total_horas
-        pl.save(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Hrs Folha.xlsx')
-
-        ponto.add_paragraph(f'Total de dias trabalhados: {dias}', 'Default').alignment = 2
-        ponto.add_paragraph('', 'Normal')
-        ponto.add_paragraph('', 'Normal')
-        ponto.add_paragraph('______________________________________________', 'Normal').alignment = 1
-        ponto.add_paragraph(f'{planbase[str(matricula)]}', 'Normal').alignment = 1
         try:
-            ponto.save(rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
-            docx2pdf.convert(
-                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx',
-                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.pdf')
-            os.remove(
-                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
-        except FileNotFoundError:
-            os.makedirs(
-                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}')
-            ponto.save(rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
-            docx2pdf.convert(
-                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx',
-                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.pdf')
-            os.remove(
-                rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
+            fl[f'A{y}'].value = planbase[str(matricula)]
+            fl[f'B{y}'].value = total_horas
+            pl.save(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Hrs Folha.xlsx')
+    
+            ponto.add_paragraph(f'Total de dias trabalhados: {dias}', 'Default').alignment = 2
+            ponto.add_paragraph('', 'Normal')
+            ponto.add_paragraph('', 'Normal')
+            ponto.add_paragraph('______________________________________________', 'Normal').alignment = 1
+            ponto.add_paragraph(f'{planbase[str(matricula)]}', 'Normal').alignment = 1
+            try:
+                ponto.save(rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
+                docx2pdf.convert(
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx',
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.pdf')
+                os.remove(
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
+            except FileNotFoundError:
+                os.makedirs(
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}')
+                ponto.save(rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
+                docx2pdf.convert(
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx',
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.pdf')
+                os.remove(
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {planbase[str(matricula)]}.docx')
+        except KeyError:
+            fl[f'A{y}'].value = str(matricula)
+            fl[f'B{y}'].value = total_horas
+            pl.save(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Hrs Folha.xlsx')
+
+            ponto.add_paragraph(f'Total de dias trabalhados: {dias}', 'Default').alignment = 2
+            ponto.add_paragraph('', 'Normal')
+            ponto.add_paragraph('', 'Normal')
+            ponto.add_paragraph('______________________________________________', 'Normal').alignment = 1
+            ponto.add_paragraph(f'{str(matricula)}', 'Normal').alignment = 1
+            try:
+                ponto.save(
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {str(matricula)}.docx')
+                docx2pdf.convert(
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {str(matricula)}.docx',
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {str(matricula)}.pdf')
+                os.remove(
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {str(matricula)}.docx')
+            except FileNotFoundError:
+                os.makedirs(
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}')
+                ponto.save(
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {str(matricula)}.docx')
+                docx2pdf.convert(
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {str(matricula)}.docx',
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {str(matricula)}.pdf')
+                os.remove(
+                    rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {str(matricula)}.docx')
 
 
 def cadastrar_no_ponto(nome, altera, matrpt=''):

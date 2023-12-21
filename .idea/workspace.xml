@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="0d245823-4f07-4137-8b0a-0288354f51fd" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/view/emitir_contrachques.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/view/emitir_contrachques.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/controler/f_ponto.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/controler/f_ponto.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,10 +162,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.00_janela_principal" />
+        <item itemvalue="Python.cadastrar_bancoColaborador" />
+        <item itemvalue="Python.testes_diversos" />
         <item itemvalue="Python.alterar_bancoAulas" />
         <item itemvalue="Python.alteracoes_folha" />
-        <item itemvalue="Python.testes_diversos" />
-        <item itemvalue="Python.cadastrar_bancoColaborador" />
       </list>
     </recent_temporary>
   </component>
