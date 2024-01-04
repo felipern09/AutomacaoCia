@@ -77,17 +77,20 @@ def confirma_folha(comp: int):
         lancar_folha_no_dexion(comp)
 
 
-def confirma_grade(comp: int):
+def confirma_grade(comp: str):
     """
     Confirm that the user wnats to proceed with procedures to register the payroll.
     :param comp: Month reference to payroll calculate.
     :return: Call function salvar_planilha_soma_final().
     """
+    dia, mes, ano = comp.split('/')
+    mes = int(mes)
+    ano = int(ano)
     r = messagebox.askyesno(title='Tem certeza?',
-                            message=f'Tem certeza que deseja gerar a folha do mês {comp}?\n'
+                            message=f'Tem certeza que deseja gerar a folha do mês {mes}/{ano}?\n'
                                     f'Essa ação irá sobrepor qualquer arquivo de folha já salvo na pasta dessa competência.')
     if r:
-        salvar_planilha_soma_final(comp)
+        salvar_planilha_soma_final(mes, ano)
 
 
 def lancar_folha_no_dexion(competencia):
@@ -413,13 +416,13 @@ def somar_horas_professor(folha: Folha, prof: str, depto: str, nome: str, compet
     return somahoras
 
 
-def consultar_faltas(comp) -> dict:
+def consultar_faltas(comp, ano) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     falt = session.query(Faltas).all()
-    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
-                year=dt.today().year)
-    fim = dt(day=20, month=comp, year=dt.today().year)
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).month,
+                year=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).year)
+    fim = dt(day=20, month=comp, year=ano)
     dic = {}
     for f in falt:
         if inicio <= dt.strptime(f.data, '%d/%m/%Y') <= fim:
@@ -433,13 +436,13 @@ def consultar_faltas(comp) -> dict:
     return dic
 
 
-def consultar_ferias(comp) -> dict:
+def consultar_ferias(comp, ano) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     fer = session.query(Ferias).all()
-    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
-                year=dt.today().year)
-    fim = dt(day=20, month=comp, year=dt.today().year)
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).month,
+                year=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).year)
+    fim = dt(day=20, month=comp, year=ano)
     dic = {}
     for f in fer:
         if inicio <= dt.strptime(f.inicio, '%d/%m/%Y') <= fim:
@@ -460,13 +463,13 @@ def consultar_ferias(comp) -> dict:
     return dic
 
 
-def consultar_atestados(comp) -> dict:
+def consultar_atestados(comp, ano) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     ates = session.query(Atestado).all()
-    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
-                year=dt.today().year)
-    fim = dt(day=20, month=comp, year=dt.today().year)
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).month,
+                year=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).year)
+    fim = dt(day=20, month=comp, year=ano)
     dic = {}
     for a in ates:
         if inicio <= dt.strptime(a.data, '%d/%m/%Y') <= fim:
@@ -480,10 +483,10 @@ def consultar_atestados(comp) -> dict:
     return dic
 
 
-def listar_feriados(comp: int) -> list:
-    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
-                year=dt.today().year)
-    fim = dt(day=20, month=comp, year=dt.today().year)
+def listar_feriados(comp: int, ano) -> list:
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).month,
+                year=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).year)
+    fim = dt(day=20, month=comp, year=ano)
     # Get the Bank Holidays for the given country
     feriados = holidays.country_holidays('BR')
     # Create a list of dates between the start and end date
@@ -493,13 +496,13 @@ def listar_feriados(comp: int) -> list:
     return feriados_nacionais
 
 
-def consultar_substituicoes(comp: int) -> dict:
+def consultar_substituicoes(comp: int, ano) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     subst = session.query(Substituicao).all()
-    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
-                year=dt.today().year)
-    fim = dt(day=20, month=comp, year=dt.today().year)
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).month,
+                year=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).year)
+    fim = dt(day=20, month=comp, year=ano)
     dic = {}
     for s in subst:
         if inicio <= dt.strptime(s.data, '%d/%m/%Y') <= fim:
@@ -508,13 +511,13 @@ def consultar_substituicoes(comp: int) -> dict:
     return dic
 
 
-def consultar_desligamentos(comp: int) -> dict:
+def consultar_desligamentos(comp: int, ano) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     desl = session.query(Desligados).all()
-    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
-                year=dt.today().year)
-    fim = dt(day=20, month=comp, year=dt.today().year)
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).month,
+                year=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).year)
+    fim = dt(day=20, month=comp, year=ano)
     dic = {}
     for d in desl:
         if inicio <= dt.strptime(d.datadesligamento, '%d/%m/%Y') <= fim:
@@ -528,13 +531,13 @@ def consultar_desligamentos(comp: int) -> dict:
     return dic
 
 
-def consultar_escalas(comp: int) -> dict:
+def consultar_escalas(comp: int, ano) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     esc = session.query(Escala).all()
-    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
-                year=dt.today().year)
-    fim = dt(day=20, month=comp, year=dt.today().year)
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).month,
+                year=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).year)
+    fim = dt(day=20, month=comp, year=ano)
     dic = {}
     for e in esc:
         if inicio <= dt.strptime(e.data, '%d/%m/%Y') <= fim:
@@ -548,13 +551,13 @@ def consultar_escalas(comp: int) -> dict:
     return dic
 
 
-def consultar_horas_complementares(comp: int) -> dict:
+def consultar_horas_complementares(comp: int, ano) -> dict:
     sessions = sessionmaker(bind=enginefolha)
     session = sessions()
     hrsc = session.query(Hrcomplement).all()
-    inicio = dt(day=21, month=(dt(day=1, month=comp, year=dt.today().year) - relativedelta(months=1)).month,
-                year=dt.today().year)
-    fim = dt(day=20, month=comp, year=dt.today().year)
+    inicio = dt(day=21, month=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).month,
+                year=(dt(day=1, month=comp, year=ano) - relativedelta(months=1)).year)
+    fim = dt(day=20, month=comp, year=ano)
     dic = {}
     for h in hrsc:
         if inicio <= dt.strptime(h.data, '%d/%m/%Y') <= fim:
@@ -568,10 +571,10 @@ def consultar_horas_complementares(comp: int) -> dict:
     return dic
 
 
-def salvar_planilha_grade_horaria(dic: dict, comp: int):
+def salvar_planilha_grade_horaria(dic: dict, comp: int, an: int):
     hj = dt.today()
     mes = str(comp).zfill(2)
-    ano = hj.year
+    ano = an
     mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
               '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
     pasta_pgto = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Grades e Comissões'
@@ -579,15 +582,15 @@ def salvar_planilha_grade_horaria(dic: dict, comp: int):
     grd = os.path.relpath(rf'C:\Users\{os.getlogin()}\PycharmProjects\AutomacaoCia\src\models\static\files\Grade.xlsx')
     grade = l_w(grd, read_only=False)
     plan1 = grade['Planilha1']
-    flt = consultar_faltas(comp)
-    subs = consultar_substituicoes(comp)
-    dslg = consultar_desligamentos(comp)
-    fer = consultar_ferias(comp)
-    complem = consultar_horas_complementares(comp)
-    atest = consultar_atestados(comp)
-    feriad = listar_feriados(comp)
-    escal = consultar_escalas(comp)
-    competencia = dt(day=10, month=comp, year=dt.today().year)
+    flt = consultar_faltas(comp, an)
+    subs = consultar_substituicoes(comp, an)
+    dslg = consultar_desligamentos(comp, an)
+    fer = consultar_ferias(comp, an)
+    complem = consultar_horas_complementares(comp, an)
+    atest = consultar_atestados(comp, an)
+    feriad = listar_feriados(comp, an)
+    escal = consultar_escalas(comp, an)
+    competencia = dt(day=10, month=comp, year=an)
     inicio = dt(day=21, month=(competencia - relativedelta(months=1)).month,
                 year=(competencia - relativedelta(months=1)).year)
     fechamento = dt(day=20, month=competencia.month, year=competencia.year)
@@ -1703,10 +1706,9 @@ def somar_aulas_de_domingo(diaplan: str, nome: str, depto: str) -> float:
     return somas * 2
 
 
-def salvar_planilha_soma_final(compet: int):
-    hj = dt.today()
+def salvar_planilha_soma_final(compet: int, year: int):
     mes = str(compet).zfill(2)
-    ano = hj.year
+    ano = year
     mesext = {'01': 'JAN', '02': 'FEV', '03': 'MAR', '04': 'ABR', '05': 'MAI', '06': 'JUN',
               '07': 'JUL', '08': 'AGO', '09': 'SET', '10': 'OUT', '11': 'NOV', '12': 'DEZ'}
     pasta_pgto = rf'\\192.168.0.250\rh\01 - RH\01 - Administração.Controles\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Grades e Comissões'
@@ -1751,12 +1753,12 @@ def salvar_planilha_soma_final(compet: int):
                     folha[f'D{x}'].value = float(str(somafinal[i][sub][sub2]))
                     x += 1
     plan.save(pasta_pgto + f'\\Somafinal mes {compet}.xlsx')
-    salvar_planilha_grade_horaria(somafinal, compet)
+    salvar_planilha_grade_horaria(somafinal, compet, ano)
     substitutos = {}
     complementares = {}
     feriasl = {}
     desligadosl = {}
-    planilha = l_w(pasta_pgto + f'\\Grade {compet}-2023.xlsx')
+    planilha = l_w(pasta_pgto + f'\\Grade {compet}-{ano}.xlsx')
     aba = planilha['Planilha1']
     for row in aba.iter_cols(min_row=3, min_col=3, max_row=150, max_col=35):
         for cell in row:

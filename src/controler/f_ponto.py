@@ -18,7 +18,7 @@ from src.models.dados_servd import rede
 import tkinter.filedialog
 from tkinter import messagebox
 import tkinter.filedialog
-import time as t
+import time
 import win32com.client as client
 
 locale.setlocale(locale.LC_MONETARY, 'pt_BR.UTF-8')
@@ -551,7 +551,7 @@ def cadastrar_funcionario_no_secullum():
         depto = str(sh[f'E{x}'].value)
         admiss = str(sh[f'F{x}'].value)
         # # clicar incluir
-        pa.click(-1507, 147), t.sleep(3)
+        pa.click(-1507, 147), time.sleep(3)
         pa.write(matricula), pa.press('tab')
         pp.copy(nome), pa.hotkey('ctrl', 'v'), pa.press('tab')
         pa.write(pis), pa.press('tab', 4)
@@ -561,7 +561,7 @@ def cadastrar_funcionario_no_secullum():
         pa.write(admiss)
         # click concluir
         pa.click(-1492, 617)
-        t.sleep(2)
+        time.sleep(2)
         x += 1
 
 
@@ -858,6 +858,13 @@ def gerar_relatorios_ponto_pdf(arq: str, datai: str, dataf: str, estag: int):
                     rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {str(matricula)}.pdf')
                 os.remove(
                     rede + rf'\04 - Folha de Pgto\{ano}\{mes} - {mesext[mes]}\Relatórios de Ponto\{dataipt} a {datafpt}\Ponto {str(matricula)}.docx')
+    while 1:
+        if pa.locateOnScreen('../models/static/imgs/pyt.png'):
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/pyt.png')))
+            break
+        else:
+            time.sleep(5)
+    tkinter.messagebox.showinfo(title='Relatórios ok!', message='Relatórios de ponto salvos com sucesso!')
 
 
 def cadastrar_no_ponto(nome, altera, matrpt=''):
@@ -868,11 +875,11 @@ def cadastrar_no_ponto(nome, altera, matrpt=''):
     pessoa = session.query(Colaborador).filter_by(nome=nome).order_by(Colaborador.matricula.desc()).first()
     if altera == 0:
         if 'ESTAG' in pessoa.cargo:
-            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/controlid.png'))), t.sleep(0.5)
-            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/novofunc.png'))), t.sleep(0.5)
-            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/adcusuario.png'))), t.sleep(0.5)
-            pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(str(pessoa.matricula)), t.sleep(0.5)
-            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okponto.png'))), t.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/controlid.png'))), time.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/novofunc.png'))), time.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/adcusuario.png'))), time.sleep(0.5)
+            pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(str(pessoa.matricula)), time.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okponto.png'))), time.sleep(0.5)
             pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okconfirmaponto.png')))
             estag = BasePonto(nome=pessoa.nome, matricula=pessoa.matricula, pis=pessoa.pis,
                               matrponto=pessoa.matricula, email=pessoa.email, cargo=pessoa.cargo,
@@ -880,10 +887,10 @@ def cadastrar_no_ponto(nome, altera, matrpt=''):
             sessionpt.add(estag)
             sessionpt.commit()
         else:
-            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/controlid.png'))), t.sleep(0.5)
-            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/novofunc.png'))), t.sleep(0.5)
-            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/adcusuario.png'))), t.sleep(0.5)
-            pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(str(pessoa.pis)), t.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/controlid.png'))), time.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/novofunc.png'))), time.sleep(0.5)
+            pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/adcusuario.png'))), time.sleep(0.5)
+            pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(str(pessoa.pis)), time.sleep(0.5)
             pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okponto.png')))
             func = BasePonto(nome=pessoa.nome, matricula=pessoa.matricula, pis=pessoa.pis,
                               matrponto=pessoa.pis, email=pessoa.email, cargo=pessoa.cargo,
@@ -892,11 +899,11 @@ def cadastrar_no_ponto(nome, altera, matrpt=''):
             sessionpt.commit()
 
     else:
-        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/controlid.png'))), t.sleep(0.5)
-        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/novofunc.png'))), t.sleep(0.5)
-        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/adcusuario.png'))), t.sleep(0.5)
-        pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(str(matrpt)), t.sleep(0.5)
-        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okponto.png'))), t.sleep(0.5)
+        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/controlid.png'))), time.sleep(0.5)
+        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/novofunc.png'))), time.sleep(0.5)
+        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/adcusuario.png'))), time.sleep(0.5)
+        pp.copy(pessoa.nome), pa.hotkey('ctrl', 'v'), pa.press('tab'), pa.write(str(matrpt)), time.sleep(0.5)
+        pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okponto.png'))), time.sleep(0.5)
         pa.click(pa.center(pa.locateOnScreen('../models/static/imgs/okconfirmaponto.png')))
         estag = BasePonto(nome=pessoa.nome, matricula=pessoa.matricula, pis=pessoa.pis,
                           matrponto=matrpt, email=pessoa.email, cargo=pessoa.cargo,
