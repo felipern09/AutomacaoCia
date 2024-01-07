@@ -1,6 +1,6 @@
 import datetime
 import tkinter as tk
-from src.controler.f_folha import confirma_grade, lancar_folha_no_dexion, previa_folha
+from src.controler.f_folha import confirma_grade, confirma_folha, previa_folha
 from tkcalendar import DateEntry
 from tkinter import ttk
 from tkinter import *
@@ -50,16 +50,18 @@ class Frame1(ttk.Frame):
 class Frame2(ttk.Frame):
     def __init__(self, container):
         super().__init__()
+        self.hoje = datetime.datetime.today()
         self.competencia = IntVar()
         self.competencias = list(range(1, 13))
         # aparecer dropdown com nomes da plan
         self.labelcomp = ttk.Label(self, width=60, text="Escolha a competência da folha: ")
         self.labelcomp.grid(column=1, row=1, padx=25, pady=50, sticky=W)
-        self.combocomp = ttk.Combobox(self, values=self.competencias, textvariable=self.competencia, width=15)
-        self.combocomp.grid(column=1, row=1, padx=205, pady=50, sticky=W)
+        self.entrydtfolha = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month,
+                                        day=self.hoje.day, locale='pt_BR')
+        self.entrydtfolha.grid(column=1, row=1, padx=205, pady=50, sticky=W)
         # gerar folha da competencia selecionada
         self.botaolancar = ttk.Button(self, width=20, text="Lançar folha no Dexion",
-                                      command=lambda: [lancar_folha_no_dexion(self.competencia.get())])
+                                      command=lambda: [confirma_folha(self.entrydtfolha.get())])
         self.botaolancar.grid(column=1, row=3, padx=190, pady=1, sticky=W)
 
 

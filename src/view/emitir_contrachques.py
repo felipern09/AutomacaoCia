@@ -70,7 +70,8 @@ class AnexarGrade(ttk.Frame):
         # selecionar competencia
         self.labelcompet = ttk.Label(self, width=40, text="Competência:")
         self.labelcompet.grid(column=1, row=3, padx=10, pady=2, sticky=W)
-        self.competencia = ttk.Combobox(self, width=15, values=self.comp)
+        self.competencia = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month,
+                                     day=self.hoje.day, locale='pt_BR')
         self.competencia.grid(column=1, row=3, padx=col2, pady=2, sticky=W)
         # selecionar data do pagamento
         self.labeldt = ttk.Label(self, width=60, text="Data do pgto:")
@@ -81,7 +82,7 @@ class AnexarGrade(ttk.Frame):
 
         # gerar folha da competencia selecionada
         self.botaogerar = ttk.Button(self, text="Anexar", command=lambda: [
-            incluir_grade_email_holerite(self.folha.get(), int(self.competencia.get()), self.pagamento.get())])
+            incluir_grade_email_holerite(self.folha.get(), self.competencia.get(), self.pagamento.get())])
         self.botaogerar.grid(column=1, row=11, padx=210, pady=1, sticky=W)
 
     def selecionar_folha(self):

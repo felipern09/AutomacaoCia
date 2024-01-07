@@ -504,6 +504,13 @@ class NovaAula(ttk.Frame):
         # combo Dias
         self.combodias = ttk.Combobox(self, width=17, values=self.dias)
         self.combodias.grid(column=1, row=7, padx=95, pady=2, sticky=W)
+        # Label inic
+        self.labelinicg = ttk.Label(self, width=20, text='Data de início:')
+        self.labelinicg.grid(column=1, row=7, padx=245, pady=2, sticky=W)
+        # inicio grade
+        self.iniciogrd = DateEntry(self, selectmode='day', year=self.hoje.year, month=self.hoje.month,
+                                     day=self.hoje.day, locale='pt_BR')
+        self.iniciogrd.grid(column=1, row=7, padx=350, pady=1, sticky=W)
         # Inicio
         self.labeliniciohr = ttk.Label(self, width=20, text='Início:')
         self.labeliniciohr.grid(column=1, row=8, padx=5, pady=2, sticky=W)
@@ -526,7 +533,7 @@ class NovaAula(ttk.Frame):
         self.botaogerar = ttk.Button(self, width=20, text="Lançar Novo Horário", command=lambda: [
             lancar_novaaula(self.combonome.get(), self.combodepto.get(), self.comboaula.get(),
                             self.combodias.get(), self.entryiniciohr.get(), self.entryfimhr.get(),
-                            self.entryvalor.get())])
+                            self.entryvalor.get(), self.iniciogrd.get())])
         self.botaogerar.grid(column=1, row=30, padx=190, pady=1, sticky=W)
         self.botaosalvar = ttk.Button(self, width=20, text="Salvar Banco de Hrs", command=lambda: [
             salvar_banco_aulas()])

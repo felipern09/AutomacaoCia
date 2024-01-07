@@ -48,8 +48,9 @@ def salvar_holerites():
     tkinter.messagebox.showinfo('Contracheques Salvos!', 'Contracheques salvos com sucesso!')
 
 
-def incluir_grade_email_holerite(planfolha: str, comp: int, pgto: str):
-    competencia = str(comp).zfill(2) + '-' + str(dt.today().year)
+def incluir_grade_email_holerite(planfolha: str, comp: str, pgto: str):
+    dia, mes, ano = comp.split('/')
+    competencia = str(mes).zfill(2) + '-' + str(ano)
     pagamento = dt.strftime(dt.strptime(pgto, '%d/%m/%Y'), '%d-%m-%Y')
     pst_dexion = r'\\192.168.0.234\Dexion\Logistica\000001\Folha'
 
